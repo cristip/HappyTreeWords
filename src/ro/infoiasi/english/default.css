@@ -2,3 +2,33 @@
 @namespace s "library://ns.adobe.com/flex/spark";
 @namespace mx "library://ns.adobe.com/flex/mx";
 
+#startScreen
+{
+	skin-class: ClassReference("ro.infoiasi.english.skins.StartScreenSkin");
+}
+
+#startGameTitle
+{
+	color: #ffffff;
+	font-size: 40;
+	font-family:Englebert;
+}
+#gameScreen
+{
+	skin-class: ClassReference("ro.infoiasi.english.skins.StartScreenSkin");
+}
+mx|LinkButton
+{
+	color: #ffffff;
+	font-size: 20;
+	font-family:Englebert;
+}
+
+@font-face { 
+	src: url("../../../assets/Englebert-Regular.ttf"); 
+	fontFamily: Englebert; 
+	fontStyle: normal;
+	fontWeight: normal;
+	embedAsCFF:true;
+	advancedAntiAliasing: true;
+}
