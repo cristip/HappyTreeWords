@@ -11,10 +11,24 @@
 		<![CDATA[
 			import flash.net.navigateToURL;
 			
+			import mx.controls.Alert;
+			import mx.core.DragSource;
+			import mx.core.UIComponent;
 			import mx.events.FlexEvent;
+			import mx.managers.DragManager;
+			
+			import ro.infoiasi.english.model.WordVO;
+			import ro.infoiasi.english.utils.GameUtils;
+			import ro.infoiasi.english.view.WordPiece;
 			
 			
 			private var xloader:URLLoader;
+			[Bindable]
+			private var currentLevelWordsCount:int=-1;
+			[Bindable]
+			private var currentScore:int;
+			[Bindable]
+			private var currentGameLevel:int;
 			[Bindable] public var xData:XML;
 			
 			protected function getHelpBtn_clickHandler(event:MouseEvent):void
@@ -33,11 +47,18 @@
 			protected function startGameBtn_clickHandler(event:MouseEvent):void
 			{
 				currentState="game";
+				startGame();
 			}
+			
+			
+			
 			
 			protected function onXDataProgress(event:ProgressEvent):void
 			{
-				progressBar.setProgress(Math.round(event.bytesLoaded/event.bytesTotal*100), 100);
+				if(progressBar)
+				{
+					progressBar.setProgress(Math.round(event.bytesLoaded/event.bytesTotal*100), 100);
+				}
 			}
 			protected function onXDataComplete(event:Event):void
 			{
@@ -54,10 +75,134 @@
 				xloader.dataFormat = URLLoaderDataFormat.TEXT;
 				xloader.addEventListener(ProgressEvent.PROGRESS, onXDataProgress);
 				xloader.addEventListener(Event.COMPLETE, onXDataComplete);
+				xloader.addEventListener(IOErrorEvent.IO_ERROR, onXIOError);
 				xloader.load(request);
 			}
 			
 
+			protected function onXIOError(event:IOErrorEvent):void
+			{
+				navigateToURL(new URLRequest("javascript:document.location.reload()"));
+			}
+			
+			private function startGame():void
+			{
+				this.currentScore = 0;
+				this.currentGameLevel = 0;
+				playLevel();
+			}
+			
+			private function playLevel():void
+			{
+				
+				dragTargets.removeAllElements();
+				dropTargets.removeAllElements();
+				droppedItems.removeAllElements();
+				
+				var words:Vector.<WordVO> = new Vector.<WordVO>();
+				var structure:WordVO = GameUtils.createPhrase(currentGameLevel, xData, words);
+				this.currentLevelWordsCount = words.length;
+				var i:int;
+				for(i = 0; i < currentLevelWordsCount; i++)
+				{
+					var wordp:WordPiece = new WordPiece();
+					wordp.wordValue = words[i];
+					wordp.addEventListener(MouseEvent.MOUSE_OVER, onWordMouseMove);
+					wordp.addEventListener(MouseEvent.MOUSE_DOWN, onWordMouseDown);
+					wordp.addEventListener(MouseEvent.MOUSE_UP, onWordMouseUp);
+					dragTargets.addElement(wordp);
+					wordp.text = words[i].form;
+					wordp.isBlank = false;
+					
+				}
+				
+				
+				
+				drawTree(structure, 0);
+				
+				callLater(function():void{
+				words[0].ui.x = 0;
+				
+				for(i = 1; i < currentLevelWordsCount; i++)
+				{
+					words[i].ui.x = words[i-1].ui.x + words[i-1].ui.width + 10;  
+				}
+				});
+			}
+			private function drawTree(structure:WordVO, level:int):void
+			{
+				var wordp:WordPiece = new WordPiece();
+				dropTargets.addElement(wordp);
+				wordp.text = structure.form;
+				wordp.wordValue = structure;
+				wordp.isBlank = true;
+				structure.ui = wordp;
+				structure.level = level;
+				wordp.y = 35*level;
+				
+				if(structure.children.length > 0)
+				{
+					for(var i:int = 0; i < structure.children.length; i++)
+					{
+						drawTree(structure.children[i], level+1);
+					}
+				}
+			}
+			
+			
+			protected function onWordMouseMove(event:MouseEvent):void
+			{
+				
+				
+			}
+			
+			protected function onWordMouseDown(event:MouseEvent):void
+			{
+				var word:WordPiece = WordPiece(event.currentTarget);
+				droppedItems.addElement(word);
+				currentLevelWordsCount = Math.max(--currentLevelWordsCount, 0) ;
+				word.startDrag(false, new Rectangle(0, 0, 490, 430));
+			}
+			
+			protected function onWordMouseUp(event:MouseEvent):void
+			{
+				var word:WordPiece = WordPiece(event.currentTarget);
+				word.stopDrag();
+				for(var i:int = 0; i < dropTargets.numElements; i++)
+				{
+					var targetWord:DisplayObject = dropTargets.getElementAt(i) as DisplayObject;
+					if(word.hitTestObject(targetWord))
+					{
+						var point:Point = new Point(targetWord.x, targetWord.y);
+						var gPoint:Point = dropTargets.localToGlobal(point);
+						var lPoint:Point = dragTargets.globalToLocal(gPoint);
+						word.x = lPoint.x;
+						word.y = lPoint.y;
+						break;
+					}
+				}
+			}
+			
+			protected function validateBtn_clickHandler(event:MouseEvent):void
+			{
+				var i:int = 0;
+				for(i =0 ;i < droppedItems.numElements; i++)
+				{
+					var sourceWord:WordPiece = droppedItems.getElementAt(i) as WordPiece;
+					var destinationWord:DisplayObject = sourceWord.wordValue.ui;
+					if(sourceWord.hitTestObject(destinationWord))
+					{
+						currentScore += 10;
+					}else
+					{
+						//currentScore -= 10;
+					}
+				}
+				currentGameLevel ++;
+				playLevel();
+				
+			}
+			
 		]]>
 	</fx:Script>
 
@@ -72,16 +217,24 @@
 	<fx:Style source="ro/infoiasi/english/default.css"/>
 	<s:SkinnableContainer id="initScreen" includeIn="default" width="764" height="505">
 		<mx:ProgressBar label="Loading data..." minimum="0" maximum="100"  id="progressBar" horizontalCenter="0" verticalCenter="0"/>
-			
 	</s:SkinnableContainer>
 	<s:SkinnableContainer id="startScreen" includeIn="start" width="764" height="505">
-		<s:Label y="39" text="Hppy Tree Words" id="startGameTitle" horizontalCenter="0"/>
+		<s:Label y="39" text="Happy Tree Words" id="startGameTitle" horizontalCenter="0"/>
 		<mx:LinkButton label="Start the Game" click="startGameBtn_clickHandler(event)" id="startGameBtn" verticalCenter="0" left="50"/>
 		<mx:LinkButton click="getHelpBtn_clickHandler(event)" label="Get Help" id="getHelpBtn" verticalCenter="0" horizontalCenter="0"/>
 		<mx:LinkButton click="aboutBtn_clickHandler(event)" id="aboutBtn" label="About..." verticalCenter="0" right="50"/>
 	</s:SkinnableContainer>
 	<s:SkinnableContainer id="gameScreen" includeIn="game" width="100%" height="100%">
-		
+		<s:Image source="@Embed('assets/tree_empty.png')" verticalCenter="0" left="10"/>
+		<s:Group id="dropTargets" horizontalCenter="-130" verticalCenter="0">
+		</s:Group>
+		<s:HGroup gap="5" id="dragTargets"/>
+		<s:Group id="droppedItems"/>
+		<s:Group width="250" right="0" top="0" bottom="0">
+			<mx:Label fontFamily="Englebert" color="#FFFFFF" fontSize="15" text="Punctaj {currentScore}" horizontalCenter="0" y="30"/>
+			<mx:Label fontFamily="Englebert" color="#FFFFFF" fontSize="15" text="Nivelul {currentGameLevel+1}" horizontalCenter="0" y="50"/>
+			<s:Button enabled="{currentLevelWordsCount==0}" id="validateBtn" label="Verifica!" click="validateBtn_clickHandler(event)" horizontalCenter="0" bottom="10"/>
+		</s:Group>
 	</s:SkinnableContainer>
 	
 </s:Application>

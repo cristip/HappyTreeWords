@@ -39,6 +39,8 @@
              */
             override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number) : void
             {
+                
+                
                 super.updateDisplayList(unscaledWidth, unscaledHeight);
             }
         ]]>        
@@ -46,25 +48,21 @@
     
     <s:states>
         <s:State name="normal" />
-		<s:State name="done"/>
         <s:State name="disabled" />
     </s:states>
     
     <!--- Defines the appearance of the SkinnableContainer class's background. -->
-    <s:Rect id="backgroundNormal" includeIn="normal" left="0" right="0" top="0" bottom="0">
+    <s:Rect id="background" left="0" right="0" top="0" bottom="0">
         <s:fill>
             <!--- @private -->
-			<s:BitmapFill source="@Embed('assets/tree_empty.png')"/>
+			<s:BitmapFill source="@Embed('assets/start_screen_bg.png')"/>
         </s:fill>
     </s:Rect>
-	<s:Rect id="backgroundDone" includeIn="done" left="0" right="0" top="0" bottom="0">
+	<s:Rect id="backgroundSide" width="240" right="0" top="0" bottom="0">
 		<s:fill>
-			<!--- @private -->
-			<s:BitmapFill source="@Embed('assets/tree_full.png')"/>
+			<s:SolidColor color="#3F48CC" alpha=".5"/>
 		</s:fill>
 	</s:Rect>
-	
-	
     <!--
         Note: setting the minimum size to 0 here so that changes to the host component's
         size will not be thwarted by this skin part's minimum size.   This is a compromise,

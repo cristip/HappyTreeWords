@@ -1,6 +1,7 @@
 /* CSS file */
 @namespace s "library://ns.adobe.com/flex/spark";
 @namespace mx "library://ns.adobe.com/flex/mx";
+@namespace view "ro.infoiasi.english.view.*";
 
 #startScreen
 {
@@ -15,7 +16,7 @@
 }
 #gameScreen
 {
-	skin-class: ClassReference("ro.infoiasi.english.skins.StartScreenSkin");
+	skin-class: ClassReference("ro.infoiasi.english.skins.GameScreenSkin");
 }
 mx|LinkButton
 {
@@ -23,6 +24,21 @@ mx|LinkButton
 	font-size: 20;
 	font-family:Englebert;
 }
+
+
+
+view|WordPiece
+{
+	skinClass: ClassReference("ro.infoiasi.english.skins.WordSkin");
+}
+#wordLabel
+{
+	color: #333333;
+	font-size: 15;
+	font-family:Englebert;
+}
+
+
 
 @font-face { 
 	src: url("../../../assets/Englebert-Regular.ttf"); 
