@@ -1,6 +1,11 @@
 package ro.infoiasi.english.utils
 {
 	
+	import flash.geom.Point;
+	
+	import mx.core.IFlexDisplayObject;
+	import mx.core.IVisualElement;
+	
 	import ro.infoiasi.english.model.WordVO;
 
 	public class GameUtils
@@ -40,6 +45,14 @@ package ro.infoiasi.english.utils
 			}
 			
 			return rootNode;
+		}
+		public static function translateCoords(targetPlace:IVisualElement, droppedPiece:IVisualElement, dropTargets:IFlexDisplayObject, dragTargets:IFlexDisplayObject):void
+		{
+			var point:Point = new Point(targetPlace.x, targetPlace.y);
+			var gPoint:Point = dropTargets.localToGlobal(point);
+			var lPoint:Point = dragTargets.globalToLocal(gPoint);
+			droppedPiece.x = lPoint.x;
+			droppedPiece.y = lPoint.y;
 		}
 	}
 }

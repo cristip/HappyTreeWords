@@ -9,6 +9,7 @@ package ro.infoiasi.english.view
 	public class WordPiece extends WordPieceBase
 	{
 		public static const SPACER:int = 10;
+		public var wordValue:WordVO;
 		
 		public function WordPiece()
 		{
@@ -23,8 +24,11 @@ package ro.infoiasi.english.view
 				updateSize();
 			}
 		}
-		
-		public var wordValue:WordVO;
+		override public function set isBlank(value:Boolean):void
+		{
+			super.isBlank = value;
+			updateSize();
+		}
 		
 		override public function set text(value:String):void
 		{
@@ -34,17 +38,20 @@ package ro.infoiasi.english.view
 		
 		protected function updateSize():void
 		{
+			
 			if(wordLabel)
 			{
 				wordLabel.validateNow();
-				callLater(function():void{
-				var lineMetrics:TextLineMetrics = wordLabel.measureText(wordLabel.text);
-				wordLabel.width = lineMetrics.width + 5;
-				wordLabel.height = lineMetrics.height;
-				this.width = lineMetrics.width +8;
-				this.height = lineMetrics.height +2;
+				callLater(function():void
+				{
+					var lineMetrics:TextLineMetrics = wordLabel.measureText(wordLabel.text);
+					wordLabel.width = isBlank?0: lineMetrics.width + 5;
+					wordLabel.height = lineMetrics.height;
+					this.width = isBlank? Math.max(60, lineMetrics.width +8) : lineMetrics.width +8;
+					this.height = lineMetrics.height +2;
 				});
 			}
+			validateNow();
 		}
 		
 	}

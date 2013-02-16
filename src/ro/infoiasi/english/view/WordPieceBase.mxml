@@ -8,8 +8,19 @@
 		<![CDATA[
 		
 			private var _text:String;
+			private var _isBlank:Boolean;
+
 			[Bindable]
-			public var isBlank:Boolean;
+			public function get isBlank():Boolean
+			{
+				return _isBlank;
+			}
+
+			public function set isBlank(value:Boolean):void
+			{
+				_isBlank = value;
+			}
+
 			[Bindable]
 			public function set text(value:String):void
 			{
