@@ -10,6 +10,7 @@
 	<fx:Script>
 		<![CDATA[
 			import flash.net.navigateToURL;
+			import flash.utils.setTimeout;
 			
 			import mx.core.IVisualElement;
 			import mx.events.FlexEvent;
@@ -111,7 +112,7 @@
 					element = droppedItems.removeElementAt(0);
 					removeEventListeners(element);
 				}
-				
+				droppedItems.graphics.clear();
 			}
 			
 			private function addEventListeners(element:IVisualElement):void
@@ -146,33 +147,45 @@
 					var wordp:WordPiece = new WordPiece();
 					wordp.wordValue = words[i];
 					addEventListeners(wordp);
-					dragSources.addElement(wordp);
+					setTimeout(addAnimatedWord, i*100, wordp);
 					wordp.text = words[i].form;
 					wordp.isBlank = false;
 					
 				}
+				setTimeout(enableValidateButton, currentLevelWordsCount* 100 + 500);
 				
 				
 			}
-			
+			private function addAnimatedWord(word:WordPiece):void
+			{
+				word.setStyle('addedEffect', showEff);
+				dragSources.addElement(word);
+				word.clearStyle('addedEffect');
+			}
 			
 			
 			protected function onWordMouseDown(event:MouseEvent):void
 			{
 				var word:WordPiece = WordPiece(event.currentTarget);
-				droppedItems.addElement(word);
+				if(word.parent != droppedItems)
+				{
+					droppedItems.addElement(word);
+				}
 				word.startDrag(false, new Rectangle(0, 0, 490, 430));
+				word.addEventListener(MouseEvent.MOUSE_MOVE, onWordMouseMove);
 			}
 			
 			protected function onWordMouseUp(event:MouseEvent):void
 			{
 				var word:WordPiece = WordPiece(event.currentTarget);
 				word.stopDrag();
+				word.removeEventListener(MouseEvent.MOUSE_MOVE, onWordMouseMove);
 				word.addEventListener("connect_out", onInitiateWordConnection);
 			}
 			
 			protected function validateBtn_clickHandler(event:MouseEvent):void
 			{
+				validateBtn.enabled = false;
 				currentSentenceIndex ++;
 				playLevel();
 				
@@ -191,7 +204,7 @@
 			{
 				connectionGroup.graphics.clear();
 				connectionGroup.graphics.moveTo(currentConnectedWord.x + currentConnectedWord.width/2, currentConnectedWord.y + currentConnectedWord.height -2); 
-				connectionGroup.graphics.lineStyle(2, 0xFF0000);
+				connectionGroup.graphics.lineStyle(4, 0xCCCCCC, 1, true, LineScaleMode.NORMAL, CapsStyle.SQUARE);
 				connectionGroup.graphics.lineTo(droppedItems.mouseX, droppedItems.mouseY);
 			}
 			
@@ -202,10 +215,13 @@
 					var destinationWord:WordPiece = WordPiece(droppedItems.getElementAt(i));
 					if(destinationWord.hitTestPoint(mouseX, mouseY) && destinationWord != currentConnectedWord && destinationWord.wordValue.head > 0 && !destinationWord.head)
 					{
+						currentConnectedWord.tails.push(destinationWord);
+						destinationWord.head = currentConnectedWord;
 						connectWords(currentConnectedWord, destinationWord);
 						break;
 					}
 				}
+				addEventListeners(currentConnectedWord);
 				currentConnectedWord = null;
 				connectionGroup.graphics.clear();
 				removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove_drawConnector);
@@ -214,49 +230,99 @@
 			
 			private function connectWords(sourceWord:WordPiece, destinationWord:WordPiece):void
 			{
-				sourceWord.tails.push(destinationWord);
-				destinationWord.head = sourceWord;
 				 
 				droppedItems.graphics.moveTo(sourceWord.x + sourceWord.width/2, sourceWord.y + sourceWord.height -2); 
-				droppedItems.graphics.lineStyle(2, 0x00FF00);
+				droppedItems.graphics.lineStyle(4, 0xFFFFFF, 1, true, LineScaleMode.NORMAL, CapsStyle.SQUARE);
 				droppedItems.graphics.lineTo(destinationWord.x + destinationWord.width/2, destinationWord.y + 2);
+			}
+			
+			private function onWordMouseMove(event:MouseEvent):void
+			{
+				var word:WordPiece = WordPiece(event.currentTarget);
+				if(!word.head && word.tails.length == 0)
+				{
+					return;
+				}
+				reconnectAllWords();
+			}
+			
+			private function reconnectAllWords():void
+			{
+				droppedItems.graphics.clear();
+				for(var i:int = 0; i < droppedItems.numElements; i++)
+				{
+					var word:WordPiece = WordPiece(droppedItems.getElementAt(i));
+					if(word.head)
+					{
+						connectWords(word.head, word);
+					}
+				}
+			}
+			
+			protected function resetCurrentSentence_clickHandler(event:MouseEvent):void
+			{
+				playSentence();
+			}
+			
+			private function enableValidateButton():void
+			{
+				validateBtn.enabled = true;	
 			}
 			
 		]]>
 	</fx:Script>
-
+	
+	
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:DropShadowFilter id="dsFilter" blurX="5" blurY="5" distance="0" angle="0"/>
+		<s:Parallel id="showEff">
+			<s:Rotate3D angleZFrom="-90" angleZTo="0"/>
+			<s:Fade alphaFrom="0.0" alphaTo="1.0" />
+		</s:Parallel>
 	</fx:Declarations>
 	<s:states>
 		<s:State name="default"/>
 		<s:State name="start"/>
 		<s:State name="game"/>
 	</s:states>
+	
+	<s:transitions>
+		<s:Transition fromState="start" toState="game">
+			<s:Parallel>
+				<s:Fade alphaFrom="0" alphaTo="1" target="{gameScreen}" duration="500"/>
+				<s:Fade alphaFrom="1" alphaTo="0" target="{startScreen}" duration="500"/>
+			</s:Parallel>
+			
+		</s:Transition>
+		
+	</s:transitions>
+	
 	<fx:Style source="ro/infoiasi/english/default.css"/>
 	<s:SkinnableContainer id="initScreen" includeIn="default" width="764" height="505">
 		<mx:ProgressBar label="Loading data..." minimum="0" maximum="100"  id="progressBar" horizontalCenter="0" verticalCenter="0"/>
 	</s:SkinnableContainer>
 	<s:SkinnableContainer id="startScreen" includeIn="start" width="764" height="505">
-		<s:Label y="39" text="Happy Tree Words" id="startGameTitle" horizontalCenter="0"/>
-		<mx:LinkButton label="Start the Game" click="startGameBtn_clickHandler(event)" id="startGameBtn" verticalCenter="0" left="50"/>
-		<mx:LinkButton click="getHelpBtn_clickHandler(event)" label="Get Help" id="getHelpBtn" verticalCenter="0" horizontalCenter="0"/>
-		<mx:LinkButton click="aboutBtn_clickHandler(event)" id="aboutBtn" label="About..." verticalCenter="0" right="50"/>
+		<s:Label x="300" y="80" text="Cuvintele Fericite" id="startGameTitle"/>
+		<s:HGroup left="10" verticalCenter="60" verticalAlign="middle" horizontalAlign="left">
+		<mx:LinkButton label="Start" click="startGameBtn_clickHandler(event)" id="startGameBtn" verticalCenter="0" left="50"/>
+		<mx:LinkButton click="getHelpBtn_clickHandler(event)" label="Ajutor" id="getHelpBtn" verticalCenter="0" horizontalCenter="0"/>
+		<mx:LinkButton click="aboutBtn_clickHandler(event)" id="aboutBtn" label="Despre Joc" verticalCenter="0" right="50"/>
+		</s:HGroup>
 	</s:SkinnableContainer>
 	<s:SkinnableContainer id="gameScreen" includeIn="game" width="100%" height="100%">
-		<s:Image source="@Embed('assets/tree_empty.png')" verticalCenter="0" left="10"/>
+		<s:Image source="@Embed('assets/tree_full.png')" verticalCenter="0" left="10"/>
 		<s:Image source="@Embed('assets/tree_full.png')" alpha="0" id="validationTree" verticalCenter="0" left="10"/>
 		<s:Group id="dropTargets" horizontalCenter="-130" verticalCenter="0">
 		</s:Group>
-		<s:HGroup gap="5" id="dragSources"/>
-		
+		<s:HGroup gap="5" id="dragSources" left="2" top="2"/>
 		<s:Group id="droppedItems"/>
 		<s:Group id="connectionGroup"/>
-		<s:Group width="250" right="0" top="0" bottom="0">
-			<mx:Label fontFamily="Englebert" color="#FFFFFF" fontSize="15" text="Punctaj {currentScore}" horizontalCenter="0" y="30"/>
-			<mx:Label fontFamily="Englebert" color="#FFFFFF" fontSize="15" text="Nivelul {currentGameLevel+1}" horizontalCenter="0" y="50"/>
-			<s:Button enabled="{dragSources.numElements==0}" id="validateBtn" label="Treci la urmatoarea propozitie" click="validateBtn_clickHandler(event)" horizontalCenter="0" bottom="10"/>
-		</s:Group>
+		<s:HGroup width="100%" height="40" horizontalAlign="left" bottom="0" verticalAlign="middle">
+			<mx:LinkButton id="resetBtn" label="Reseteaza Propozitia" click="resetCurrentSentence_clickHandler(event)"/>
+			<mx:LinkButton id="validateBtn" label="Urmatoarea propozitie" click="validateBtn_clickHandler(event)"/>
+			<s:Spacer width="100%"/>
+			<mx:Label filters="{[dsFilter]}" fontFamily="Englebert" color="#FFFFFF" fontSize="20" text="Punctaj {currentScore}   Nivelul {currentGameLevel+1}"/>
+		</s:HGroup>
 	</s:SkinnableContainer>
 	
 </s:Application>

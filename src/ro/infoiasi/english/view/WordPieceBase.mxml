@@ -42,10 +42,11 @@
 	</fx:Script>
 	<fx:Declarations>
 		<s:DropShadowFilter id="dsFilter" blurX="2" blurY="2" distance="0" angle="0"/>
+		<s:BevelFilter id="bvFilter"/>
 	</fx:Declarations>
 	
-	<s:Image filters="{[dsFilter]}" source="@Embed('assets/conn.png')" id="inConnector" visible="{wordValue.head > 0}" />
+	<s:Image filters="{[bvFilter]}" source="@Embed('assets/conn.png')" id="inConnector" visible="{wordValue.head > 0}" />
 	<mx:Label visible="{!isBlank}" horizontalCenter="0" verticalCenter="0" textAlign="center" id="wordLabel" text="{text}"/>
-	<s:Image filters="{[dsFilter]}" source="@Embed('assets/conn.png')" id="outConnector" visible="{wordValue.deprel != 'punct.'}" />
+	<s:Image filters="{[bvFilter]}" source="@Embed('assets/conn.png')" id="outConnector" visible="{wordValue.deprel != 'punct.'}" />
 	
 </s:SkinnableContainer>
