@@ -6,9 +6,12 @@
 		 >
 	<fx:Script>
 		<![CDATA[
+			import ro.infoiasi.english.model.WordVO;
 		
 			private var _text:String;
 			private var _isBlank:Boolean;
+			[Bindable]
+			public var wordValue:WordVO;
 
 			[Bindable]
 			public function get isBlank():Boolean
@@ -33,11 +36,16 @@
 			}
 			
 			
+			
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:DropShadowFilter id="dsFilter" blurX="2" blurY="2" distance="0" angle="0"/>
 	</fx:Declarations>
 	
+	<s:Image filters="{[dsFilter]}" source="@Embed('assets/conn.png')" id="inConnector" visible="{wordValue.head > 0}" />
 	<mx:Label visible="{!isBlank}" horizontalCenter="0" verticalCenter="0" textAlign="center" id="wordLabel" text="{text}"/>
+	<s:Image filters="{[dsFilter]}" source="@Embed('assets/conn.png')" id="outConnector" visible="{wordValue.deprel != 'punct.'}" />
+	
 </s:SkinnableContainer>

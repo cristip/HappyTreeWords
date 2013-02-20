@@ -1,7 +1,7 @@
 package ro.infoiasi.english.model
 {
 	import ro.infoiasi.english.view.WordPiece;
-
+	[Bindable]
 	public class WordVO
 	{
 		//<word id="3" form="să" lemma="să" postag="Qs" head="5" chunk="" deprel="part."/>

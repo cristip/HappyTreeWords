@@ -20,6 +20,7 @@
 			
 			
 			private var xloader:URLLoader;
+			private var currentConnectedWord:WordPiece;
 			[Bindable]
 			private var currentLevelWordsCount:int=-1;
 			[Bindable]
@@ -151,43 +152,9 @@
 					
 				}
 				
-				/*
 				
-				drawTree(structure, 0);
-				
-				callLater(function():void
-				{
-					words[0].ui.x = 0;
-				
-					for(i = 1; i < currentLevelWordsCount; i++)
-					{
-						words[i].ui.x = words[i-1].ui.x + words[i-1].ui.width + 10;  
-						//words[i].ui.x = words[i-1].ui.x + 60;
-					}
-				});
-				*/
 			}
-			/*
-			private function drawTree(structure:WordVO, level:int):void
-			{
-				var wordp:WordPiece = new WordPiece();
-				dropTargets.addElement(wordp);
-				wordp.text = structure.form;
-				wordp.wordValue = structure;
-				wordp.isBlank = true;
-				structure.ui = wordp;
-				structure.level = level;
-				wordp.y = 35*level;
-				
-				if(structure.children.length > 0)
-				{
-					for(var i:int = 0; i < structure.children.length; i++)
-					{
-						drawTree(structure.children[i], level+1);
-					}
-				}
-			}
-			*/
+			
 			
 			
 			protected function onWordMouseDown(event:MouseEvent):void
@@ -201,68 +168,58 @@
 			{
 				var word:WordPiece = WordPiece(event.currentTarget);
 				word.stopDrag();
-				/*
-				var hitted:Boolean = false;
-				for(var i:int = 0; i < dropTargets.numElements; i++)
-				{
-					var targetWord:WordPiece = dropTargets.getElementAt(i) as WordPiece;
-					if(word.hitTestObject(targetWord))
-					{
-						hitted = true;
-						if(word.wordValue.head == 0 || currentGameLevel == 0)
-						{
-							if(targetWord.wordValue == word.wordValue)
-							{
-								GameUtils.translateCoords(targetWord, word, dropTargets, dragSources);
-								break;;
-							}
-							else
-							{
-								dragSources.addElementAt(word, word.wordValue.id-1);
-								return;
-							}
-						}
-						//il lasi oricum
-						GameUtils.translateCoords(targetWord, word, dropTargets, dragSources);
-						break;
-					}
-				}
-				var icorrectItems:int = updateTree();
-				
-				if(!hitted)
-				{
-					dragSources.addElementAt(word, word.wordValue.id-1 - (dropTargets.numElements - icorrectItems));
-				}
-				
-					
-				var ratio:Number = 1-icorrectItems/dropTargets.numElements;
-				validationTree.alpha=ratio;
-				*/
+				word.addEventListener("connect_out", onInitiateWordConnection);
 			}
-			/*
-			private function updateTree():int
-			{
-				var incorrectCount:int = dropTargets.numElements;
-				for(var i:int =0; i < droppedItems.numElements; i++)
-				{
-					var sourceWord:WordPiece = droppedItems.getElementAt(i) as WordPiece;
-					var destinationWord:DisplayObject = sourceWord.wordValue.ui;
-					if(sourceWord.hitTestObject(destinationWord))
-					{
-						incorrectCount--;
-					}else
-					{
-						//currentScore -= 10;
-					}
-				}
-				return incorrectCount;
-			}
-			*/
+			
 			protected function validateBtn_clickHandler(event:MouseEvent):void
 			{
 				currentSentenceIndex ++;
 				playLevel();
 				
+			}
+			
+			protected function onInitiateWordConnection(event:Event):void
+			{
+				var word:WordPiece = WordPiece(event.target);
+				currentConnectedWord = word;
+				removeEventListeners(currentConnectedWord);
+				addEventListener(MouseEvent.MOUSE_MOVE, mouseMove_drawConnector);
+				addEventListener(MouseEvent.MOUSE_UP, mouseUp_drawConnector);
+			}
+			
+			protected function mouseMove_drawConnector(event:MouseEvent):void
+			{
+				connectionGroup.graphics.clear();
+				connectionGroup.graphics.moveTo(currentConnectedWord.x + currentConnectedWord.width/2, currentConnectedWord.y + currentConnectedWord.height -2); 
+				connectionGroup.graphics.lineStyle(2, 0xFF0000);
+				connectionGroup.graphics.lineTo(droppedItems.mouseX, droppedItems.mouseY);
+			}
+			
+			protected function mouseUp_drawConnector(event:MouseEvent):void
+			{
+				for(var i:int = 0; i < droppedItems.numElements; i++)
+				{
+					var destinationWord:WordPiece = WordPiece(droppedItems.getElementAt(i));
+					if(destinationWord.hitTestPoint(mouseX, mouseY) && destinationWord != currentConnectedWord && destinationWord.wordValue.head > 0 && !destinationWord.head)
+					{
+						connectWords(currentConnectedWord, destinationWord);
+						break;
+					}
+				}
+				currentConnectedWord = null;
+				connectionGroup.graphics.clear();
+				removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove_drawConnector);
+				removeEventListener(MouseEvent.MOUSE_UP, mouseUp_drawConnector);
+			}
+			
+			private function connectWords(sourceWord:WordPiece, destinationWord:WordPiece):void
+			{
+				sourceWord.tails.push(destinationWord);
+				destinationWord.head = sourceWord;
+				 
+				droppedItems.graphics.moveTo(sourceWord.x + sourceWord.width/2, sourceWord.y + sourceWord.height -2); 
+				droppedItems.graphics.lineStyle(2, 0x00FF00);
+				droppedItems.graphics.lineTo(destinationWord.x + destinationWord.width/2, destinationWord.y + 2);
 			}
 			
 		]]>
@@ -292,7 +249,9 @@
 		<s:Group id="dropTargets" horizontalCenter="-130" verticalCenter="0">
 		</s:Group>
 		<s:HGroup gap="5" id="dragSources"/>
+		
 		<s:Group id="droppedItems"/>
+		<s:Group id="connectionGroup"/>
 		<s:Group width="250" right="0" top="0" bottom="0">
 			<mx:Label fontFamily="Englebert" color="#FFFFFF" fontSize="15" text="Punctaj {currentScore}" horizontalCenter="0" y="30"/>
 			<mx:Label fontFamily="Englebert" color="#FFFFFF" fontSize="15" text="Nivelul {currentGameLevel+1}" horizontalCenter="0" y="50"/>

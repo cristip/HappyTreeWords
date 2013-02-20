@@ -42,7 +42,7 @@
     </fx:Script>
     
 	<fx:Declarations>
-		<s:DropShadowFilter id="dsFilter" inner="true" blurX="2" blurY="2" distance="2" angle="0"/>
+		<s:DropShadowFilter id="dsFilter" blurX="12" blurY="12" distance="0" angle="0"/>
 	</fx:Declarations>
 	
     <s:states>
@@ -51,7 +51,7 @@
     </s:states>
     
     <!--- Defines the appearance of the SkinnableContainer class's background. -->
-    <s:Rect id="background" radiusX="5" radiusY="5" left="0" right="0" top="0" bottom="0" filters="{[dsFilter]}">
+    <s:Rect id="background" radiusX="5" radiusY="5" left="0" right="0" top="10" bottom="10" filters="{[dsFilter]}">
         <s:fill>
             <!--- @private -->
             <s:SolidColor id="bgFill" color="#FFFFFF"/>
@@ -66,7 +66,7 @@
     <!--- @copy spark.components.SkinnableContainer#contentGroup -->
     <s:Group id="contentGroup" left="0" right="0" top="0" bottom="0" minWidth="0" minHeight="0">
         <s:layout>
-            <s:BasicLayout/>
+            <s:VerticalLayout horizontalAlign="center" gap="0"/>
         </s:layout>
     </s:Group>
 
