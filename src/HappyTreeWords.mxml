@@ -151,7 +151,7 @@
 					
 				}
 				
-				
+				/*
 				
 				drawTree(structure, 0);
 				
@@ -165,7 +165,9 @@
 						//words[i].ui.x = words[i-1].ui.x + 60;
 					}
 				});
+				*/
 			}
+			/*
 			private function drawTree(structure:WordVO, level:int):void
 			{
 				var wordp:WordPiece = new WordPiece();
@@ -185,7 +187,7 @@
 					}
 				}
 			}
-			
+			*/
 			
 			
 			protected function onWordMouseDown(event:MouseEvent):void
@@ -199,6 +201,7 @@
 			{
 				var word:WordPiece = WordPiece(event.currentTarget);
 				word.stopDrag();
+				/*
 				var hitted:Boolean = false;
 				for(var i:int = 0; i < dropTargets.numElements; i++)
 				{
@@ -220,12 +223,6 @@
 							}
 						}
 						//il lasi oricum
-						/*var point:Point = new Point(targetWord.x, targetWord.y);
-						var gPoint:Point = dropTargets.localToGlobal(point);
-						var lPoint:Point = dragTargets.globalToLocal(gPoint);
-						word.x = lPoint.x;
-						word.y = lPoint.y;
-						*/
 						GameUtils.translateCoords(targetWord, word, dropTargets, dragSources);
 						break;
 					}
@@ -240,9 +237,9 @@
 					
 				var ratio:Number = 1-icorrectItems/dropTargets.numElements;
 				validationTree.alpha=ratio;
-				
+				*/
 			}
-			
+			/*
 			private function updateTree():int
 			{
 				var incorrectCount:int = dropTargets.numElements;
@@ -260,7 +257,7 @@
 				}
 				return incorrectCount;
 			}
-			
+			*/
 			protected function validateBtn_clickHandler(event:MouseEvent):void
 			{
 				currentSentenceIndex ++;
