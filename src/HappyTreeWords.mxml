@@ -12,7 +12,9 @@
 			import flash.net.navigateToURL;
 			import flash.utils.setTimeout;
 			
+			import mx.collections.ArrayCollection;
 			import mx.core.IVisualElement;
+			import mx.events.EffectEvent;
 			import mx.events.FlexEvent;
 			
 			import ro.infoiasi.english.model.WordVO;
@@ -22,6 +24,8 @@
 			
 			private var xloader:URLLoader;
 			private var currentConnectedWord:WordPiece;
+			[Bindable]
+			private var sentenceLevels:ArrayCollection = new ArrayCollection();
 			[Bindable]
 			private var currentLevelWordsCount:int=-1;
 			[Bindable]
@@ -113,18 +117,19 @@
 					removeEventListeners(element);
 				}
 				droppedItems.graphics.clear();
+				connectionGroup.graphics.clear();
 			}
 			
 			private function addEventListeners(element:IVisualElement):void
 			{
 				element.addEventListener(MouseEvent.MOUSE_DOWN, onWordMouseDown);
-				element.addEventListener(MouseEvent.MOUSE_UP, onWordMouseUp);
+				//element.addEventListener(MouseEvent.MOUSE_UP, onWordMouseUp);
 			}
 			
 			private function removeEventListeners(element:IVisualElement):void
 			{
 				element.removeEventListener(MouseEvent.MOUSE_DOWN, onWordMouseDown);
-				element.removeEventListener(MouseEvent.MOUSE_UP, onWordMouseUp);
+				//element.removeEventListener(MouseEvent.MOUSE_UP, onWordMouseUp);
 			}
 			
 			private function playLevel():void
@@ -140,6 +145,9 @@
 				validationTree.alpha = 0;
 				var words:Vector.<WordVO> = new Vector.<WordVO>();
 				var structure:WordVO = GameUtils.createPhrase(currentSentenceIndex, xData, words);
+				
+				GameUtils.computeSentenceLevels(structure, sentenceLevels);
+				
 				this.currentLevelWordsCount = words.length;
 				var i:int;
 				for(i = 0; i < currentLevelWordsCount; i++)
@@ -167,12 +175,35 @@
 			protected function onWordMouseDown(event:MouseEvent):void
 			{
 				var word:WordPiece = WordPiece(event.currentTarget);
-				if(word.parent != droppedItems)
+				var draggedWord:WordPiece;
+				if(dragSources.containsElement(word))
 				{
-					droppedItems.addElement(word);
+					word.removeEventListener(MouseEvent.MOUSE_DOWN, onWordMouseDown);
+					word.mouseEnabled = false;
+					draggedWord = new WordPiece();
+					draggedWord.wordValue = word.wordValue;
+					draggedWord.x = word.x;
+					draggedWord.y = word.y;
+					draggedWord.text = word.text;
+					draggedWord.isBlank = false;
+					word.isBlank = true;
+					droppedItems.addElement(draggedWord);
 				}
-				word.startDrag(false, new Rectangle(0, 0, 490, 430));
-				word.addEventListener(MouseEvent.MOUSE_MOVE, onWordMouseMove);
+				else
+				{
+					draggedWord = word;
+				}
+				
+				
+				draggedWord.startDrag(false, new Rectangle(0, 0, this.width, this.height-50));
+				draggedWord.addEventListener(MouseEvent.MOUSE_MOVE, onWordMouseMove);
+				draggedWord.addEventListener(MouseEvent.MOUSE_UP, onWordMouseUp);
+				if(currentGameLevel <=1)
+				{
+					var levelUI:IVisualElement = this.sentenceLevelsGroup.getElementAt(draggedWord.wordValue.level);
+					levelFadeIn.end();
+					levelFadeIn.play([levelUI]);
+				}
 			}
 			
 			protected function onWordMouseUp(event:MouseEvent):void
@@ -180,7 +211,24 @@
 				var word:WordPiece = WordPiece(event.currentTarget);
 				word.stopDrag();
 				word.removeEventListener(MouseEvent.MOUSE_MOVE, onWordMouseMove);
+				word.removeEventListener(MouseEvent.MOUSE_UP, onWordMouseUp);
 				word.addEventListener("connect_out", onInitiateWordConnection);
+				word.addEventListener(MouseEvent.MOUSE_DOWN, onWordMouseDown);
+				
+				if(currentGameLevel <= 1)
+				{
+					word.y = sentenceLevelsGroup.getElementAt(word.wordValue.level).y - word.height/2 + sentenceLevelsGroup.y;
+				}else
+				{
+					//guessed sentence level
+					var currentWordY:Number = word.y;
+					currentWordY -= sentenceLevelsGroup.y;
+					var guessedLevel:int = Math.round(currentWordY/105);
+					word.y = guessedLevel * 105 + sentenceLevelsGroup.y - word.height/2;
+					
+				}
+				reconnectAllWords();
+				hideLevels();
 			}
 			
 			protected function validateBtn_clickHandler(event:MouseEvent):void
@@ -202,10 +250,10 @@
 			
 			protected function mouseMove_drawConnector(event:MouseEvent):void
 			{
-				connectionGroup.graphics.clear();
-				connectionGroup.graphics.moveTo(currentConnectedWord.x + currentConnectedWord.width/2, currentConnectedWord.y + currentConnectedWord.height -2); 
-				connectionGroup.graphics.lineStyle(4, 0xCCCCCC, 1, true, LineScaleMode.NORMAL, CapsStyle.SQUARE);
-				connectionGroup.graphics.lineTo(droppedItems.mouseX, droppedItems.mouseY);
+				droppedItems.graphics.clear();
+				droppedItems.graphics.moveTo(currentConnectedWord.x + currentConnectedWord.width/2, currentConnectedWord.y + currentConnectedWord.height -2); 
+				droppedItems.graphics.lineStyle(4, 0xCCCCCC, 1, true, LineScaleMode.NORMAL, CapsStyle.SQUARE);
+				droppedItems.graphics.lineTo(droppedItems.mouseX, droppedItems.mouseY);
 			}
 			
 			protected function mouseUp_drawConnector(event:MouseEvent):void
@@ -223,7 +271,7 @@
 				}
 				addEventListeners(currentConnectedWord);
 				currentConnectedWord = null;
-				connectionGroup.graphics.clear();
+				droppedItems.graphics.clear();
 				removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove_drawConnector);
 				removeEventListener(MouseEvent.MOUSE_UP, mouseUp_drawConnector);
 			}
@@ -231,9 +279,9 @@
 			private function connectWords(sourceWord:WordPiece, destinationWord:WordPiece):void
 			{
 				 
-				droppedItems.graphics.moveTo(sourceWord.x + sourceWord.width/2, sourceWord.y + sourceWord.height -2); 
-				droppedItems.graphics.lineStyle(4, 0xFFFFFF, 1, true, LineScaleMode.NORMAL, CapsStyle.SQUARE);
-				droppedItems.graphics.lineTo(destinationWord.x + destinationWord.width/2, destinationWord.y + 2);
+				connectionGroup.graphics.moveTo(sourceWord.x + sourceWord.width/2, sourceWord.y + sourceWord.height -2); 
+				connectionGroup.graphics.lineStyle(4, 0xFF0000, 1, true, LineScaleMode.NORMAL, CapsStyle.SQUARE);
+				connectionGroup.graphics.lineTo(destinationWord.x + destinationWord.width/2, destinationWord.y + 2);
 			}
 			
 			private function onWordMouseMove(event:MouseEvent):void
@@ -245,10 +293,13 @@
 				}
 				reconnectAllWords();
 			}
-			
+			/**
+			 * reface legaturile dintre cuvint
+			 * 
+			 */
 			private function reconnectAllWords():void
 			{
-				droppedItems.graphics.clear();
+				connectionGroup.graphics.clear();
 				for(var i:int = 0; i < droppedItems.numElements; i++)
 				{
 					var word:WordPiece = WordPiece(droppedItems.getElementAt(i));
@@ -269,12 +320,28 @@
 				validateBtn.enabled = true;	
 			}
 			
+			private function hideLevels():void
+			{
+				for (var i:int = 0; i < sentenceLevelsGroup.numElements; i++)
+				{
+					sentenceLevelsGroup.getElementAt(i).alpha = .2;
+				}
+			}
+			
+			protected function levelFadeIn_effectEndHandler(event:EffectEvent):void
+			{
+				setTimeout(hideLevels, 100);
+			}
+			
 		]]>
 	</fx:Script>
 	
 	
 	<fx:Declarations>
 		<s:DropShadowFilter id="dsFilter" blurX="5" blurY="5" distance="0" angle="0"/>
+		<s:BevelFilter id="bvFilter"/>
+		<s:Fade id="levelFadeIn" alphaFrom=".2" alphaTo="1" repeatCount="3" repeatBehavior="reverse" effectEnd="levelFadeIn_effectEndHandler(event)"/>
+		<s:Fade id="levelFadeOut" alphaFrom="1" alphaTo=".2"/>
 		<s:Parallel id="showEff">
 			<s:Rotate3D angleZFrom="-90" angleZTo="0"/>
 			<s:Fade alphaFrom="0.0" alphaTo="1.0" />
@@ -312,11 +379,44 @@
 	<s:SkinnableContainer id="gameScreen" includeIn="game" width="100%" height="100%">
 		<s:Image source="@Embed('assets/tree_full.png')" verticalCenter="0" left="10"/>
 		<s:Image source="@Embed('assets/tree_full.png')" alpha="0" id="validationTree" verticalCenter="0" left="10"/>
-		<s:Group id="dropTargets" horizontalCenter="-130" verticalCenter="0">
+		<s:VGroup id="sentenceLevelsGroup" top="120" gap="100" width="100%" height="100%">
+			<s:Line width="100%" alpha=".2">
+				<s:stroke>
+					<s:SolidColorStroke color="0xFFFFFF" weight="5"/>
+				</s:stroke>
+			</s:Line>
+			<s:Line width="100%" alpha=".2">
+				<s:stroke>
+					<s:SolidColorStroke color="0xFFFFFF" weight="5"/>
+				</s:stroke>
+			</s:Line>
+			<s:Line width="100%" alpha=".2">
+				<s:stroke>
+					<s:SolidColorStroke color="0xFFFFFF" weight="5"/>
+				</s:stroke>
+			</s:Line>
+			<s:Line width="100%" alpha=".2">
+				<s:stroke>
+					<s:SolidColorStroke color="0xFFFFFF" weight="5"/>
+				</s:stroke>
+			</s:Line>
+			<s:Line width="100%" alpha=".2">
+				<s:stroke>
+					<s:SolidColorStroke color="0xFFFFFF" weight="5"/>
+				</s:stroke>
+			</s:Line>
+			<s:Line width="100%" alpha=".2">
+				<s:stroke>
+					<s:SolidColorStroke color="0xFFFFFF" weight="5"/>
+				</s:stroke>
+			</s:Line>
+		</s:VGroup>
+		<s:Group id="dropTargets" horizontalCenter="0" verticalCenter="0">
+			
 		</s:Group>
 		<s:HGroup gap="5" id="dragSources" left="2" top="2"/>
 		<s:Group id="droppedItems"/>
-		<s:Group id="connectionGroup"/>
+		<s:Group id="connectionGroup" filters="{[bvFilter, dsFilter]}"/>
 		<s:HGroup width="100%" height="40" horizontalAlign="left" bottom="0" verticalAlign="middle">
 			<mx:LinkButton id="resetBtn" label="Reseteaza Propozitia" click="resetCurrentSentence_clickHandler(event)"/>
 			<mx:LinkButton id="validateBtn" label="Urmatoarea propozitie" click="validateBtn_clickHandler(event)"/>

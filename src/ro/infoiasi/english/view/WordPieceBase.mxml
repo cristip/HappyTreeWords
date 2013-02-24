@@ -22,6 +22,13 @@
 			public function set isBlank(value:Boolean):void
 			{
 				_isBlank = value;
+				if(value)
+				{
+					this.alpha = .5
+				}else
+				{
+					this.alpha = 1;
+				}
 			}
 
 			[Bindable]
@@ -46,7 +53,7 @@
 	</fx:Declarations>
 	
 	<s:Image filters="{[bvFilter]}" source="@Embed('assets/conn.png')" id="inConnector" visible="{wordValue.head > 0}" />
-	<mx:Label visible="{!isBlank}" horizontalCenter="0" verticalCenter="0" textAlign="center" id="wordLabel" text="{text}"/>
+	<mx:Label horizontalCenter="0" verticalCenter="0" textAlign="center" id="wordLabel" text="{text}"/>
 	<s:Image filters="{[bvFilter]}" source="@Embed('assets/conn.png')" id="outConnector" visible="{wordValue.deprel != 'punct.'}" />
 	
 </s:SkinnableContainer>

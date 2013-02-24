@@ -3,6 +3,7 @@ package ro.infoiasi.english.utils
 	
 	import flash.geom.Point;
 	
+	import mx.collections.ArrayCollection;
 	import mx.core.IFlexDisplayObject;
 	import mx.core.IVisualElement;
 	
@@ -10,6 +11,9 @@ package ro.infoiasi.english.utils
 
 	public class GameUtils
 	{
+		/**
+		 * creeaza 
+		 */
 		public static function createPhrase(phraseIndex:int, xData:XML, words:Vector.<WordVO>):WordVO
 		{
 			var selectedElement:XML = xData.children()[phraseIndex];
@@ -54,5 +58,32 @@ package ro.infoiasi.english.utils
 			droppedPiece.x = lPoint.x;
 			droppedPiece.y = lPoint.y;
 		}
+		
+		
+		
+		public static function computeSentenceLevels(structure:WordVO, levels:ArrayCollection):void
+		{
+			var temp_buffer:Array = [];
+			function setUpLevels(structure:WordVO, level:int):void
+			{
+				structure.level = level;
+				if(!temp_buffer[level])
+				{
+					temp_buffer[level] = [structure];
+					levels.addItem(temp_buffer[level]);
+				}else
+				{
+					temp_buffer[level].push(structure);
+					
+				}
+				for(var i:int = 0; i < structure.children.length; i++)
+				{
+					setUpLevels(structure.children[i], level+1);
+				}
+			}
+			setUpLevels(structure, 0);
+			
+		}
+		
 	}
 }
