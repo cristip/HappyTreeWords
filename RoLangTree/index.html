@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Ro Lang Tree</title>
+  <link rel="stylesheet" type="text/css" href="css/screen.css">
+  <link href='http://fonts.googleapis.com/css?family=Averia+Sans+Libre' rel='stylesheet' type='text/css'>
+  <script src="js/createjs-2013.12.12.min.js"></script>
+  <script src="js/jquery-1.11.0.min.js"></script>
+  <script src="js/dummyserver.js"></script>
+  <script src="js/game.js"></script>
+  <script>
+  var stage;
+  var update = false;
+  var treeContainer;
+
+
+  
+
+
+
+
+  function init () {
+  	stage = new createjs.Stage("gameCanvas");
+  	treeContainer = new createjs.Container();
+  	treeContainer.y = 200;
+  	stage.addChild(treeContainer);
+  	initLevel();
+
+
+  	//stage.update();
+  	createjs.Ticker.addEventListener("tick", tick);
+
+  	
+  }
+  function tick(event){
+    if(update)
+  	stage.update();
+  }
+  function handleClick(event){
+   console.log("click")
+  }
+	
+  </script>
+</head>
+<body onload="init();">
+
+	<div id="loader"></div>
+
+	<p style="font-family:AveriaSansLibre;visibility:hidden;width:1px;height:1px;">Hello</p>
+	<div class="game">
+		<canvas id="gameCanvas" width="800" height="600">
+			Browserul dvs nu este suportat. Recomandam Chrome, Firefox sau Internet Explorer 11.
+		</canvas>
+	</div>
+
+</body>
+</html>
