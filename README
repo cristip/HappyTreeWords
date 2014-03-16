@@ -1,24 +1,3 @@
 ﻿''Joacă-te cu limba română construind arbori''
 
-Proiectul constă în realizarea unei aplicaţii de joc on line care are menirea să facă analiza sintactică a unei propoziţii în limba romană. Deocamdată mă interesează doar partea de dinaintea devenirii unui joc on line, accesat de users care vor trebui să îşi facă un cont.
-Fiind un proiect mai amplu, rog studenţii să vină cu ideii de a împărţi acest proiect în proiecte mai mici pentru a putea fi repartizat la câţi mai mulţi studenţi, care ar putea lucra şi în echipă. 
-În slide-ul 2 avem un desen ce ne arată cum ar trebui să fie aplicaţia. Bineînţeles, orice alte sugestii de design sunt binevenite.
-Aplicaţia ar trebui să se deschidă ca în imaginea din slide-ul 2, unde avem din oficiu:
-Un trunchi de arbore (situat la baza paginii pe mijloc);
-O propoziţie (la început, adică la nivelul 1, începători) simplă, situată în partea e sus a paginii;
-Informaţii privind regulile şi modalităţile de ajuca acest joc (dreapta).
-
-
-În primă fază, utilizatorul trebuie să drag-eze fiecare căsuţă de cuvânt sau semn de punctuaţie  în căsuţa alba de deasupra trunchiului. La nivelul 1 (începători) nu i se permite utilizatorului să plaseze cuvintele decât în locul de drept al cuvâtului respectiv. Chiar dacă el încearcă să pună, de exemplu, verbul în alt loc în afară de head-ul arborelui, să nu i se permită şi cuvântul respectiv să fie tras ca un magnet înapoi la locul lui din propozţie. Când îl plasează în locul potrivit să se auda ca un fel de click şi să rămână în căsuţa corectă.
-După ce au fost puse toate elementele propoziţiei în chenarele corecte, aplicaţia ar trebui să genereze automat o coroană care să cuprindă, într-un mod armonios, toate elementele propoziţiei din chenarele albe.
-Astfel utilizatorul poate trece la nivelul următor. La acest prim nivel, utilizatorul ar putea avea încă 2 exemple asemănătoare, pentru a putea exersa acest tip de analiză sintactică.
-
-La nivelul 2, utilizatorului nu i se mai dă aşa de multe indicii cum trebuie să poziţioneze elementele, ci doar verbul este condiţionat din oficiu, adică utilizatorul nu-l poate pune decât în căsuţa head al arborelui. Restul elementelor pot fi puse după voiţa utilizatorului, însă la doar la sfârşit (după ce a poziţionat toate elementele în căsuţe) va afla dacă a făcut analiza corect sau nu. Veridicitatea propoziţiilor ar trebui făcută  de aplicaţia noastră prin apelarea unei baze de date (ce există în format xml.) pe care vă voi pune la dispoziţie cât de curând.
-Dacă este corect, atunci coroana arborelui poate fi generată şi se poate trece la un alt exemplu (3 de toate) de la acest nivel, dacă este incorect, utilizatorul este avertizat de acest lucru şi trebuie să reaşeze elemetele (până obţine varianta corectă) permiţându-i-se să pună elemetele (pe fiecare în parte, după cum doreşte) la loc în propoziţie.
-
-Înainte de a trece mai departe cu descrierea aplicaţiei, vreau să menţionez că aici aveţi doar o idee a proiectului, însă orice altă sugestie, orice idee de joc în orice compartiment al acestui proiect, este binevenită şi apreciată. Scopul nostru este să adunăm cât mai multe propoziţii analizate corect de utilizatori. După ce câştigăm încredere în ei, le vom da propoziţii noi, a căror analiză nici noi nu o mai avem ca să putem compara.
-În continuare, utilizatorul trebuie să facă mai multe exemple şi să treacă de mai multe nivele (unde complexitatea propoziţiilor creşte pe măsură ce nivelul creşte) pentru a trece la o fază puţin mai complicată, şi anume aceea în care utilizatorul trebuie să pună şi tipurile de relaţie dintre elementele deja poziţionate corect. În slide-ul următor avem un astfel de exemplu.  Vă rog faceţi abstracţie de faptul că aveţi, în acest exemplu, aceeaşi propoziţie. Propoziţiile ar trebui să difere de fiecare dată. 
-
-La începutul acestei noi faze de nivele, utilizatorului ar trebui să i se ofere (când dă click pe săgeată) o listă de posibile relaţii din care să se aleagă una. Statistic, putem stabili un număr fix de relaţii pentru 2 elemente. De exemplu, între verbul principal al propoziţiei sau frazei şi punctul de la final, nu poate exista decât relaţia de punctuaţie (notată – “punct.”). Pentru alte 2 elemente ar putea fi mai multe tipuri de relaţie, iar utilizatorul va trebui să o aleagă pe cea corectă. Când este aleasă corect, relaţia devine de culoare galbenă, cand este incorect, este roşu. Fiecare mutare sau alegere ar trebui înregistrată într-o baza de date pentru a face un scor a fiecărui utilizator. Un utilizator  care a ajuns la nivelul 10 (rezolvând frazele fără greşeli), are credibilitate mai mare decât unul de la acelaşi nivel dar care a avut câteva greşeli.
-Deocamdată este de ajuns pentru a avea o idee despre acest proiect. Pentru mai multe informaţii, vă stau la dispoziţie.
-
+Proiectul constă în realizarea unei aplicaţii de joc on line care are menirea să facă analiza sintactică a unei propoziţii în limba romană. 
