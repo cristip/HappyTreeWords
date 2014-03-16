@@ -1,6 +1,10 @@
 /* css screen */
 @font-face
 {
-	font-family: AveriaSansLibre;
-	src: url(../assets/fonts/AveriaSansLibre-Bold.ttf);
+	font-family:HammersmithOne;
+	src: url(../assets/fonts/HammersmithOne-Regular.ttf);
+}
+h2
+{
+	font-family:HammersmithOne;
 }

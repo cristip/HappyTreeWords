@@ -1,4 +1,4 @@
-//se ia propozita
+  //se ia propozita
   //se face arborele ca lista inlantuita (simplu, dupa atributul head)
   //se prezinta propozita ca un grup de cuvinte in ordinea lor in propozitie.
   //utlizatorul plaseaza cuvintele pe board si  le uneste
@@ -6,17 +6,73 @@
   //pentru tutorial, alege cate un cuvant si acesta este plasat automat unde trebuie
   //legaturile sunt facute de la sine si primeste punctaj maxim (din partea casei)
 
+/** integ nivelul curent, incepand cu 0 pentru primul nivel */
 var _currentLevel = 0;
+var BOARD_HEIGHT = 600;
+var BOARD_WIDTH = 1050;
+/**
+ * Array de word{
+ *	id:int,
+ *	text:string,
+ *	head:string,
+ *	lemma:string,
+ *	postag:string,
+ *	dprel:string,
+ *	parent:word,
+ *	kids:word[],
+ *  isPunctuation:bool
+ *}
+ */
 var currentProcessedSentence;
-var word = {
-	text:"Caii",
-	head:2
-};
+/**
+ * starts a new game
+ */
+function newGame()
+{
+	stage = new createjs.Stage("gameCanvas");
+  	board = new createjs.Container();
+  	board.y = 50;
+  	stage.addChild(board);
+  	initLevel();
+  	createjs.Ticker.addEventListener("tick", tick);
+
+}
 
 function initLevel()
 {
+	clearBoard();
 	loadData(_currentLevel)
 }
+/**
+ * pregateste board pentru un nou arbore,
+ * este curatat arborele vechi si aplicat gridul
+ */
+function clearBoard()
+{
+	board.removeAllChildren ();
+	var gridGraphics = new createjs.Graphics();
+	var boardGrid = new createjs.Shape(gridGraphics);
+	for(var i = 5; i < BOARD_HEIGHT; i+=30)
+	{
+		gridGraphics.beginStroke("#4EB0FF").moveTo(0, i).lineTo(BOARD_WIDTH, i).endStroke();
+	}
+	gridGraphics.beginStroke("#FF86C9").moveTo(30, 0).lineTo(30, BOARD_HEIGHT).endStroke();
+	board.addChild(boardGrid);
+
+
+	drawTree();
+	//var bitmap = new createjs.Bitmap('assets/images/tree.png');
+
+	//board.addChild(bitmap);
+
+
+	stage.update();
+
+}
+/**
+ * incarca datele pentru nivelul curent
+ * @param int level, incepant cu 0 pentru primul nivel 
+ */
 function loadData(level)
 {
 	var strData = levels[level];
@@ -24,26 +80,45 @@ function loadData(level)
 	var $xml = $(xmlData);
 	var words = $xml.find('word');
 	currentProcessedSentence = [];
+	var sentence = [];
 	for(var i = 0; i < words.length; i++)
-	{
+	{   
+		var deprel = parseWord(words[i], 'deprel');
 		currentProcessedSentence.push({
 			id:parseInt(parseWord(words[i], 'id')),
 			text:parseWord(words[i], 'form'),
 			head:parseInt(parseWord(words[i], 'head')),
 			lemma:parseWord(words[i], 'lemma'),
 			postag:parseWord(words[i], 'postag'),
-			dprel:parseWord(words[i], 'dprel'),
+			dprel:deprel,
 			parent:null,
-			kids:[]
+			kids:[],
+			isPunctuation:(deprel == "punct.")
 		});
+		sentence.push(currentProcessedSentence[i].text);
 	}
+	var strSentence = sentence.join(" ");
 	for(var i = 0; i < currentProcessedSentence.length; i++)
 	{
 		updateParentKid(currentProcessedSentence[i]);
 	}
 	displayInitialSentence();
+	displayTextSentence(strSentence);
+	stage.update();
 }
-
+/**
+ *@param Object word {
+ *	id:int,
+ *	text:string,
+ *	head:string,
+ *	lemma:string,
+ *	postag:string,
+ *	dprel:string,
+ *	parent:word,
+ *	kids:word[],
+ *  isPunctuation:bool
+ *}
+ */
 function updateParentKid(word)
 {
 	if(!word.head)
@@ -53,7 +128,12 @@ function updateParentKid(word)
 	word.parent = currentProcessedSentence[word.head];
 	word.parent.kids.push(word);
 }
-
+/**
+ * verifica daca wordXML are atributul attributeName si-i intoarce
+ * valoarea, sau null daca nu exista atributul
+ * @param wordXML un nod
+ * @param attributeName, string numele atributului
+ */
 function parseWord(wordXML, attributeName)
 {
    var wordAttr = wordXML.attributes[attributeName];
@@ -63,7 +143,22 @@ function parseWord(wordXML, attributeName)
    }
    return null;
 }
-
+/**
+ * afiseaza propozitia ca text static
+ */
+function displayTextSentence(strSentence)
+{
+	/*var sentenceText = new createjs.Text(strSentence, "24px HammersmithOne","#333333");
+	sentenceText.x = (BOARD_WIDTH - sentenceText.getMeasuredWidth())/2;
+	sentenceText.y = 10;
+	board.addChild(sentenceText);*/
+	$("#sentenceText").text(strSentence)
+}
+/**
+ * afiseaza propozita
+ * formata din copii de tip Container
+ * 
+ */
 function displayInitialSentence()
 {
 	var lastx = 10;
@@ -79,8 +174,10 @@ function displayInitialSentence()
 		lastx = lastx+bounds.width+15;
 		stage.addChild(word);
 	}
-	stage.update();
 }
+/**
+ * event handler, mouse down pe un cuvant
+ */
 function onWordMouseDown(event)
 {
 	var wordUI = event.currentTarget;
@@ -90,20 +187,76 @@ function onWordMouseDown(event)
 	wordUI.initialPosition = {x:wordUI.x, y:wordUI.y};
 
 }
+/**
+ * event handler, cu mouse apasat se misca cuvatul
+ */
 function onWordPressMove(event)
 {
 	update = true;
 	var wordUI = event.currentTarget;
-	wordUI.x = event.stageX - wordUI._currentLocalX;
-	wordUI.y = event.stageY - wordUI._currentLocalY;
+	var point = wordUI.parent.globalToLocal(event.stageX, event.stageY);
+	wordUI.x = point.x - wordUI._currentLocalX;
+	wordUI.y = point.y - wordUI._currentLocalY;
 }
+/**
+ * event handler, s-a eliberat mouse-ul
+ */
 function onWordPressUp(event)
 {
-   //update = false;
-   var wordUI = event.currentTarget;
-   createjs.Tween.get(wordUI).to({x:wordUI.initialPosition.x,y:wordUI.initialPosition.y}, 300);
+	var wordUI = event.currentTarget;
+	if(wordUI.y < 80)
+	{
+			 createjs.Tween.get(wordUI).to({x:wordUI.initialPosition.x,y:wordUI.initialPosition.y}, 300).call(function(){
+			 	//update = false;
+			 });
+			 return;
+	}
+	//wordUI.removeEventListener('pressup', onWordPressUp, true);
+	//wordUI.removeEventListener('mousedown', onWordMouseDown, true);
+	//wordUI.removeEventListener('pressmove', onWordPressMove, true);
+	if(wordUI.parent == stage)
+	{
+		stage.removeChild(wordUI);
+		wordUI.y -= 50;
+		board.addChild(wordUI);
+		decorateDroppedWord(wordUI)
+	}
+	
+	snapToGrid(wordUI);
+	
+	
+  
+}
+/**
+ *
+ *
+ */
+function snapToGrid(wordUI)
+{
+	for(var i = 65; i < BOARD_HEIGHT; i += 30)
+	{
+		if(wordUI.y > i && wordUI.y < i +35)
+		{
+			wordUI.y = i;
+			break;
+		}
+	}
 }
 
+/**
+ * pentru un wordObj{
+ *	id:int,
+ *	text:string,
+ *	head:string,
+ *	lemma:string,
+ *	postag:string,
+ *	dprel:string,
+ *	parent:word,
+ *	kids:word[],
+ *  isPunctuation:bool
+ *}
+ * returneaza un Container
+ */
 function createWordUI(wordObj)
 {
 	var container = new createjs.Container();
@@ -112,11 +265,39 @@ function createWordUI(wordObj)
 	container._data = wordObj;
 	container.addChild(wordUI);
 
-	var displayText = new createjs.Text(wordObj.text,'32px AveriaSansLibre','#000000');
+	var displayText = new createjs.Text(wordObj.text,'32px HammersmithOne','#000000');
 	displayText.x = 5;
-	displayText.y = 0;
-	graphix.beginFill('#FFFFFF').drawRoundRect(0,0,displayText.getMeasuredWidth()+10,displayText.getMeasuredHeight()+10,10).ef();
+	displayText.y = is_firefox?6:0;
+	graphix.beginStroke("#FFFFFF").beginFill('#267F2D').drawRoundRect(0,0,displayText.getMeasuredWidth()+10,displayText.getMeasuredHeight()+10,10).ef();
 	wordUI.shadow = new createjs.Shadow("#000000", 0, 0, 10);
 	container.addChild(displayText);
 	return container;
+}
+function decorateDroppedWord(wordContainer)
+{
+	var graphics = new createjs.Graphics();
+	var shapeOut = new createjs.Shape(graphics);
+	var shapeIn = new createjs.Shape(graphics);
+	graphics.f("#FF66CC").p("AhEg7ICJAAIhFB3g");
+	var bounds = wordContainer.getBounds();
+	shapeOut.setTransform(bounds.width/2+5, bounds.height+14);
+	shapeIn.setTransform(bounds.width/2+5, 0);
+	shapeIn.enableMouseOver = true;
+	shapeIn.addEventListener('rollover', onInMouseOver)
+	if(wordContainer._data.isPunctuation)
+	{
+		wordContainer.addChild(shapeIn);
+	}else
+	{
+		wordContainer.addChild(shapeIn, shapeOut);
+	}
+	
+}
+function onInMouseOver(event)
+{
+	console.log('mouse over...' + event)
+}
+function onInPressUp(event)
+{
+	console.log(event);
 }

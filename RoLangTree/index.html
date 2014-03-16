@@ -4,52 +4,36 @@
   <meta charset="utf-8">
   <title>Ro Lang Tree</title>
   <link rel="stylesheet" type="text/css" href="css/screen.css">
-  <link href='http://fonts.googleapis.com/css?family=Averia+Sans+Libre' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Hammersmith+One&subset=latin-ext' rel='stylesheet' type='text/css'>
   <script src="js/createjs-2013.12.12.min.js"></script>
   <script src="js/jquery-1.11.0.min.js"></script>
   <script src="js/dummyserver.js"></script>
   <script src="js/game.js"></script>
+  <script src="js/tree.js"></script>
   <script>
   var stage;
   var update = false;
-  var treeContainer;
-
-
-  
-
-
-
-
+  var board;
+  var boardGrid;
+  var is_firefox;
   function init () {
-  	stage = new createjs.Stage("gameCanvas");
-  	treeContainer = new createjs.Container();
-  	treeContainer.y = 200;
-  	stage.addChild(treeContainer);
-  	initLevel();
 
-
-  	//stage.update();
-  	createjs.Ticker.addEventListener("tick", tick);
-
+    is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+  	setTimeout(newGame, 1000)
   	
   }
   function tick(event){
-    if(update)
-  	stage.update();
-  }
-  function handleClick(event){
-   console.log("click")
+    if(update){
+      stage.update();    
+    }
   }
 	
   </script>
 </head>
 <body onload="init();">
-
-	<div id="loader"></div>
-
-	<p style="font-family:AveriaSansLibre;visibility:hidden;width:1px;height:1px;">Hello</p>
+	<h2 id="sentenceText">&nbsp;</h2>
 	<div class="game">
-		<canvas id="gameCanvas" width="800" height="600">
+		<canvas id="gameCanvas" width="1050" height="650">
 			Browserul dvs nu este suportat. Recomandam Chrome, Firefox sau Internet Explorer 11.
 		</canvas>
 	</div>
