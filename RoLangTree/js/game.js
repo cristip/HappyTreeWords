@@ -25,6 +25,10 @@ var BOARD_WIDTH = 1050;
  */
 var currentProcessedSentence;
 /**
+ * wordUI care au fost plasate deja pe board;
+ */
+var boardDroppedWords;
+/**
  * starts a new game
  */
 function newGame()
@@ -148,10 +152,6 @@ function parseWord(wordXML, attributeName)
  */
 function displayTextSentence(strSentence)
 {
-	/*var sentenceText = new createjs.Text(strSentence, "24px HammersmithOne","#333333");
-	sentenceText.x = (BOARD_WIDTH - sentenceText.getMeasuredWidth())/2;
-	sentenceText.y = 10;
-	board.addChild(sentenceText);*/
 	$("#sentenceText").text(strSentence)
 }
 /**
@@ -174,6 +174,7 @@ function displayInitialSentence()
 		lastx = lastx+bounds.width+15;
 		stage.addChild(word);
 	}
+	boardDroppedWords = [];
 }
 /**
  * event handler, mouse down pe un cuvant
@@ -211,9 +212,16 @@ function onWordPressUp(event)
 			 });
 			 return;
 	}
+
 	//wordUI.removeEventListener('pressup', onWordPressUp, true);
 	//wordUI.removeEventListener('mousedown', onWordMouseDown, true);
 	//wordUI.removeEventListener('pressmove', onWordPressMove, true);
+	
+	//wordUI.addEventListener('doubleclick', onBoardWordDoubleClick, true);
+	//wordUI.addEventListener('pressup', onBoardWordPressUp, true);
+	//wordUI.addEventListener('mousedown', onBoardWordMouseDown, true);
+	//wordUI.addEventListener('pressmove', onBoardWordPressMove, true);
+
 	if(wordUI.parent == stage)
 	{
 		stage.removeChild(wordUI);
@@ -224,9 +232,32 @@ function onWordPressUp(event)
 	
 	snapToGrid(wordUI);
 	
-	
+	boardDroppedWords.push(wordUI);
+	if(boardDroppedWords.length == currentProcessedSentence.length)
+	{
+		displayStartConnectionsButton();
+	}
   
 }
+
+function onBoardWordDoubleClick(event){
+
+}
+function onBoardWordPressUp(event){
+	var fromWord = event.target;
+
+
+}
+
+function onBoardWordMouseDown(event){
+	
+}
+
+function onBoardWordPressMove(event){
+	
+}
+
+
 /**
  *
  *
@@ -265,11 +296,11 @@ function createWordUI(wordObj)
 	container._data = wordObj;
 	container.addChild(wordUI);
 
-	var displayText = new createjs.Text(wordObj.text,'32px HammersmithOne','#000000');
+	var displayText = new createjs.Text(wordObj.text,'32px HammersmithOne','#FFFFFF');
 	displayText.x = 5;
 	displayText.y = is_firefox?6:0;
 	graphix.beginStroke("#FFFFFF").beginFill('#267F2D').drawRoundRect(0,0,displayText.getMeasuredWidth()+10,displayText.getMeasuredHeight()+10,10).ef();
-	wordUI.shadow = new createjs.Shadow("#000000", 0, 0, 10);
+	wordUI.shadow = new createjs.Shadow("#000000", 0, 0, 5);
 	container.addChild(displayText);
 	return container;
 }

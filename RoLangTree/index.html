@@ -15,12 +15,12 @@
   var update = false;
   var board;
   var boardGrid;
+  /** masoara in mod diferit fata de IE sau WebKit) boolean */
   var is_firefox;
   function init () {
-
     is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    //simulez un preloader...
   	setTimeout(newGame, 1000)
-  	
   }
   function tick(event){
     if(update){
