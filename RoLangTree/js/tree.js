@@ -1,10 +1,11 @@
 function drawTree()
 {
+	var bmp =  new createjs.Bitmap(null);
+	stage.addChild(bmp);
 	var img = new Image();
-	img.src = "assets/images/tree.png";
+	img.src = "assets/images/bg_small.png";
 	img.onload = function (e) {
-    var bmp = new createjs.Bitmap(e.target);
-    board.addChild(bmp);
-    stage.update();
-}
+    	bmp.image = (e.target);
+	    stage.update();
+	}
 }

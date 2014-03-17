@@ -4,7 +4,16 @@
 	font-family:HammersmithOne;
 	src: url(../assets/fonts/HammersmithOne-Regular.ttf);
 }
-h2
+body
 {
 	font-family:HammersmithOne;
+	text-align: center;
+}
+#gameCanvas
+{
+	position:absolute;
+	
+	left: 50%;
+	margin-left: -525px;
+	
 }

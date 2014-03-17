@@ -36,6 +36,7 @@ function newGame()
 	stage = new createjs.Stage("gameCanvas");
   	board = new createjs.Container();
   	board.y = 50;
+  	drawTree();
   	stage.addChild(board);
   	initLevel();
   	createjs.Ticker.addEventListener("tick", tick);
@@ -54,22 +55,14 @@ function initLevel()
 function clearBoard()
 {
 	board.removeAllChildren ();
-	var gridGraphics = new createjs.Graphics();
-	var boardGrid = new createjs.Shape(gridGraphics);
-	for(var i = 5; i < BOARD_HEIGHT; i+=30)
-	{
-		gridGraphics.beginStroke("#4EB0FF").moveTo(0, i).lineTo(BOARD_WIDTH, i).endStroke();
-	}
-	gridGraphics.beginStroke("#FF86C9").moveTo(30, 0).lineTo(30, BOARD_HEIGHT).endStroke();
-	board.addChild(boardGrid);
-
-
-	drawTree();
-	//var bitmap = new createjs.Bitmap('assets/images/tree.png');
-
-	//board.addChild(bitmap);
-
-
+	//var gridGraphics = new createjs.Graphics();
+	//var boardGrid = new createjs.Shape(gridGraphics);
+	//for(var i = 5; i < BOARD_HEIGHT; i+=30)
+	//{
+	//	gridGraphics.beginStroke("#4EB0FF").moveTo(0, i).lineTo(BOARD_WIDTH, i).endStroke();
+	//}
+	//gridGraphics.beginStroke("#FF86C9").moveTo(30, 0).lineTo(30, BOARD_HEIGHT).endStroke();
+	//board.addChild(boardGrid);
 	stage.update();
 
 }
@@ -227,7 +220,7 @@ function onWordPressUp(event)
 		stage.removeChild(wordUI);
 		wordUI.y -= 50;
 		board.addChild(wordUI);
-		decorateDroppedWord(wordUI)
+		//decorateDroppedWord(wordUI)
 	}
 	
 	snapToGrid(wordUI);
@@ -264,7 +257,7 @@ function onBoardWordPressMove(event){
  */
 function snapToGrid(wordUI)
 {
-	for(var i = 65; i < BOARD_HEIGHT; i += 30)
+	for(var i = 65; i < BOARD_HEIGHT; i += 60)
 	{
 		if(wordUI.y > i && wordUI.y < i +35)
 		{
@@ -296,24 +289,28 @@ function createWordUI(wordObj)
 	container._data = wordObj;
 	container.addChild(wordUI);
 
-	var displayText = new createjs.Text(wordObj.text,'32px HammersmithOne','#FFFFFF');
+	var displayText = new createjs.Text(wordObj.text,'24px HammersmithOne','#000000');
 	displayText.x = 5;
-	displayText.y = is_firefox?6:0;
-	graphix.beginStroke("#FFFFFF").beginFill('#267F2D').drawRoundRect(0,0,displayText.getMeasuredWidth()+10,displayText.getMeasuredHeight()+10,10).ef();
+	displayText.y = is_firefox?12:6;
+	graphix.beginFill('#FF66CC').drawRoundRect(0,0,displayText.getMeasuredWidth()+10,displayText.getMeasuredHeight()+20,10).ef();
 	wordUI.shadow = new createjs.Shadow("#000000", 0, 0, 5);
 	container.addChild(displayText);
 	return container;
 }
+/*
 function decorateDroppedWord(wordContainer)
 {
 	var graphics = new createjs.Graphics();
 	var shapeOut = new createjs.Shape(graphics);
 	var shapeIn = new createjs.Shape(graphics);
+	//AiWiBIEtAAIiXEDg
 	graphics.f("#FF66CC").p("AhEg7ICJAAIhFB3g");
 	var bounds = wordContainer.getBounds();
-	shapeOut.setTransform(bounds.width/2+5, bounds.height+14);
-	shapeIn.setTransform(bounds.width/2+5, 0);
+	shapeOut.setTransform(bounds.width/2+5, bounds.height+26);
+	shapeOut.shadow = new createjs.Shadow("#000000", 0, 2, 5);
+	shapeIn.setTransform(bounds.width/2+5, -5);
 	shapeIn.enableMouseOver = true;
+	shapeIn.shadow = new createjs.Shadow("#000000", 0, -1, 5);
 	shapeIn.addEventListener('rollover', onInMouseOver)
 	if(wordContainer._data.isPunctuation)
 	{
@@ -324,6 +321,7 @@ function decorateDroppedWord(wordContainer)
 	}
 	
 }
+*/
 function onInMouseOver(event)
 {
 	console.log('mouse over...' + event)
