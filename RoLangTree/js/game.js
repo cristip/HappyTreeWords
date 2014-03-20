@@ -230,7 +230,13 @@ function onWordPressUp(event)
 	{
 		displayStartConnectionsButton();
 	}
-  
+}
+
+function displayStartConnectionsButton()
+{
+	var graphics = new createjs.Graphics();
+	graphics.beginFill('#FF66CC').drawRoundRect(0,0,150,40,10).ef()
+	var startConnectionBtn = new createjs.Sprite(graphics);
 }
 
 function onBoardWordDoubleClick(event){
