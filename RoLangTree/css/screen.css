@@ -9,11 +9,70 @@ body
 	font-family:HammersmithOne;
 	text-align: center;
 }
-#gameCanvas
+a{
+	text-decoration: none;
+	color:#FFFFFF;
+}
+a:visited{
+	color:#FFFFFF;	
+}
+
+.leftAlign{
+	float:left;
+}
+.rightAlign{
+	float:right;
+}
+.centerAlign{
+	float:none;
+	clear: both;;
+}
+#gameBox
 {
 	position:absolute;
-	
+	width:1050px; 
 	left: 50%;
 	margin-left: -525px;
+	background-color: #333333;
+	color: #FFFFFF;
+}
+#user
+{
+	margin-left: 15px;
+}
+#points
+{
+	margin-right:15px;
+}
+#sentenceText
+{
 	
+}
+#gameCanvas
+{
+	
+	display:none;
+
+}
+#startGame
+{
+	position: absolute;
+	background-image: url(../assets/images/tree.png);
+	background-color: #336533;
+	width:1050px; 
+	height:650px;
+	text-align: left;
+	color:#FFFFFF;
+}
+#startGame ol
+{
+	position: absolute;
+	margin-top: 150px;
+	margin-left: 40px;
+}
+#startGame ol li
+{
+	text-shadow: 0px 0px 20px rgba(255, 255, 255, 1);
+	font-size: 25px;
+	margin-top: 40px;	
 }

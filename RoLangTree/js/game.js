@@ -33,6 +33,8 @@ var boardDroppedWords;
  */
 function newGame()
 {
+	$("#startGame").hide();
+	$('#gameCanvas').show();
 	stage = new createjs.Stage("gameCanvas");
   	board = new createjs.Container();
   	board.y = 50;

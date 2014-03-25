@@ -20,7 +20,8 @@
   function init () {
     is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
     //simulez un preloader...
-  	setTimeout(newGame, 1000)
+  	//setTimeout(newGame, 1000)
+    $("#startGameBtn").click(newGame);
   }
   function tick(event){
     if(update){
@@ -32,8 +33,25 @@
 </head>
 <body onload="init();">
   <div id="gameBox">
-    <h2 id="sentenceText">&nbsp;</h2>
-
+    <div id="gameStats">
+      <div class="leftAlign">
+        <p id="user">Popescu Ionel-Marin, Nivelul 15</p>
+      </div>
+      <div class="rightAlign">
+        <p id="points">2134 puncte</p>
+      </div>
+      <div class="centerAlign">
+        <h2 id="sentenceText">Hai să incepem</h2>
+      </div>
+    </div>
+    <div id="startGame">
+        <ol>
+          <li><a href="#">Vezi tutorial</a></li>
+          <li><a href="#" id="startGameBtn">Să jucăm</a></li>
+          <li><a href="#">Vezi clasamentul</a></li>
+          <li><a href="#">Despre această aplicație</a></li>
+        </ol>
+    </div>
     <canvas id="gameCanvas" width="1050" height="650">
       Browserul dvs nu este suportat. Recomandam Chrome, Firefox sau Internet Explorer 11.
     </canvas>
