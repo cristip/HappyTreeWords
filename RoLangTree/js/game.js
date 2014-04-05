@@ -10,6 +10,10 @@
 var _currentLevel = 0;
 var BOARD_HEIGHT = 600;
 var BOARD_WIDTH = 1050;
+var BOARD_Y = 50;
+var _currentConnections = [];
+var _currentConnection = null;
+var _isConnecting = false;
 /**
  * Array de word{
  *	id:int,
@@ -35,9 +39,12 @@ function newGame()
 {
 	$("#startGame").hide();
 	$('#gameCanvas').show();
+	$('#helpBtn').show();
+	$('#dprelBtn').show();
 	stage = new createjs.Stage("gameCanvas");
+	createjs.Touch.enable(stage);
   	board = new createjs.Container();
-  	board.y = 50;
+  	board.y = BOARD_Y;
   	drawTree();
   	stage.addChild(board);
   	initLevel();
@@ -49,7 +56,36 @@ function initLevel()
 {
 	clearBoard();
 	loadData(_currentLevel)
+	if(_currentLevel == 0)
+	{
+		setTimeout(displayFirstHelpTip, 500);
+	}
 }
+
+function displayFirstHelpTip()
+{
+	$('.modalDialog').show();
+	$('#firstHelpTip').show();
+	$('#firstHelpTip').click(function(){
+		$('.modalDialog').hide();
+		$('#firstHelpTip').hide();
+	});
+}
+function displaySecondHelpTip()
+{
+	$('.modalDialog').show();
+	$('#secondHelpTip').show();
+	$('#secondHelpTip').click(function(){
+		$('.modalDialog').hide();
+		$('#secondHelpTip').hide();
+	});
+}
+
+function tick(event){
+    if(update){
+      stage.update();    
+    }
+  }
 /**
  * pregateste board pentru un nou arbore,
  * este curatat arborele vechi si aplicat gridul
@@ -208,54 +244,220 @@ function onWordPressUp(event)
 			 return;
 	}
 
-	//wordUI.removeEventListener('pressup', onWordPressUp, true);
-	//wordUI.removeEventListener('mousedown', onWordMouseDown, true);
-	//wordUI.removeEventListener('pressmove', onWordPressMove, true);
-	
-	//wordUI.addEventListener('doubleclick', onBoardWordDoubleClick, true);
-	//wordUI.addEventListener('pressup', onBoardWordPressUp, true);
-	//wordUI.addEventListener('mousedown', onBoardWordMouseDown, true);
-	//wordUI.addEventListener('pressmove', onBoardWordPressMove, true);
 
 	if(wordUI.parent == stage)
 	{
 		stage.removeChild(wordUI);
-		wordUI.y -= 50;
+		wordUI.y -= BOARD_Y;
 		board.addChild(wordUI);
-		//decorateDroppedWord(wordUI)
+		boardDroppedWords.push(wordUI);
+		snapToGrid(wordUI);
+		if(boardDroppedWords.length == currentProcessedSentence.length)
+		{
+			displayStartConnectionsButton();
+		}
 	}
 	
-	snapToGrid(wordUI);
 	
-	boardDroppedWords.push(wordUI);
-	if(boardDroppedWords.length == currentProcessedSentence.length)
+	
+	
+	
+}
+function removeWordMoveEventListeners(wordUI)
+{
+	wordUI.removeEventListener('pressup', onWordPressUp, true);
+	wordUI.removeEventListener('mousedown', onWordMouseDown, true);
+	wordUI.removeEventListener('pressmove', onWordPressMove, true);
+}
+function removeMoveEventListeners()
+{
+	for(var i = 0; i < boardDroppedWords.length; i++)
 	{
-		displayStartConnectionsButton();
+		var wordUI = boardDroppedWords[i];
+		removeWordMoveEventListeners(wordUI);
 	}
 }
-
+function addWordDoubleClickEventListener(wordUI)
+{
+	wordUI.addEventListener('dblclick', onBoardWordDoubleClick, true);
+}
+function addDoubleClickEventListeners()
+{
+	for(var i = 0; i < boardDroppedWords.length; i++)
+	{
+		var wordUI = boardDroppedWords[i];
+		addWordDoubleClickEventListener(wordUI);
+	}
+}
+function switch2DrawPaths()
+{
+	displayNextLevelButton();
+	for(var i = 0; i < boardDroppedWords.length; i++)
+	{
+		var wordUI = boardDroppedWords[i];
+		wordUI.addEventListener('pressup', onBoardWordPressUp, true);
+		wordUI.addEventListener('mousedown', onBoardWordMouseDown, true);
+		wordUI.addEventListener('pressmove', onBoardWordPressMove, true);
+	}
+}
 function displayStartConnectionsButton()
 {
-	var graphics = new createjs.Graphics();
-	graphics.beginFill('#FF66CC').drawRoundRect(0,0,150,40,10).ef()
-	var startConnectionBtn = new createjs.Sprite(graphics);
+	if(_currentLevel == 0)
+	{
+		setTimeout(displaySecondHelpTip, 500);
+	}
+
+	
+
+	_currentConnections = [];
+
+	addDoubleClickEventListeners();
+	
+
+}
+
+function displayNextLevelButton()
+{
+	var domEl = document.getElementById('nextLevelBtn');
+	
+	var nextBtn = new createjs.DOMElement(domEl);
+	stage.addChild(nextBtn);
+	domEl.style.visibility = "hidden";
+	domEl.style.display = "inline-block";
+	//nextBtn.x = BOARD_WIDTH/2 - 30;
+	nextBtn.y = 150;
+	nextBtn.x = -530;
+	createjs.Tween.get(nextBtn).to({x:-130}, 500);
+
+}
+
+function getNewConnection(sourceWordUI, destinationWordUI)
+{
+	var connection = {
+		source:sourceWordUI,
+		destination:destinationWordUI,
+		shape:null,
+		lineTo:function (point){
+			this.shape.graphics.clear();
+			var startPoint = this.getStartPoint();
+			this.shape.graphics.setStrokeStyle(3, 1).beginStroke(0xFF0000).moveTo(startPoint.x, startPoint.y).lineTo(point.x, point.y).endStroke();
+		},
+		cleanUp:function(){
+			this.shape.parent.removeChild(this.shape);
+			this.shape.graphics.clear();
+			this.shape = null;
+			this.source = null;
+			this.destination = null;
+			for(var i in this)
+			{
+				delete(this[i]);
+			}
+		},
+		endConnection:function(){
+			var point = this.getEndPoint();
+			this.lineTo(point);
+		},
+		getStartPoint:function(){
+			if(!this.source)
+			{
+				return null;
+			}
+			
+			var bounds = this.source.getBounds();
+			return this.source.localToGlobal(bounds.width/2, bounds.height - BOARD_Y);
+		},
+		getEndPoint:function(){
+			if(!this.destination)
+			{
+				return null;
+			}
+			var bounds = this.destination.getBounds();
+			return this.destination.localToGlobal(bounds.width/2, -BOARD_Y);
+		}
+	}
+	var graphic = new createjs.Graphics();
+	connection.shape = new createjs.Shape(graphic);
+	return connection;
 }
 
 function onBoardWordDoubleClick(event){
-
+	event.preventDefault();
+	event.stopImmediatePropagation();
+	removeMoveEventListeners();
+	switch2DrawPaths();
+}
+function getWordUnderPoint(x, y)
+{
+	for(var i = 0; i < boardDroppedWords.length; i++)
+	{
+		var wordUI = boardDroppedWords[i];
+		var bounds = wordUI.getBounds();
+		if(x >= wordUI.x && x <= wordUI.x + bounds.width && y >= wordUI.y && y <= wordUI.y + bounds.height)
+		{
+			return wordUI;
+		}
+	}
+	return null;
 }
 function onBoardWordPressUp(event){
-	var fromWord = event.target;
+	_isConnecting = false;
+	var wordUI = event.currentTarget;
+	event.stopImmediatePropagation();
+	console.log("mouse up " + wordUI)
+	var connection = _currentConnection;
+	if(wordUI != _currentConnection.source)
+	{
+		console.log("initiator gresit...");
+		_currentConnection = null;
+		connection.cleanUp();
+		return;
+	}
 
-
+	var targetWordUI = getWordUnderPoint(event.stageX, event.stageY - BOARD_Y)
+	if(	null == targetWordUI ||
+		wordUI == targetWordUI ||
+		!targetWordUI.hasOwnProperty('_data')
+	  )
+	{
+		console.log("nu s-a dat drumul peste un obiect...");
+		_currentConnection = null;
+		connection.cleanUp();
+		return;
+	}
+	connection.destination = targetWordUI;
+	connection.endConnection();
+	_currentConnections.push(connection);
+	_currentConnection = null;
+	
 }
 
 function onBoardWordMouseDown(event){
-	
-}
+	var wordUI = event.currentTarget;
+	event.stopImmediatePropagation();
+	if(_isConnecting)
+	{
+		//clear current failed connection
+		return;
+	}
+	_isConnecting = true;
+	var connection = getNewConnection(wordUI, null);
+	board.addChild(connection.shape);
+	_currentConnection = connection;
+}	
 
 function onBoardWordPressMove(event){
+	var wordUI = event.currentTarget;
+	event.stopImmediatePropagation();
+	var connection = _currentConnection;
+	if(!connection)
+	{
+		return;
+	}
 	
+	var point = wordUI.parent.globalToLocal(event.stageX, event.stageY);
+	connection.lineTo(point)
+	_currentConnection = connection;
+
 }
 
 
@@ -270,6 +472,8 @@ function snapToGrid(wordUI)
 		if(wordUI.y > i && wordUI.y < i +35)
 		{
 			wordUI.y = i;
+			var bounds = wordUI.getBounds();
+			wordUI.setBounds(wordUI.x, wordUI.y, bounds.width, bounds.height);
 			break;
 		}
 	}
@@ -292,6 +496,7 @@ function snapToGrid(wordUI)
 function createWordUI(wordObj)
 {
 	var container = new createjs.Container();
+	container.name = wordObj.text;
 	var graphix = new createjs.Graphics();
 	var wordUI = new createjs.Shape(graphix);
 	container._data = wordObj;
@@ -300,9 +505,12 @@ function createWordUI(wordObj)
 	var displayText = new createjs.Text(wordObj.text,'24px HammersmithOne','#000000');
 	displayText.x = 5;
 	displayText.y = is_firefox?12:6;
-	graphix.beginFill('#FF66CC').drawRoundRect(0,0,displayText.getMeasuredWidth()+10,displayText.getMeasuredHeight()+20,10).ef();
+	var _width = displayText.getMeasuredWidth()+10;
+	var _height = displayText.getMeasuredHeight()+20;
+	graphix.beginFill('#FF66CC').drawRoundRect(0,0,_width,_height,10).ef();
 	wordUI.shadow = new createjs.Shadow("#000000", 0, 0, 5);
 	container.addChild(displayText);
+	container.setBounds(0, 0, _width, _height);
 	return container;
 }
 /*

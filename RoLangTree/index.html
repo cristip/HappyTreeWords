@@ -23,39 +23,47 @@
   	//setTimeout(newGame, 1000)
     $("#startGameBtn").click(newGame);
   }
-  function tick(event){
-    if(update){
-      stage.update();    
-    }
-  }
+  
 	
   </script>
 </head>
 <body onload="init();">
+<a href="#nextLevel" class="myButton" id="nextLevelBtn" title="Click pentru a merge la nivelul urmator">Nivelul Urmator</a>
   <div id="gameBox">
     <div id="gameStats">
       <div class="leftAlign">
-        <p id="user">Popescu Ionel-Marin, Nivelul 15</p>
+        <p id="user">Popescu Ionel-Marin, Nivelul 15<br/><span id="points">2134</points> puncte</p>
       </div>
       <div class="rightAlign">
-        <p id="points">2134 puncte</p>
+        
+        <p><a href="#showHelp" id="helpBtn">Ajutor, ce trebuie să fac acum?</a><br/><a id="dprelBtn" href="#showHint">Arată parți vorbire (-150 puncte)</a></p>
       </div>
       <div class="centerAlign">
         <h2 id="sentenceText">Hai să incepem</h2>
+
       </div>
     </div>
     <div id="startGame">
         <ol>
-          <li><a href="#">Vezi tutorial</a></li>
-          <li><a href="#" id="startGameBtn">Să jucăm</a></li>
-          <li><a href="#">Vezi clasamentul</a></li>
-          <li><a href="#">Despre această aplicație</a></li>
+          <li><a href="#tutorial">Vezi tutorial</a></li>
+          <li><a href="#startJoc" id="startGameBtn">Să jucăm</a></li>
+          <li><a href="#clasament">Vezi clasamentul</a></li>
+          <li><a href="#despre">Despre această aplicație</a></li>
         </ol>
     </div>
     <canvas id="gameCanvas" width="1050" height="650">
       Browserul dvs nu este suportat. Recomandam Chrome, Firefox sau Internet Explorer 11.
     </canvas>
-   
+  </div>
+  <div class="modalDialog">&nbsp;
+      <div id="firstHelpTip" title="Apasă pentru a închide">
+        <p>Plasează toate cuvintele ca să obții arborele dorit!</p>
+        <p><img src="assets/images/hint_plasare.png" alt="cuvinte plasate"/><br/>Continuă</p>
+      </div>
+      <div id="secondHelpTip" title="Apasă pentru a închide">
+        <p>Conectează cuvintele respectînd ordinea sintactică!</p>
+        <p><img src="assets/images/hint_conectare.png" alt="cuvinte conectate"/><br/>Dublu click pe un cuvant pentru a-l conecta</p>
+      </div>
   </div>
 </body>
 </html>
