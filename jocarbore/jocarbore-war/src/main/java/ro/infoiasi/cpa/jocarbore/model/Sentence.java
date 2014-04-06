@@ -65,6 +65,7 @@ public class Sentence implements Serializable{
 	}
 	public static Sentence fromNode(Node node)
 	{
+		node.normalize();
 		Sentence sentence = new Sentence();
 		NodeList wordNodes = node.getChildNodes();
 		int numWords = wordNodes.getLength();
@@ -72,6 +73,11 @@ public class Sentence implements Serializable{
 		for(int i = 0; i < numWords; i++)
 		{
 			Node wordNode = wordNodes.item(i);
+			short nodeType = wordNode.getNodeType();
+			if(nodeType != Node.ELEMENT_NODE)
+			{
+				continue;
+			}
 			NamedNodeMap wordAttributes = wordNode.getAttributes();
 			int numWordAttributes = wordAttributes.getLength();
 			Map<String, String> wordAttributesMap = new HashMap<String, String>();

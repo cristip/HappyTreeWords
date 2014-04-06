@@ -52,15 +52,18 @@ public class ImportSentencesServlet extends HttpServlet {
 				    //String filename = FilenameUtils.getName(item.getName());
 				    InputStream filecontent = item.getInputStream();
 				    Document doc = Utils.readXml(filecontent);
+				    doc.normalizeDocument();
 				    int numEntries = adminService.importDocument(doc);
 				    //resp.addIntHeader("numEntries", numEntries);
 				}
 			 }
 			 return;
 		}catch(FileUploadException e){
-			resp.sendError(500);
+			e.printStackTrace();
+			//resp.sendError(500);
 		}catch(Exception e){
-			resp.sendError(500);
+			//resp.sendError(500);
+			e.printStackTrace();
 		}
 		resp.sendError(500);
 	}

@@ -9,6 +9,7 @@ import org.w3c.dom.NodeList;
 import ro.infoiasi.cpa.jocarbore.model.Sentence;
 
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Text;
 
 public class AdminService extends AbstractService {
 	private static AdminService Me;
@@ -42,7 +43,8 @@ public class AdminService extends AbstractService {
 			level.setProperty("value", lastLevel+i);
 			Node sentenceNode = sentenceNodes.item(i);
 			Sentence sentence = Sentence.fromNode(sentenceNode);
-			level.setProperty("data", sentence.toString());
+			Text data = new Text(sentence.toString());
+			level.setProperty("data", data);
 			update(level);
 		}
 		return numEntries;
