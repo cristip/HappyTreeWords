@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<datastore-indexes>
+  <datastore-index kind="User">
+    <property name="email" direction="asc" />
+    <property name="level" direction="asc" />
+    <property name="points" direction="asc" />
+    <property name="active" direction="asc" />
+    <property name="name" direction="asc" />
+    <property name="scoala" direction="asc" />
+    <property name="joindate" direction="desc"/>
+    <property name="lastplaydate" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="GameSession">
+    <property name="email" direction="asc" />
+    <property name="date" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="GameLevel">
+  	<property name="value" direction="asc"/>
+  	<property name="data"/>
+  </datastore-index>
+</datastore-indexes>
