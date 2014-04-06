@@ -1,3 +1,4 @@
+<%@page import="ro.infoiasi.cpa.jocarbore.services.GameUserProfileService"%>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="com.google.appengine.api.users.User" %>
 <%@ page import="com.google.appengine.api.users.UserService" %>
@@ -16,6 +17,8 @@
 	User user = userService.getCurrentUser();
 	if (user != null) {
     	pageContext.setAttribute("user", user);
+    	pageContext.setAttribute("userProfile", GameUserProfileService.getInstance().getUserProfile());
+    	
 %>
 	<link href='http://fonts.googleapis.com/css?family=Hammersmith+One&subset=latin-ext' rel='stylesheet' type='text/css'>
 	<script src="http://code.createjs.com/createjs-2013.12.12.min.js" type="text/javascript"></script>
@@ -29,13 +32,18 @@
 	var update = false;
 	var board;
 	var boardGrid;
+	/** integ nivelul curent, incepand cu 0 pentru primul nivel */
+	var _currentLevel = 0;
+	var initialUserProfile = ${userProfile};
 	/** masoara in mod diferit fata de IE sau WebKit) boolean */
 	var is_firefox;
 	function init () {
 	  is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-	  //simulez un preloader...
-		//setTimeout(newGame, 1000)
 	  $("#startGameBtn").click(newGame);
+	  _currentLevel = parseInt(initialUserProfile.level);
+	  $("#gameLevel").text(_currentLevel+1);
+	  $("#points").text(initialUserProfile.points);
+	  
 	}
 	</script>
 </head>
@@ -44,7 +52,7 @@
   <div id="gameBox">
     <div id="gameStats">
       <div class="leftAlign">
-        <p id="user">${fn:escapeXml(user.nickname)}, Nivelul 15<br/><span id="points">2134</span> puncte</p>
+        <p id="user">${fn:escapeXml(user.nickname)}, Nivelul <span id="gameLevel">15</span><br/><span id="points">2134</span> puncte</p>
       </div>
       <div class="rightAlign">
         

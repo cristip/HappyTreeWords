@@ -11,6 +11,10 @@
     	<servlet-name>import</servlet-name>
     	<servlet-class>ro.infoiasi.cpa.jocarbore.admin.ImportSentencesServlet</servlet-class>
     </servlet>
+    <servlet>
+    	<servlet-name>leveldata</servlet-name>
+    	<servlet-class>ro.infoiasi.cpa.jocarbore.users.GetLevelDataServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
     	<servlet-name>userprofile</servlet-name>
     	<url-pattern>/userprofile</url-pattern>
@@ -18,5 +22,9 @@
     <servlet-mapping>
     	<servlet-name>import</servlet-name>
     	<url-pattern>/import</url-pattern>
+    </servlet-mapping>
+     <servlet-mapping>
+    	<servlet-name>leveldata</servlet-name>
+    	<url-pattern>/leveldata</url-pattern>
     </servlet-mapping>
 </web-app>

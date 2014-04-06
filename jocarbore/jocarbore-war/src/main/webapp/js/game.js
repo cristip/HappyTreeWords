@@ -6,8 +6,7 @@
   //pentru tutorial, alege cate un cuvant si acesta este plasat automat unde trebuie
   //legaturile sunt facute de la sine si primeste punctaj maxim (din partea casei)
 
-/** integ nivelul curent, incepand cu 0 pentru primul nivel */
-var _currentLevel = 0;
+
 var BOARD_HEIGHT = 600;
 var BOARD_WIDTH = 1050;
 var BOARD_Y = 50;
@@ -93,14 +92,6 @@ function tick(event){
 function clearBoard()
 {
 	board.removeAllChildren ();
-	//var gridGraphics = new createjs.Graphics();
-	//var boardGrid = new createjs.Shape(gridGraphics);
-	//for(var i = 5; i < BOARD_HEIGHT; i+=30)
-	//{
-	//	gridGraphics.beginStroke("#4EB0FF").moveTo(0, i).lineTo(BOARD_WIDTH, i).endStroke();
-	//}
-	//gridGraphics.beginStroke("#FF86C9").moveTo(30, 0).lineTo(30, BOARD_HEIGHT).endStroke();
-	//board.addChild(boardGrid);
 	stage.update();
 
 }
@@ -110,6 +101,9 @@ function clearBoard()
  */
 function loadData(level)
 {
+	//TODO: load data from ajax service
+	
+	
 	var strData = levels[level];
 	var xmlData = $.parseXML(strData);
 	var $xml = $(xmlData);

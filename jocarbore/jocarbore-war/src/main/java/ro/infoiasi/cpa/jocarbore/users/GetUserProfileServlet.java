@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import ro.infoiasi.cpa.jocarbore.Utils;
 import ro.infoiasi.cpa.jocarbore.exceptions.UserBannedException;
-import ro.infoiasi.cpa.jocarbore.services.UserService;
+import ro.infoiasi.cpa.jocarbore.services.GameUserProfileService;
 
 
 
@@ -20,7 +20,7 @@ public class GetUserProfileServlet extends HttpServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = 520735051974116706L;
-	private UserService userService = UserService.getInstance();
+	private GameUserProfileService userService = GameUserProfileService.getInstance();
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)

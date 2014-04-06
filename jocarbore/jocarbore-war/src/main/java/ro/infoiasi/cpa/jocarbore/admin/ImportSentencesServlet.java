@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +17,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FilenameUtils;
 import org.w3c.dom.Document;
 
 import ro.infoiasi.cpa.jocarbore.Utils;
@@ -45,6 +43,7 @@ public class ImportSentencesServlet extends HttpServlet {
 				    // Process regular form field (input type="text|radio|checkbox|etc", select, etc).
 				    //String fieldname = item.getFieldName();
 				    //String fieldvalue = item.getString();
+					//we dont care about these here...
 				    continue;
 				} else {
 				    // Process form file field (input type="file").
@@ -54,7 +53,10 @@ public class ImportSentencesServlet extends HttpServlet {
 				    Document doc = Utils.readXml(filecontent);
 				    doc.normalizeDocument();
 				    int numEntries = adminService.importDocument(doc);
-				    //resp.addIntHeader("numEntries", numEntries);
+				    resp.setContentType(Utils.JSON_CONTENT_TYPE);
+				    PrintWriter printer = resp.getWriter();
+					printer.print("{\"result\":\"200 OK\", \"status\":\"File Imported:" + numEntries + "\"}");
+					printer.flush();
 				}
 			 }
 			 return;

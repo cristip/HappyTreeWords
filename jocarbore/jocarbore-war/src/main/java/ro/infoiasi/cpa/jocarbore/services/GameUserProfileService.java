@@ -8,19 +8,20 @@ import ro.infoiasi.cpa.jocarbore.Utils;
 import ro.infoiasi.cpa.jocarbore.exceptions.UserBannedException;
 
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.users.User;
 
-public final class UserService extends AbstractService {
-	private static UserService Me;
-	private static final String USER = "User";
-	private UserService()
+public final class GameUserProfileService extends AbstractService {
+	private static GameUserProfileService Me;
+	
+	private GameUserProfileService()
 	{
 		
 	}
-	public static UserService getInstance(){
+	public static GameUserProfileService getInstance(){
 		if(null == Me)
 		{
-			Me = new UserService();
+			Me = new GameUserProfileService();
 		}
 		return Me;
 	}
@@ -33,14 +34,14 @@ public final class UserService extends AbstractService {
 		}
 		String userEmail = user.getNickname();
 		
-		Entity userEntity = getSingle(USER, "email" , userEmail);
+		Entity userEntity = getSingle(Utils.USER_ENTITY, "email" , userEmail);
 		Map<String, String> profileMap = new HashMap<String, String>();
 		profileMap.put("email", userEmail);
 		Date time = new Date();
 		
 		if(null == userEntity)
 		{
-			userEntity = new Entity(USER);
+			userEntity = new Entity(Utils.USER_ENTITY);
 			userEntity.setProperty("email", userEmail);
 			userEntity.setProperty("level", 0);
 			profileMap.put("level", "0");
@@ -62,6 +63,15 @@ public final class UserService extends AbstractService {
 		update(userEntity);
 		return Utils.jsonFromMap(profileMap);
 		
+	}
+	public String getSentenceByLevel(int level)
+	{
+		Entity sentence = getSingle(Utils.GAME_LEVEL_ENTITY, "value", level);
+		if(null == sentence)
+		{
+			return null;
+		}
+		return ((Text) sentence.getProperty("data")).getValue();
 	}
 
 }

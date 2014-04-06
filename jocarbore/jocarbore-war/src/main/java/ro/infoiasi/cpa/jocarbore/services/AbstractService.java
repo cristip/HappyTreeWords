@@ -18,7 +18,7 @@ public abstract class AbstractService {
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 		datastore.put(entity);
 	}
-	protected Entity getSingle(String key, String propertyName, String value) throws TooManyResultsException
+	protected Entity getSingle(String key, String propertyName, Object value) throws TooManyResultsException
 	{
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 		Filter filter = new Query.FilterPredicate(propertyName, FilterOperator.EQUAL, value);

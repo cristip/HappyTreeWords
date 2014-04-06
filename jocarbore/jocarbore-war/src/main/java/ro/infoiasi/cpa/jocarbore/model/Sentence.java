@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +21,8 @@ public class Sentence implements Serializable{
 	private static final long serialVersionUID = -4712860992370443094L;
 	private int level;
 	private List<Map<String, String>> words;
-	private static final String SEPARATOR = "|CPAR|";
+	private static final String SEPARATOR_IN = "|CPAR|";
+	private static final String SEPARATOR_OUT = "\\|CPAR\\|";
 	
 	public Sentence()
 	{
@@ -47,7 +49,7 @@ public class Sentence implements Serializable{
 	public static Sentence fromJSONArray(String jsonStringArray) throws JSONException
 	{
 		Sentence sentence = new Sentence();
-		String[] jsonArray = jsonStringArray.split(SEPARATOR);
+		String[] jsonArray = jsonStringArray.split(SEPARATOR_OUT);
 		for(int i = 0; i < jsonArray.length; i++)
 		{
 			Map<String, String> wordMap = new HashMap<String, String>();
@@ -99,11 +101,31 @@ public class Sentence implements Serializable{
 		for(Map<String, String> word : getWords()){
 			JSONObject json = new JSONObject(word);
 			if (index > 0){
-	            sbStr.append(SEPARATOR);
+	            sbStr.append(SEPARATOR_IN);
 			}
 			sbStr.append(json.toString());
+			index++;
 		}
 		
 		return sbStr.toString();
+	}
+	public String toUserString(Boolean hasDprel) {
+		StringBuffer sb = new StringBuffer();
+		for(int i = 0; i < getWords().size(); i++)
+		{
+			if(i > 0)
+			{
+				sb.append(",");
+			}
+			JSONObject json = new JSONObject(getWords().get(i));
+			if(!hasDprel){
+				json.remove("deprel");
+			}
+			json.remove("head");
+			json.remove("postag");
+			json.remove("chunk");
+			sb.append(json.toString());
+		}
+		return "["+sb.toString()+"]";
 	}
 }
