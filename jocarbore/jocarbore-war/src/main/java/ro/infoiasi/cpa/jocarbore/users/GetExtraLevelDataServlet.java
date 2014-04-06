@@ -14,11 +14,12 @@ import ro.infoiasi.cpa.jocarbore.Utils;
 import ro.infoiasi.cpa.jocarbore.model.Sentence;
 import ro.infoiasi.cpa.jocarbore.services.GameUserProfileService;
 
-public class GetLevelDataServlet extends HttpServlet {
+public class GetExtraLevelDataServlet extends HttpServlet {
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 8958361878455643037L;
+	private static final long serialVersionUID = -9177108747424456378L;
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -48,9 +49,10 @@ public class GetLevelDataServlet extends HttpServlet {
 			resp.sendError(500);
 			return;
 		}
+		GameUserProfileService.getInstance().removeUserPoints(150);
 		resp.setContentType(Utils.JSON_CONTENT_TYPE);
 		PrintWriter pw = resp.getWriter();
-		pw.print(sentence.toUserString(false));
+		pw.print(sentence.toUserString(true));
 		pw.flush();
 	}
 }

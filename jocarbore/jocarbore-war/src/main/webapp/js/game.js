@@ -102,27 +102,25 @@ function clearBoard()
 function loadData(level)
 {
 	//TODO: load data from ajax service
+	$.ajax("leveldata?level="+_currentLevel).done(onLevelDataLoaded);
+}
+
+function onLevelDataLoaded(words)
+{
+//	var strData = levels[level];
+//	var xmlData = $.parseXML(strData);
+//	var $xml = $(xmlData);
+//	var words = $xml.find('word');
 	
-	
-	var strData = levels[level];
-	var xmlData = $.parseXML(strData);
-	var $xml = $(xmlData);
-	var words = $xml.find('word');
 	currentProcessedSentence = [];
 	var sentence = [];
 	for(var i = 0; i < words.length; i++)
 	{   
-		var deprel = parseWord(words[i], 'deprel');
 		currentProcessedSentence.push({
-			id:parseInt(parseWord(words[i], 'id')),
-			text:parseWord(words[i], 'form'),
-			head:parseInt(parseWord(words[i], 'head')),
-			lemma:parseWord(words[i], 'lemma'),
-			postag:parseWord(words[i], 'postag'),
-			dprel:deprel,
+			id:parseInt(words[i].id),
+			text:words[i].form,
 			parent:null,
-			kids:[],
-			isPunctuation:(deprel == "punct.")
+			kids:[]
 		});
 		sentence.push(currentProcessedSentence[i].text);
 	}
@@ -135,6 +133,7 @@ function loadData(level)
 	displayTextSentence(strSentence);
 	stage.update();
 }
+
 /**
  *@param Object word {
  *	id:int,

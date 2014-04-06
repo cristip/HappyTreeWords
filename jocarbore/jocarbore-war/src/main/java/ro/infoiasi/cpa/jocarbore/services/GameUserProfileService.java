@@ -73,5 +73,19 @@ public final class GameUserProfileService extends AbstractService {
 		}
 		return ((Text) sentence.getProperty("data")).getValue();
 	}
+	public void removeUserPoints(int points) {
+		User user = Utils.getCurrentUser();
+		if(null == user)
+		{
+			return;
+		}
+		String userEmail = user.getNickname();
+		
+		Entity userEntity = getSingle(Utils.USER_ENTITY, "email" , userEmail);
+		int currentPoints = Integer.parseInt((String)userEntity.getProperty("points"));
+		currentPoints -= points;
+		userEntity.setProperty("points", currentPoints);
+		update(userEntity);
+	}
 
 }

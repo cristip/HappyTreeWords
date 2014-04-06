@@ -15,6 +15,10 @@
     	<servlet-name>leveldata</servlet-name>
     	<servlet-class>ro.infoiasi.cpa.jocarbore.users.GetLevelDataServlet</servlet-class>
     </servlet>
+    <servlet>
+    	<servlet-name>extraleveldata</servlet-name>
+    	<servlet-class>ro.infoiasi.cpa.jocarbore.users.GetExtraLevelDataServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
     	<servlet-name>userprofile</servlet-name>
     	<url-pattern>/userprofile</url-pattern>
@@ -26,5 +30,9 @@
      <servlet-mapping>
     	<servlet-name>leveldata</servlet-name>
     	<url-pattern>/leveldata</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+    	<servlet-name>extraleveldata</servlet-name>
+    	<url-pattern>/extraleveldata</url-pattern>
     </servlet-mapping>
 </web-app>
