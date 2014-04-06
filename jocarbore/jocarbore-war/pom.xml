@@ -41,6 +41,11 @@
 			<artifactId>jsp-api</artifactId>
 			<version>2.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20070829</version>
+		</dependency>
         <!-- Test Dependencies -->
         <dependency>
             <groupId>com.google.appengine</groupId>
