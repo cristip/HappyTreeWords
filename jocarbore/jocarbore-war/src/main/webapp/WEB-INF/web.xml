@@ -5,10 +5,18 @@
     </welcome-file-list>
     <servlet>
     	<servlet-name>userprofile</servlet-name>
-    	<servlet-class>ro.infoiasi.cpa.jocarbore.GetUserProfileServlet</servlet-class>
+    	<servlet-class>ro.infoiasi.cpa.jocarbore.users.GetUserProfileServlet</servlet-class>
+    </servlet>
+    <servlet>
+    	<servlet-name>import</servlet-name>
+    	<servlet-class>ro.infoiasi.cpa.jocarbore.admin.ImportSentencesServlet</servlet-class>
     </servlet>
     <servlet-mapping>
     	<servlet-name>userprofile</servlet-name>
     	<url-pattern>/userprofile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+    	<servlet-name>import</servlet-name>
+    	<url-pattern>/import</url-pattern>
     </servlet-mapping>
 </web-app>

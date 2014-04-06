@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import ro.infoiasi.cpa.jocarbore.Utils;
+import ro.infoiasi.cpa.jocarbore.exceptions.UserBannedException;
 import ro.infoiasi.cpa.jocarbore.services.UserService;
 
 
@@ -24,16 +25,21 @@ public class GetUserProfileServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		String userDetails = userService.getUserProfile();
-		if(null == userDetails)
+		try{
+			String userDetails = userService.getUserProfile();
+			if(null == userDetails)
+			{
+				resp.sendError(401);
+				return;
+			}
+			PrintWriter out = resp.getWriter();
+			resp.setContentType(Utils.JSON_CONTENT_TYPE);
+			out.print(userDetails);
+			out.flush();
+		}catch (UserBannedException e)
 		{
 			resp.sendError(401);
-			return;
 		}
-		PrintWriter out = resp.getWriter();
-		resp.setContentType(Utils.JSON_CONTENT_TYPE);
-		out.print(userDetails);
-		out.flush();
 	}
 
 }

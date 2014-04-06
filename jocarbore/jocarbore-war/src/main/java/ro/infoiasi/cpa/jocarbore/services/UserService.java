@@ -1,22 +1,18 @@
 package ro.infoiasi.cpa.jocarbore.services;
 
+import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import ro.infoiasi.cpa.jocarbore.Utils;
+import ro.infoiasi.cpa.jocarbore.exceptions.UserBannedException;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.Filter;
-import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.users.User;
 
-public final class UserService {
+public final class UserService extends AbstractService {
 	private static UserService Me;
+	private static final String USER = "User";
 	private UserService()
 	{
 		
@@ -28,8 +24,7 @@ public final class UserService {
 		}
 		return Me;
 	}
-	
-	public String getUserProfile()
+	public String getUserProfile() throws UserBannedException
 	{
 		User user = Utils.getCurrentUser();
 		if(null == user)
@@ -38,39 +33,35 @@ public final class UserService {
 		}
 		String userEmail = user.getNickname();
 		
-		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-		Filter filter = new Query.FilterPredicate("email", FilterOperator.EQUAL, userEmail);
-		Query usersQuery = new Query("User").setFilter(filter);
-		Entity userDetails = datastore.prepare(usersQuery).asSingleEntity();
+		Entity userEntity = getSingle(USER, "email" , userEmail);
 		Map<String, String> profileMap = new HashMap<String, String>();
-		profileMap.put("user", userEmail);
-		if(null == userDetails)
+		profileMap.put("email", userEmail);
+		Date time = new Date();
+		
+		if(null == userEntity)
 		{
-			
+			userEntity = new Entity(USER);
+			userEntity.setProperty("email", userEmail);
+			userEntity.setProperty("level", 0);
 			profileMap.put("level", "0");
+			userEntity.setProperty("points", 0);
 			profileMap.put("points", "0");
-			setUserProfile(profileMap);
+			userEntity.setProperty("active", true);
+			userEntity.setProperty("joinDate",  time);
 		}
 		else
 		{
-			profileMap.put("level", userDetails.getProperty("level").toString());
-			profileMap.put("points", userDetails.getProperty("points").toString());
+			if(!(Boolean)userEntity.getProperty("active"))
+			{
+				throw new UserBannedException("not active");
+			}
+			profileMap.put("level", userEntity.getProperty("level").toString());
+			profileMap.put("points", userEntity.getProperty("points").toString());
 		}
+		userEntity.setProperty("lastplaydate", time);
+		update(userEntity);
 		return Utils.jsonFromMap(profileMap);
 		
-	}
-	public void setUserProfile(Map<String, String> profileMap)
-	{
-		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-		Entity user = new Entity("User");
-		Iterator<Entry<String, String>> iterator = profileMap.entrySet().iterator();
-		while(iterator.hasNext())
-		{
-			Entry<String, String> item = iterator.next();
-			user.setProperty(item.getKey(), item.getValue());
-			iterator.remove();
-		}
-		datastore.put(user);		
 	}
 
 }
