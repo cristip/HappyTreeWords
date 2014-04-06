@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<datastore-indexes>
-  <datastore-index kind="User">
+<datastore-indexes autoGenerate="false">
+  <datastore-index kind="User" ancestor="false">
     <property name="email" direction="asc" />
     <property name="level" direction="asc" />
     <property name="points" direction="asc" />
@@ -10,12 +10,12 @@
     <property name="joindate" direction="desc"/>
     <property name="lastplaydate" direction="desc"/>
   </datastore-index>
-  <datastore-index kind="GameSession">
+  <datastore-index kind="GameSession" ancestor="false">
     <property name="email" direction="asc" />
     <property name="date" direction="desc"/>
   </datastore-index>
-  <datastore-index kind="GameLevel">
+  <datastore-index kind="GameLevel" ancestor="false">
   	<property name="value" direction="asc"/>
-  	<property name="data"/>
+  	<property name="data" direction="asc"/>
   </datastore-index>
 </datastore-indexes>
