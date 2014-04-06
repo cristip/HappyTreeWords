@@ -55,7 +55,7 @@ function newGame()
 function initLevel()
 {
 	clearBoard();
-	loadData(_currentLevel)
+	loadData(_currentLevel);
 	if(_currentLevel == 0)
 	{
 		setTimeout(displayFirstHelpTip, 500);
@@ -183,7 +183,7 @@ function parseWord(wordXML, attributeName)
  */
 function displayTextSentence(strSentence)
 {
-	$("#sentenceText").text(strSentence)
+	$("#sentenceText").text(strSentence);
 }
 /**
  * afiseaza propozita
@@ -195,7 +195,7 @@ function displayInitialSentence()
 	var lastx = 10;
 	for(var i = 0; i < currentProcessedSentence.length; i++)
 	{
-		var word = createWordUI(currentProcessedSentence[i])
+		var word = createWordUI(currentProcessedSentence[i]);
 		word.addEventListener('mousedown', onWordMouseDown, true);
 		word.addEventListener('pressmove', onWordPressMove, true);
 		word.addEventListener('pressup', onWordPressUp, true);
@@ -213,7 +213,7 @@ function displayInitialSentence()
 function onWordMouseDown(event)
 {
 	var wordUI = event.currentTarget;
-	wordUI.parent.setChildIndex(wordUI, wordUI.parent.getNumChildren()-1)
+	wordUI.parent.setChildIndex(wordUI, wordUI.parent.getNumChildren() - 1);
 	wordUI._currentLocalX = event.localX;
 	wordUI._currentLocalY = event.localY;
 	wordUI.initialPosition = {x:wordUI.x, y:wordUI.y};
@@ -374,7 +374,7 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 			var bounds = this.destination.getBounds();
 			return this.destination.localToGlobal(bounds.width/2, -BOARD_Y);
 		}
-	}
+	};
 	var graphic = new createjs.Graphics();
 	connection.shape = new createjs.Shape(graphic);
 	return connection;
@@ -403,7 +403,7 @@ function onBoardWordPressUp(event){
 	_isConnecting = false;
 	var wordUI = event.currentTarget;
 	event.stopImmediatePropagation();
-	console.log("mouse up " + wordUI)
+	console.log("mouse up " + wordUI);
 	var connection = _currentConnection;
 	if(wordUI != _currentConnection.source)
 	{
@@ -413,7 +413,7 @@ function onBoardWordPressUp(event){
 		return;
 	}
 
-	var targetWordUI = getWordUnderPoint(event.stageX, event.stageY - BOARD_Y)
+	var targetWordUI = getWordUnderPoint(event.stageX, event.stageY - BOARD_Y);
 	if(	null == targetWordUI ||
 		wordUI == targetWordUI ||
 		!targetWordUI.hasOwnProperty('_data')
@@ -455,7 +455,7 @@ function onBoardWordPressMove(event){
 	}
 	
 	var point = wordUI.parent.globalToLocal(event.stageX, event.stageY);
-	connection.lineTo(point)
+	connection.lineTo(point);
 	_currentConnection = connection;
 
 }
@@ -513,39 +513,6 @@ function createWordUI(wordObj)
 	container.setBounds(0, 0, _width, _height);
 	return container;
 }
-/*
-function decorateDroppedWord(wordContainer)
-{
-	var graphics = new createjs.Graphics();
-	var shapeOut = new createjs.Shape(graphics);
-	var shapeIn = new createjs.Shape(graphics);
-	//AiWiBIEtAAIiXEDg
-	graphics.f("#FF66CC").p("AhEg7ICJAAIhFB3g");
-	var bounds = wordContainer.getBounds();
-	shapeOut.setTransform(bounds.width/2+5, bounds.height+26);
-	shapeOut.shadow = new createjs.Shadow("#000000", 0, 2, 5);
-	shapeIn.setTransform(bounds.width/2+5, -5);
-	shapeIn.enableMouseOver = true;
-	shapeIn.shadow = new createjs.Shadow("#000000", 0, -1, 5);
-	shapeIn.addEventListener('rollover', onInMouseOver)
-	if(wordContainer._data.isPunctuation)
-	{
-		wordContainer.addChild(shapeIn);
-	}else
-	{
-		wordContainer.addChild(shapeIn, shapeOut);
-	}
-	
-}
-*/
-function onInMouseOver(event)
-{
-	console.log('mouse over...' + event)
-}
-function onInPressUp(event)
-{
-	console.log(event);
-}
 function drawTree()
 {
 	var bmp =  new createjs.Bitmap(null);
@@ -555,5 +522,5 @@ function drawTree()
 	img.onload = function (e) {
     	bmp.image = (e.target);
 	    stage.update();
-	}
+	};
 }

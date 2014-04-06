@@ -34,8 +34,6 @@ public class GetUserProfileServlet extends HttpServlet {
 		String userPoints = null;
 		
 		
-		
-		
 		PrintWriter out = resp.getWriter();
 		resp.setContentType(Utils.JSON_CONTENT_TYPE);
 		
