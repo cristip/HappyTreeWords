@@ -48,7 +48,6 @@
 	</script>
 </head>
 <body onload="init();">
-<a href="#nextLevel" class="myButton" id="nextLevelBtn" title="Click pentru a merge la nivelul urmator">Nivelul Urmator</a>
   <div id="gameBox">
     <div id="gameStats">
       <div class="leftAlign">
@@ -74,6 +73,8 @@
     <canvas id="gameCanvas" width="1050" height="650">
       Browserul dvs nu este suportat. Recomandam Chrome, Firefox sau Internet Explorer 11.
     </canvas>
+    <a class="myButton" id="back2SetupLevelBtn" title="Click pentru a reveni la pozitionare">Inapoi la pozitionare</a>
+    <a class="myButton" id="nextLevelBtn" title="Click pentru a merge la nivelul urmator">Nivelul Urmator</a>
   </div>
   <div class="modalDialog">&nbsp;
       <div id="firstHelpTip" title="Apasă pentru a închide">

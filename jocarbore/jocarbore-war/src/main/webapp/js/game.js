@@ -13,6 +13,7 @@ var BOARD_Y = 50;
 var _currentConnections = [];
 var _currentConnection = null;
 var _isConnecting = false;
+var _isDrawPaths = false;
 /**
  * Array de word{
  *	id:int,
@@ -40,6 +41,7 @@ function newGame()
 	$('#gameCanvas').show();
 	$('#helpBtn').show();
 	$('#dprelBtn').show();
+	
 	stage = new createjs.Stage("gameCanvas");
 	createjs.Touch.enable(stage);
   	board = new createjs.Container();
@@ -222,6 +224,8 @@ function onWordPressMove(event)
 	var point = wordUI.parent.globalToLocal(event.stageX, event.stageY);
 	wordUI.x = point.x - wordUI._currentLocalX;
 	wordUI.y = point.y - wordUI._currentLocalY;
+	wordUI.setShadow(25);
+	updateLiveConnections();
 }
 /**
  * event handler, s-a eliberat mouse-ul
@@ -229,6 +233,7 @@ function onWordPressMove(event)
 function onWordPressUp(event)
 {
 	var wordUI = event.currentTarget;
+	wordUI.setShadow(15);
 	if(wordUI.y < 80)
 	{
 			 createjs.Tween.get(wordUI).to({x:wordUI.initialPosition.x,y:wordUI.initialPosition.y}, 300).call(function(){
@@ -284,13 +289,35 @@ function addDoubleClickEventListeners()
 }
 function switch2DrawPaths()
 {
+	if(_isDrawPaths)
+	{
+		return;
+	}
+	_isDrawPaths = true;
 	displayNextLevelButton();
+	displayBack2SetupButton();
 	for(var i = 0; i < boardDroppedWords.length; i++)
 	{
 		var wordUI = boardDroppedWords[i];
 		wordUI.addEventListener('pressup', onBoardWordPressUp, true);
 		wordUI.addEventListener('mousedown', onBoardWordMouseDown, true);
 		wordUI.addEventListener('pressmove', onBoardWordPressMove, true);
+		wordUI.setShadow(2);
+	}
+}
+function switch2Setup()
+{
+	_isDrawPaths = false;
+	for(var i = 0; i < boardDroppedWords.length; i++)
+	{
+		var wordUI = boardDroppedWords[i];
+		wordUI.removeEventListener('pressup', onBoardWordPressUp, true);
+		wordUI.removeEventListener('mousedown', onBoardWordMouseDown, true);
+		wordUI.removeEventListener('pressmove', onBoardWordPressMove, true);
+		wordUI.setShadow(15);
+		wordUI.addEventListener('mousedown', onWordMouseDown, true);
+		wordUI.addEventListener('pressmove', onWordPressMove, true);
+		wordUI.addEventListener('pressup', onWordPressUp, true);
 	}
 }
 function displayStartConnectionsButton()
@@ -299,11 +326,7 @@ function displayStartConnectionsButton()
 	{
 		setTimeout(displaySecondHelpTip, 500);
 	}
-
-	
-
 	_currentConnections = [];
-
 	addDoubleClickEventListeners();
 	
 
@@ -312,17 +335,36 @@ function displayStartConnectionsButton()
 function displayNextLevelButton()
 {
 	var domEl = document.getElementById('nextLevelBtn');
-	
-	var nextBtn = new createjs.DOMElement(domEl);
-	stage.addChild(nextBtn);
-	domEl.style.visibility = "hidden";
+	domEl.style.position = "absolute";
+	domEl.style.visibility = "visible";
 	domEl.style.display = "inline-block";
-	//nextBtn.x = BOARD_WIDTH/2 - 30;
-	nextBtn.y = 150;
-	nextBtn.x = -530;
-	createjs.Tween.get(nextBtn).to({x:-130}, 500);
-
+	domEl.style.top = "150px";
+	domEl.style.right = "20px";
+	domEl.onclick = goToNextLevel;
 }
+function displayBack2SetupButton()
+{
+	var domEl = document.getElementById('back2SetupLevelBtn');
+	domEl.style.visibility = "visible";
+	domEl.style.display = "inline-block";
+	domEl.style.position = "absolute";
+	domEl.style.top = "150px";
+	domEl.style.left = "20px";
+	domEl.onclick = goBack2SetUpLevel;
+}
+
+function goToNextLevel(event){
+	console.log("next level...");
+}
+function goBack2SetUpLevel(event){
+	console.log("back 2 setup level...");
+	var domEl = document.getElementById('back2SetupLevelBtn');
+	domEl.style.visibility = "hidden";
+	domEl = document.getElementById('back2SetupLevelBtn');
+	domEl.style.visibility = "hidden";
+	
+}
+
 
 function getNewConnection(sourceWordUI, destinationWordUI)
 {
@@ -396,11 +438,9 @@ function onBoardWordPressUp(event){
 	_isConnecting = false;
 	var wordUI = event.currentTarget;
 	event.stopImmediatePropagation();
-	console.log("mouse up " + wordUI);
 	var connection = _currentConnection;
 	if(wordUI != _currentConnection.source)
 	{
-		console.log("initiator gresit...");
 		_currentConnection = null;
 		connection.cleanUp();
 		return;
@@ -412,7 +452,6 @@ function onBoardWordPressUp(event){
 		!targetWordUI.hasOwnProperty('_data')
 	  )
 	{
-		console.log("nu s-a dat drumul peste un obiect...");
 		_currentConnection = null;
 		connection.cleanUp();
 		return;
@@ -422,6 +461,11 @@ function onBoardWordPressUp(event){
 	_currentConnections.push(connection);
 	_currentConnection = null;
 	
+}
+
+function updateLiveConnections()
+{
+	//for(var i = 0; i < _currentConnections.length; )
 }
 
 function onBoardWordMouseDown(event){
@@ -501,9 +545,12 @@ function createWordUI(wordObj)
 	var _width = displayText.getMeasuredWidth()+10;
 	var _height = displayText.getMeasuredHeight()+20;
 	graphix.beginFill('#FF66CC').drawRoundRect(0,0,_width,_height,10).ef();
-	wordUI.shadow = new createjs.Shadow("#000000", 0, 0, 5);
+	wordUI.shadow = new createjs.Shadow("#000000", 0, 0, 15);
 	container.addChild(displayText);
 	container.setBounds(0, 0, _width, _height);
+	container.setShadow = function (value){
+		wordUI.shadow = new createjs.Shadow("#000000", 0, 0, value);
+	};
 	return container;
 }
 function drawTree()

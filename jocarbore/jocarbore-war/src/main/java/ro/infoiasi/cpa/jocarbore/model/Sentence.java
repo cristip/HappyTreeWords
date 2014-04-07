@@ -53,7 +53,8 @@ public class Sentence implements Serializable{
 		for(int i = 0; i < jsonArray.length; i++)
 		{
 			Map<String, String> wordMap = new HashMap<String, String>();
-			JSONObject jsonObj = new JSONObject(jsonArray[i]);
+			JSONObject jsonObj = new JSONObject( jsonArray[i]);
+			
 			@SuppressWarnings("unchecked")
 			Iterator<String> iterator = jsonObj.keys();
 			while (iterator.hasNext()) {

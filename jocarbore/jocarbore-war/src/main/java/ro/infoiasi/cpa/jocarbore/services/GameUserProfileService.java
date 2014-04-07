@@ -3,8 +3,10 @@ package ro.infoiasi.cpa.jocarbore.services;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import ro.infoiasi.cpa.jocarbore.Utils;
+import ro.infoiasi.cpa.jocarbore.admin.ImportSentencesServlet;
 import ro.infoiasi.cpa.jocarbore.exceptions.UserBannedException;
 
 import com.google.appengine.api.datastore.Entity;
@@ -13,6 +15,7 @@ import com.google.appengine.api.users.User;
 
 public final class GameUserProfileService extends AbstractService {
 	private static GameUserProfileService Me;
+	private static final Logger log = Logger.getLogger(ImportSentencesServlet.class.getName());
 	
 	private GameUserProfileService()
 	{
@@ -71,7 +74,10 @@ public final class GameUserProfileService extends AbstractService {
 		{
 			return null;
 		}
-		return ((Text) sentence.getProperty("data")).getValue();
+		Text words = (Text) sentence.getProperty("data");
+		String strSentence = words.getValue();
+		log.info("found sentence: " + strSentence);
+		return strSentence;
 	}
 	public void removeUserPoints(int points) {
 		User user = Utils.getCurrentUser();

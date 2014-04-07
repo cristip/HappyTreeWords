@@ -21,8 +21,10 @@ if (user == null || !userService.isUserAdmin()) {
 else
 {
 %>
-<form action="import" method="post" enctype="multipart/form-data">
-	<label for="file">Fișier: <input type="file" name="file" id="file"/></label>
+<form action="import" method="post">
+	<label for="file">Propozitii:
+	<textarea rows="50" cols="650" id="file" name="file"></textarea> 
+	</label>
 	<input type="submit" name="submit" value="Importă"/>
 </form>
 <%

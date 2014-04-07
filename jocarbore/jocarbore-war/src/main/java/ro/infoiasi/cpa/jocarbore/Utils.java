@@ -1,7 +1,6 @@
 package ro.infoiasi.cpa.jocarbore;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Map;
 
@@ -32,12 +31,12 @@ public class Utils {
 	{
 		return new JSONObject(map).toString();
 	}
-	public static Document readXml(InputStream is) throws SAXException, IOException,
+	public static Document readXml(String xmlStr) throws SAXException, IOException,
 		ParserConfigurationException {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		
 		dbf.setValidating(false);
-		dbf.setIgnoringComments(false);
+		dbf.setIgnoringComments(true);
 		dbf.setIgnoringElementContentWhitespace(true);
 		dbf.setNamespaceAware(true);
 		// dbf.setCoalescing(true);
@@ -48,7 +47,7 @@ public class Utils {
 		db.setEntityResolver(new NullResolver());
 		
 		// db.setErrorHandler( new MyErrorHandler());
-		
+		InputSource is = new InputSource(new StringReader(xmlStr));
 		return db.parse(is);
 	}
 }

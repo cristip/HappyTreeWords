@@ -2,6 +2,7 @@ package ro.infoiasi.cpa.jocarbore.users;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 
 import ro.infoiasi.cpa.jocarbore.Utils;
+import ro.infoiasi.cpa.jocarbore.admin.ImportSentencesServlet;
 import ro.infoiasi.cpa.jocarbore.model.Sentence;
 import ro.infoiasi.cpa.jocarbore.services.GameUserProfileService;
 
@@ -19,6 +21,7 @@ public class GetLevelDataServlet extends HttpServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = 8958361878455643037L;
+	private static final Logger log = Logger.getLogger(ImportSentencesServlet.class.getName());
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -49,8 +52,11 @@ public class GetLevelDataServlet extends HttpServlet {
 			return;
 		}
 		resp.setContentType(Utils.JSON_CONTENT_TYPE);
+		resp.setCharacterEncoding("utf-8");
 		PrintWriter pw = resp.getWriter();
-		pw.print(sentence.toUserString(false));
+		sentenceStr = sentence.toUserString(false);
+		log.info("Sentence processed: " + sentenceStr);
+		pw.print(sentenceStr);
 		pw.flush();
 	}
 }
