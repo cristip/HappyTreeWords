@@ -17,10 +17,10 @@
 <%
 	UserService userService = UserServiceFactory.getUserService();
 	User user = userService.getCurrentUser();
-	Map<String, String> userProfileMap = GameUserProfileService.getInstance().getUserProfile();
-	Boolean hasPlayedBefore = Integer.parseInt( userProfileMap.get("level")) == 0 && Integer.parseInt( userProfileMap.get("points")) == 0;
 	if (user != null) {
     	pageContext.setAttribute("user", user);
+    	Map<String, String> userProfileMap = GameUserProfileService.getInstance().getUserProfile();
+    	Boolean hasPlayedBefore = Integer.parseInt( userProfileMap.get("level")) == 0 && Integer.parseInt( userProfileMap.get("points")) == 0;
     	pageContext.setAttribute("userProfile", Utils.jsonFromMap(userProfileMap));
     	
 %>
