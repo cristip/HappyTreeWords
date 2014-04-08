@@ -24,13 +24,9 @@
     	pageContext.setAttribute("userProfile", Utils.jsonFromMap(userProfileMap));
     	
 %>
-	<link href='http://fonts.googleapis.com/css?family=Hammersmith+One&subset=latin-ext' rel='stylesheet' type='text/css'>
 	<script src="http://code.createjs.com/createjs-2013.12.12.min.js" type="text/javascript"></script>
 	<script src="http://code.jquery.com/jquery-2.1.0.min.js" type="text/javascript"></script>
-
-	<script src="js/dummyserver.js"></script>
 	<script src="js/game.js"></script>
-	
 	<script>
 	var stage;
 	var update = false;
