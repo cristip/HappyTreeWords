@@ -41,7 +41,7 @@ public final class GameUserProfileService extends AbstractService {
 		{
 			return null;
 		}
-		String userEmail = user.getNickname();
+		String userEmail = user.getEmail();
 		
 		Entity userEntity = getSingle(Utils.USER_ENTITY, "email" , userEmail);
 		Map<String, String> profileMap = new HashMap<String, String>();
@@ -101,7 +101,7 @@ public final class GameUserProfileService extends AbstractService {
 		{
 			return;
 		}
-		String userEmail = user.getNickname();
+		String userEmail = user.getEmail();
 		
 		Entity userEntity = getSingle(Utils.USER_ENTITY, "email" , userEmail);
 		int currentPoints = ((Long)userEntity.getProperty("points")).intValue();
@@ -111,7 +111,12 @@ public final class GameUserProfileService extends AbstractService {
 	}
 	public int getUserPoints(User user) {
 		Entity userEntity = getSingle(Utils.USER_ENTITY, "email" , user.getEmail());
-		return ((Long) userEntity.getProperty("points")).intValue();
+		Long points = (Long) userEntity.getProperty("points");
+		if(null == points)
+		{
+			return 0;
+		}
+		return points.intValue();
 	}
 		
 	public int validateUserSentence(JSONObject json, int level, User user) throws JSONException {
