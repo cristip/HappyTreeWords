@@ -75,9 +75,13 @@
           {
           %>
           <li><a href="#startJoc" id="startGameBtn">Să jucăm în continuare</a></li>
-      	  
+	      	  <%
+	      		if(Integer.parseInt( userProfileMap.get("level")) < 5)
+	      		{
+	      	  %>
       	  <li><a href="#resetJoc">Începe de la primul nivel</a></li>
           <%
+          		}
           }
           %>
           <li><a href="#clasament">Vezi clasamentul</a></li>

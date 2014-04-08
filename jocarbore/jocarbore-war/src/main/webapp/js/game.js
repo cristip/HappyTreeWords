@@ -154,6 +154,11 @@ function onLevelDataLoaded(response)
 	$("#points").text(newPoints);
 	_currentLevel = parseInt(response.level);
 	$("#gameLevel").text(_currentLevel + 1);
+	
+	if(response.previousSentence){
+		displaySolvedSentence(response.previousSentence);
+	}
+	
 	if(_levelsPlayed > 0 && currentPoints >= newPoints)
 	{
 		displaySameLevel();
@@ -184,7 +189,10 @@ function onLevelDataLoaded(response)
 	displayTextSentence(strSentence);
 	stage.update();
 }
-
+function displaySolvedSentence(solvedSentence)
+{
+	//TODO: show the correct tree
+}
 /**
  *@param Object word {
  *	id:int,
