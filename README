@@ -1,3 +1,33 @@
 ﻿''Joacă-te cu limba română construind arbori''
 
 Proiectul constă în realizarea unei aplicaţii de joc on line care are menirea să facă analiza sintactică a unei propoziţii în limba romană. 
+
+
+dupa logare userul poate sa
+
+1. Vezi tutorial
+
+Aici este un filmulet de pe youtube/vimeo cu un tutorial despre cum se joaca
+
+2. Start joc / Sa jucam in continuare
+
+Se intra in joc.
+2.1. Ajutor ce pot sa fac acum? 
+Afisat doar la primele 5 niveluri. Daca mai are piese de plasat se afiseaza un popup cu "termina de aranjat piesele"
+Daca le-a aranjat dar nu e in modul conexiune, atunci "termina de aranjat sau intra in conexiune"
+Daca este in conexiune: " poti sterge conexiune sau poti trece la nivelul urmator"
+2.2. Arata parti vorbire
+Se primeste de la server propozitia impreuna cu partile de vorbire si este afisata.
+Se primeste penalizare 20 de puncte pentru fiecare element mai putin cele de punctuatie.
+
+3. Incepe de la primul nivel
+
+Daca nu este deja la primul nivel si este maxim la nivelul 5 inca isi mai poate reseta progresul. Dupa nivelul 5 nu se poate reseta progresul.
+
+4. Vezi clasamentul
+
+Top 10 utilizatori
+
+5. Despre aplicatie
+
+Se afiseaza un popup micut cu numelel celor implicati
