@@ -26,7 +26,7 @@ public class GetUserProfileServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		try{
-			String userDetails = userService.getUserProfile();
+			String userDetails = Utils.jsonFromMap(userService.getUserProfile());
 			if(null == userDetails)
 			{
 				resp.sendError(401);

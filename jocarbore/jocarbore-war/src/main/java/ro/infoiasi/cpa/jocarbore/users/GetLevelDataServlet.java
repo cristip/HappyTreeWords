@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -14,16 +12,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.google.appengine.api.users.User;
 
 import ro.infoiasi.cpa.jocarbore.Utils;
 import ro.infoiasi.cpa.jocarbore.admin.ImportSentencesServlet;
 import ro.infoiasi.cpa.jocarbore.model.Sentence;
 import ro.infoiasi.cpa.jocarbore.services.GameUserProfileService;
+
+import com.google.appengine.api.users.User;
 
 public class GetLevelDataServlet extends HttpServlet {
 	/**
@@ -55,13 +52,26 @@ public class GetLevelDataServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		ServletInputStream is = req.getInputStream();
+		BufferedReader br = new BufferedReader( new InputStreamReader(is) );
+		String jsonStr, line = br.readLine();
+		jsonStr = line;
+		
+		
+		while((line = br.readLine()) != null)
+		{
+			jsonStr += line;
+		}
 		User user = Utils.getCurrentUser();
 		if(null == user)
 		{
 			resp.sendError(401);
 			return;
 		}
-		ServletInputStream is = req.getInputStream();
+		
+		
+		
+		
 		String levelStr = req.getParameter("level");
 		
 		
@@ -72,15 +82,7 @@ public class GetLevelDataServlet extends HttpServlet {
 		}
 		int level = Integer.parseInt(levelStr);
 		
-		BufferedReader br = new BufferedReader( new InputStreamReader(is) );
-		String jsonStr, line = br.readLine();
-		jsonStr = line;
 		
-		
-		while((line = br.readLine()) != null)
-		{
-			jsonStr += line;
-		}
 		JSONObject json = null;
 		try {
 			log.info("trying to parse the level string: " + jsonStr);
@@ -101,19 +103,23 @@ public class GetLevelDataServlet extends HttpServlet {
 		
 		
 	}
+
 	private void sendLevelResponse(HttpServletResponse resp, int level, User user) throws IOException
 	{
 		int points = GameUserProfileService.getInstance().getUserPoints(user);
-		
-		String sentenceStr = GameUserProfileService.getInstance().getSentenceByLevel(level);
-		if(null == sentenceStr)
-		{
-			resp.sendError(404);
-			return;
-		}
-		Sentence sentence;
+		Sentence sentence = null;
+		Sentence previousSentence = null;
 		try {
-			sentence = Sentence.fromJSONArray(sentenceStr);
+			sentence = GameUserProfileService.getInstance().getSentenceByLevel(level);
+			if(level > 0)
+			{
+				previousSentence = GameUserProfileService.getInstance().getSentenceByLevel(level-1);
+			}
+			if(null == sentence)
+			{
+				resp.sendError(404);
+				return;
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 			resp.sendError(500);
@@ -124,8 +130,12 @@ public class GetLevelDataServlet extends HttpServlet {
 		
 		String responseJSON = "{\"points\":\""+points+"\",";
 		responseJSON += "\"level\":\""+level+"\",";
+		if(null != previousSentence)
+		{
+			responseJSON += "\"previousSentence\":"+previousSentence.toUserCompleteString()+",";
+		}
 		PrintWriter pw = resp.getWriter();
-		sentenceStr = sentence.toUserString(false);
+		String sentenceStr = sentence.toUserString(false);
 		responseJSON += "\"sentence\":"+sentenceStr+"}";
 		log.info("Sentence processed: " + responseJSON);
 		pw.print(responseJSON);

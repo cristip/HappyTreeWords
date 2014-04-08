@@ -12,6 +12,7 @@ var BOARD_WIDTH = 1050;
 var BOARD_Y = 50;
 var _currentConnections = [];
 var _currentConnection = null;
+var _levelsPlayed = 0;
 /**
  * related to the connection action
  * is connection while the mouse is pressed 
@@ -147,13 +148,13 @@ function onLevelDataLoaded(response)
 //	var xmlData = $.parseXML(strData);
 //	var $xml = $(xmlData);
 //	var words = $xml.find('word');
-	var words = response.sentence;
+	
 	var currentPoints = parseInt($("#points").text());
 	var newPoints = response.points;
 	$("#points").text(newPoints);
 	_currentLevel = parseInt(response.level);
 	$("#gameLevel").text(_currentLevel + 1);
-	if(currentPoints < newPoints)
+	if(_levelsPlayed > 0 && currentPoints >= newPoints)
 	{
 		displaySameLevel();
 		return;
@@ -161,6 +162,7 @@ function onLevelDataLoaded(response)
 	
 	initLevel();
 	
+	var words = response.sentence;
 	currentProcessedSentence = [];
 	var sentence = [];
 	for(var i = 0; i < words.length; i++)
@@ -415,6 +417,7 @@ function goToNextLevel(event){
 		userLevelData += _currentConnections[i].toJSON();
 	}
 	userLevelData += ']}';
+	_levelsPlayed++;
 	$.ajax({
 			url:"leveldata?level="+_currentLevel,
 			type:"POST",
@@ -436,7 +439,7 @@ function hideNextLevelBtn()
 function goBack2SetUpLevel(event){
 	console.log("back 2 setup level...");
 	hideBack2SetupLevelBtn();
-	
+	hideNextLevelBtn();
 	displayNext2ConnectionsButton();
 	switch2Setup();
 }
@@ -455,7 +458,10 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 		},
 		cleanUp:function(){
 			this.shape.removeEventListener("click", onConnectionLineClick);
-			this.shape.parent.removeChild(this.shape);
+			if(this.shape.parent)
+			{
+				this.shape.parent.removeChild(this.shape);
+			}
 			this.shape.graphics.clear();
 			this.shape = null;
 			this.source = null;
@@ -497,9 +503,7 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 			}
 			var json = '{';
 			json += '"source":"' + this.source._data.id+'",';
-			//json += '"sourceWord":"' + this.source._data.text+'",';
 			json += '"destination":"' + this.destination._data.id+'"';
-			//json += '"destinationWord":"' + this.destination._data.text+'"';
 			json += '}';
 			return json;
 		}

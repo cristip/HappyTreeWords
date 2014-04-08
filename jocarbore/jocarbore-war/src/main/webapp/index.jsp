@@ -1,3 +1,5 @@
+<%@page import="ro.infoiasi.cpa.jocarbore.Utils"%>
+<%@page import="java.util.Map"%>
 <%@page import="ro.infoiasi.cpa.jocarbore.services.GameUserProfileService"%>
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="com.google.appengine.api.users.User" %>
@@ -15,9 +17,11 @@
 <%
 	UserService userService = UserServiceFactory.getUserService();
 	User user = userService.getCurrentUser();
+	Map<String, String> userProfileMap = GameUserProfileService.getInstance().getUserProfile();
+	Boolean hasPlayedBefore = Integer.parseInt( userProfileMap.get("level")) == 0 && Integer.parseInt( userProfileMap.get("points")) == 0;
 	if (user != null) {
     	pageContext.setAttribute("user", user);
-    	pageContext.setAttribute("userProfile", GameUserProfileService.getInstance().getUserProfile());
+    	pageContext.setAttribute("userProfile", Utils.jsonFromMap(userProfileMap));
     	
 %>
 	<link href='http://fonts.googleapis.com/css?family=Hammersmith+One&subset=latin-ext' rel='stylesheet' type='text/css'>
@@ -65,7 +69,21 @@
     <div id="startGame">
         <ol>
           <li><a href="#tutorial">Vezi tutorial</a></li>
+          <%
+          if(hasPlayedBefore)
+          {
+          %>
           <li><a href="#startJoc" id="startGameBtn">Să jucăm</a></li>
+          <%
+          }else
+          {
+          %>
+          <li><a href="#startJoc" id="startGameBtn">Să jucăm în continuare</a></li>
+      	  
+      	  <li><a href="#resetJoc">Începe de la primul nivel</a></li>
+          <%
+          }
+          %>
           <li><a href="#clasament">Vezi clasamentul</a></li>
           <li><a href="#despre">Despre această aplicație</a></li>
         </ol>

@@ -34,7 +34,7 @@ public final class GameUserProfileService extends AbstractService {
 		}
 		return Me;
 	}
-	public String getUserProfile() throws UserBannedException
+	public Map<String, String> getUserProfile() throws UserBannedException
 	{
 		User user = Utils.getCurrentUser();
 		if(null == user)
@@ -71,7 +71,7 @@ public final class GameUserProfileService extends AbstractService {
 		userEntity.setProperty("lastplaydate", time);
 		update(userEntity);
 		//startGameSession(user);
-		return Utils.jsonFromMap(profileMap);
+		return profileMap;
 		
 	}
 	
@@ -83,7 +83,7 @@ public final class GameUserProfileService extends AbstractService {
 		update(gameSession);
 	}
 	
-	public String getSentenceByLevel(int level)
+	public Sentence getSentenceByLevel(int level) throws JSONException
 	{
 		Entity sentence = getSingle(Utils.GAME_LEVEL_ENTITY, "value", level);
 		if(null == sentence)
@@ -93,7 +93,7 @@ public final class GameUserProfileService extends AbstractService {
 		Text words = (Text) sentence.getProperty("data");
 		String strSentence = words.getValue();
 		log.info("found sentence: " + strSentence);
-		return strSentence;
+		return Sentence.fromJSONArray(strSentence);
 	}
 	public void removeUserPoints(int points) {
 		User user = Utils.getCurrentUser();
@@ -104,7 +104,7 @@ public final class GameUserProfileService extends AbstractService {
 		String userEmail = user.getNickname();
 		
 		Entity userEntity = getSingle(Utils.USER_ENTITY, "email" , userEmail);
-		int currentPoints = Integer.parseInt((String)userEntity.getProperty("points"));
+		int currentPoints = ((Long)userEntity.getProperty("points")).intValue();
 		currentPoints -= points;
 		userEntity.setProperty("points", currentPoints);
 		update(userEntity);
@@ -116,7 +116,7 @@ public final class GameUserProfileService extends AbstractService {
 		
 	public int validateUserSentence(JSONObject json, int level, User user) throws JSONException {
 		JSONArray connections = json.getJSONArray("connections");
-		Sentence sentence = Sentence.fromJSONArray(getSentenceByLevel(level));
+		Sentence sentence = getSentenceByLevel(level);
 		int points = 0;
 		for(int i = 0; i < connections.length(); i++)
 		{
@@ -130,7 +130,7 @@ public final class GameUserProfileService extends AbstractService {
 			}
 		}
 		Entity userEntity = getSingle(Utils.USER_ENTITY, "email" , user.getEmail());
-		int currentPoints = Integer.parseInt((String) userEntity.getProperty("points"));
+		int currentPoints = ((Long) userEntity.getProperty("points")).intValue();
 		currentPoints += points;
 		userEntity.setProperty("points", currentPoints);
 		if(points > 0)

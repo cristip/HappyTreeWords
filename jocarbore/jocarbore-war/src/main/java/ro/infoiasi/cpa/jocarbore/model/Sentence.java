@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -109,6 +108,20 @@ public class Sentence implements Serializable{
 		}
 		
 		return sbStr.toString();
+	}
+	public String toUserCompleteString()
+	{
+		StringBuffer sb = new StringBuffer();
+		for(int i = 0; i < getWords().size(); i++)
+		{
+			if(i > 0)
+			{
+				sb.append(",");
+			}
+			JSONObject json = new JSONObject(getWords().get(i));
+			sb.append(json.toString());
+		}
+		return "["+sb.toString()+"]";
 	}
 	public String toUserString(Boolean hasDprel) {
 		StringBuffer sb = new StringBuffer();

@@ -35,15 +35,14 @@ public class GetExtraLevelDataServlet extends HttpServlet {
 			resp.sendError(400);
 			return;
 		}
-		String sentenceStr = GameUserProfileService.getInstance().getSentenceByLevel(Integer.parseInt(levelStr));
-		if(null == sentenceStr)
-		{
-			resp.sendError(404);
-			return;
-		}
 		Sentence sentence;
 		try {
-			sentence = Sentence.fromJSONArray(sentenceStr);
+			sentence = GameUserProfileService.getInstance().getSentenceByLevel(Integer.parseInt(levelStr));
+			if(null == sentence)
+			{
+				resp.sendError(404);
+				return;
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 			resp.sendError(500);
