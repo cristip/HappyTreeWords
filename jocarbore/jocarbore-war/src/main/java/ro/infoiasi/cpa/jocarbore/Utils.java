@@ -22,6 +22,7 @@ public class Utils {
 	public static final String JSON_CONTENT_TYPE 	= "application/json";
 	public static final String GAME_LEVEL_ENTITY 	= "GameLevel";
 	public static final String USER_ENTITY 			= "User";
+	public static final String GAME_SESSION_ENTITY	= "GameSession";
 	public static User getCurrentUser()
 	{
 		UserService userService = UserServiceFactory.getUserService();

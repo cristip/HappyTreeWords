@@ -2,12 +2,18 @@ package ro.infoiasi.cpa.jocarbore.services;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import ro.infoiasi.cpa.jocarbore.Utils;
 import ro.infoiasi.cpa.jocarbore.admin.ImportSentencesServlet;
 import ro.infoiasi.cpa.jocarbore.exceptions.UserBannedException;
+import ro.infoiasi.cpa.jocarbore.model.Sentence;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Text;
@@ -64,9 +70,19 @@ public final class GameUserProfileService extends AbstractService {
 		}
 		userEntity.setProperty("lastplaydate", time);
 		update(userEntity);
+		//startGameSession(user);
 		return Utils.jsonFromMap(profileMap);
 		
 	}
+	
+	public void startGameSession(User user)
+	{
+		Entity gameSession = new Entity(Utils.GAME_SESSION_ENTITY);
+		gameSession.setProperty("email", user.getEmail());
+		gameSession.setProperty("date", new Date());
+		update(gameSession);
+	}
+	
 	public String getSentenceByLevel(int level)
 	{
 		Entity sentence = getSingle(Utils.GAME_LEVEL_ENTITY, "value", level);
@@ -92,6 +108,55 @@ public final class GameUserProfileService extends AbstractService {
 		currentPoints -= points;
 		userEntity.setProperty("points", currentPoints);
 		update(userEntity);
+	}
+	public int getUserPoints(User user) {
+		Entity userEntity = getSingle(Utils.USER_ENTITY, "email" , user.getEmail());
+		return ((Long) userEntity.getProperty("points")).intValue();
+	}
+		
+	public int validateUserSentence(JSONObject json, int level, User user) throws JSONException {
+		JSONArray connections = json.getJSONArray("connections");
+		Sentence sentence = Sentence.fromJSONArray(getSentenceByLevel(level));
+		int points = 0;
+		for(int i = 0; i < connections.length(); i++)
+		{
+			JSONObject connection = connections.getJSONObject(i);
+			if(isConnectionInWords(connection, sentence.getWords()))
+			{
+				points += 30;
+			}else
+			{
+				points -= 30;
+			}
+		}
+		Entity userEntity = getSingle(Utils.USER_ENTITY, "email" , user.getEmail());
+		int currentPoints = Integer.parseInt((String) userEntity.getProperty("points"));
+		currentPoints += points;
+		userEntity.setProperty("points", currentPoints);
+		if(points > 0)
+		{
+			userEntity.setProperty("level", level+1);
+		}
+		update(userEntity);
+		return points;
+	}
+	/*
+	 * connections:
+	 * [{source:n, destination:m}...
+	 * sentence:
+	 * [{id:i, head:j}...
+	 * must check if head == source and id == destination
+	 */
+	private Boolean isConnectionInWords(JSONObject connection, List<Map<String, String>> words) throws JSONException
+	{
+		for(Map<String, String> word:words)
+		{
+			if( word.get("head").equals(connection.getString("source")) && word.get("id").equals(connection.getString("destination")))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

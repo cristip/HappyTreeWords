@@ -77,7 +77,7 @@
     <a class="myButton" id="nextLevelBtn" title="Click pentru a merge la nivelul urmator">Nivelul Urmator</a>
     <a class="myButton" id="next2ConnectionsBtn" title="Click pentru a intra in modul conexiuni">Conexiuni</a>
   </div>
-  <div class="modalDialog">&nbsp;
+  <div class="modalDialog">
       <div id="firstHelpTip" title="Apasă pentru a închide">
         <p>Plasează toate cuvintele ca să obții arborele dorit!</p>
         <p><img src="assets/images/hint_plasare.png" alt="cuvinte plasate"/><br/>Continuă</p>
@@ -89,6 +89,10 @@
       <div id="deleteDialog" title="Apasă pentru a închide">
         <p>Vrei sa stergi aceasta conexiune?</p>
         <a class="myButton" id="deleteConnectionBtn">Sterge</a>&nbsp;&nbsp;<a class="myButton" id="cancelDeleteConnectionBtn">Anulează</a>
+      </div>
+      <div id="samelevelDialog" title="Apasă pentru a închide">
+        <p>Nu ai obtinut suficient puncte pentru a trece la nivelul urmator. Mai încearcă!</p>
+        
       </div>
   </div>
 <%

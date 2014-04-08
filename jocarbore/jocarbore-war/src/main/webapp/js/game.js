@@ -12,7 +12,12 @@ var BOARD_WIDTH = 1050;
 var BOARD_Y = 50;
 var _currentConnections = [];
 var _currentConnection = null;
+/**
+ * related to the connection action
+ * is connection while the mouse is pressed 
+ */
 var _isConnecting = false;
+//related to the application state
 var _isDrawPaths = false;
 /**
  * Array de word{
@@ -48,7 +53,7 @@ function newGame()
   	board.y = BOARD_Y;
   	drawTree();
   	stage.addChild(board);
-  	initLevel();
+  	loadData(_currentLevel);
   	createjs.Ticker.addEventListener("tick", tick);
 
 }
@@ -56,11 +61,22 @@ function newGame()
 function initLevel()
 {
 	clearBoard();
-	loadData(_currentLevel);
 	if(_currentLevel == 0)
 	{
 		setTimeout(displayFirstHelpTip, 500);
 	}
+	_isConnecting = false;
+	_currentConnection = null;
+	_isDrawPaths = false;
+	hideNext2ConnectionsButton();
+	hideBack2SetupLevelBtn();
+	hideNextLevelBtn();
+	while(_currentConnections.length > 0)
+	{
+		var connection = _currentConnections.pop();
+		connection.cleanUp();
+	}
+	
 }
 
 function displayFirstHelpTip()
@@ -91,6 +107,15 @@ function displayDeleteConnectionAlert()
 	});
 	$('#deleteConnectionBtn').click(deleteCurrentConnection);
 }
+function displaySameLevel()
+{
+	$('.modalDialog').show();
+	$('#samelevelDialog').show();
+	$('#samelevelDialog').click(function(){
+		$('.modalDialog').hide();
+		$('#samelevelDialog').hide();
+	});
+}
 
 function tick(event){
     if(update){
@@ -113,16 +138,28 @@ function clearBoard()
  */
 function loadData(level)
 {
-	//TODO: load data from ajax service
 	$.ajax("leveldata?level="+_currentLevel).done(onLevelDataLoaded);
 }
 
-function onLevelDataLoaded(words)
+function onLevelDataLoaded(response)
 {
 //	var strData = levels[level];
 //	var xmlData = $.parseXML(strData);
 //	var $xml = $(xmlData);
 //	var words = $xml.find('word');
+	var words = response.sentence;
+	var currentPoints = parseInt($("#points").text());
+	var newPoints = response.points;
+	$("#points").text(newPoints);
+	_currentLevel = parseInt(response.level);
+	$("#gameLevel").text(_currentLevel + 1);
+	if(currentPoints < newPoints)
+	{
+		displaySameLevel();
+		return;
+	}
+	
+	initLevel();
 	
 	currentProcessedSentence = [];
 	var sentence = [];
@@ -368,13 +405,38 @@ function hideNext2ConnectionsButton()
 }
 function goToNextLevel(event){
 	console.log("next level...");
+	var userLevelData = '{"connections":[';
+	for(var i = 0; i < _currentConnections.length; i++)
+	{
+		if(i > 0)
+		{
+			userLevelData += ',';
+		}
+		userLevelData += _currentConnections[i].toJSON();
+	}
+	userLevelData += ']}';
+	$.ajax({
+			url:"leveldata?level="+_currentLevel,
+			type:"POST",
+			data:userLevelData
+	}).done(onLevelDataLoaded);
 }
-function goBack2SetUpLevel(event){
-	console.log("back 2 setup level...");
+
+function hideBack2SetupLevelBtn()
+{
 	var domEl = document.getElementById('back2SetupLevelBtn');
 	domEl.style.display = "none";
-	domEl = document.getElementById('nextLevelBtn');
+}
+function hideNextLevelBtn()
+{
+	var domEl = document.getElementById('nextLevelBtn');
 	domEl.style.display = "none";
+}
+
+function goBack2SetUpLevel(event){
+	console.log("back 2 setup level...");
+	hideBack2SetupLevelBtn();
+	
 	displayNext2ConnectionsButton();
 	switch2Setup();
 }
@@ -389,7 +451,7 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 		lineTo:function (point){
 			this.shape.graphics.clear();
 			var startPoint = this.getStartPoint();
-			this.shape.graphics.setStrokeStyle(3, 1).beginStroke(0xFF0000).moveTo(startPoint.x, startPoint.y).lineTo(point.x, point.y).endStroke();
+			this.shape.graphics.setStrokeStyle(5, 1).beginStroke(0xFF0000).moveTo(startPoint.x, startPoint.y).lineTo(point.x, point.y).endStroke();
 		},
 		cleanUp:function(){
 			this.shape.removeEventListener("click", onConnectionLineClick);
@@ -426,13 +488,27 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 			}
 			var bounds = this.destination.getBounds();
 			return this.destination.localToGlobal(bounds.width/2, -BOARD_Y);
+		},
+		toJSON:function()
+		{
+			if(!this.source||!this.destination)
+			{
+				return;
+			}
+			var json = '{';
+			json += '"source":"' + this.source._data.id+'",';
+			//json += '"sourceWord":"' + this.source._data.text+'",';
+			json += '"destination":"' + this.destination._data.id+'"';
+			//json += '"destinationWord":"' + this.destination._data.text+'"';
+			json += '}';
+			return json;
 		}
 	};
 	connection.shape.addEventListener("click", onConnectionLineClick);
 	return connection;
 }
 function onConnectionLineClick(event){
-	if(_isDrawPaths)
+	if(!_isDrawPaths)
 	{
 		return;
 	}

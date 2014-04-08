@@ -13,6 +13,8 @@
   <datastore-index kind="GameSession" ancestor="false">
     <property name="email" direction="asc" />
     <property name="date" direction="desc"/>
+    <property name="level" direction="asc"/>
+    <property name="connectionsJSON" direction="asc"/>
   </datastore-index>
   <datastore-index kind="GameLevel" ancestor="false">
   	<property name="value" direction="asc"/>
