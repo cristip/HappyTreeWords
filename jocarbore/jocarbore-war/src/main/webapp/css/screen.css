@@ -99,7 +99,7 @@ a:visited{
 	z-index: 1;
 	background-color: rgba(0,0,0,0.3);
 }
-#firstHelpTip,#secondHelpTip
+#firstHelpTip,#secondHelpTip,#deleteDialog
 {
 	display:none;
 	background-color: #333333;
@@ -138,8 +138,7 @@ a:visited{
 	-webkit-border-radius:3px;
 	border-radius:3px;
 	border:1px solid #0b0e07;
-	/*display:inline-block*/;
-	display:none;
+	display:inline-block;
 	cursor:pointer;
 	color:#ffffff;
 	font-family:arial;
@@ -164,7 +163,22 @@ a:visited{
 }
 #nextLevelBtn{
 	z-index: 2;
+	position:absolute;
+	top:150px;
+	right:20px;
+	display: none;
 }
 #back2SetupLevelBtn{
-	z-index: 3;
+	z-index: 2;
+	position:absolute;
+	top:150px;
+	left:20px;
+	display: none;
+}
+#next2ConnectionsBtn{
+	z-index: 2;
+	position:absolute;
+	top:150px;
+	right:20px;
+	display: none;
 }

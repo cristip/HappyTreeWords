@@ -75,6 +75,7 @@
     </canvas>
     <a class="myButton" id="back2SetupLevelBtn" title="Click pentru a reveni la pozitionare">Inapoi la pozitionare</a>
     <a class="myButton" id="nextLevelBtn" title="Click pentru a merge la nivelul urmator">Nivelul Urmator</a>
+    <a class="myButton" id="next2ConnectionsBtn" title="Click pentru a intra in modul conexiuni">Conexiuni</a>
   </div>
   <div class="modalDialog">&nbsp;
       <div id="firstHelpTip" title="Apasă pentru a închide">
@@ -84,6 +85,10 @@
       <div id="secondHelpTip" title="Apasă pentru a închide">
         <p>Conectează cuvintele respectînd ordinea sintactică!</p>
         <p><img src="assets/images/hint_conectare.png" alt="cuvinte conectate"/><br/>Dublu click pe un cuvant pentru a-l conecta</p>
+      </div>
+      <div id="deleteDialog" title="Apasă pentru a închide">
+        <p>Vrei sa stergi aceasta conexiune?</p>
+        <a class="myButton" id="deleteConnectionBtn">Sterge</a>&nbsp;&nbsp;<a class="myButton" id="cancelDeleteConnectionBtn">Anulează</a>
       </div>
   </div>
 <%

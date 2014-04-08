@@ -81,6 +81,16 @@ function displaySecondHelpTip()
 		$('#secondHelpTip').hide();
 	});
 }
+function displayDeleteConnectionAlert()
+{
+	$('.modalDialog').show();
+	$('#deleteDialog').show();
+	$('#deleteDialog').click(function(){
+		$('.modalDialog').hide();
+		$('#deleteDialog').hide();
+	});
+	$('#deleteConnectionBtn').click(deleteCurrentConnection);
+}
 
 function tick(event){
     if(update){
@@ -233,7 +243,7 @@ function onWordPressMove(event)
 function onWordPressUp(event)
 {
 	var wordUI = event.currentTarget;
-	wordUI.setShadow(15);
+	wordUI.setShadow(10);
 	if(wordUI.y < 80)
 	{
 			 createjs.Tween.get(wordUI).to({x:wordUI.initialPosition.x,y:wordUI.initialPosition.y}, 300).call(function(){
@@ -296,6 +306,7 @@ function switch2DrawPaths()
 	_isDrawPaths = true;
 	displayNextLevelButton();
 	displayBack2SetupButton();
+	hideNext2ConnectionsButton();
 	for(var i = 0; i < boardDroppedWords.length; i++)
 	{
 		var wordUI = boardDroppedWords[i];
@@ -314,7 +325,7 @@ function switch2Setup()
 		wordUI.removeEventListener('pressup', onBoardWordPressUp, true);
 		wordUI.removeEventListener('mousedown', onBoardWordMouseDown, true);
 		wordUI.removeEventListener('pressmove', onBoardWordPressMove, true);
-		wordUI.setShadow(15);
+		wordUI.setShadow(10);
 		wordUI.addEventListener('mousedown', onWordMouseDown, true);
 		wordUI.addEventListener('pressmove', onWordPressMove, true);
 		wordUI.addEventListener('pressup', onWordPressUp, true);
@@ -328,41 +339,44 @@ function displayStartConnectionsButton()
 	}
 	_currentConnections = [];
 	addDoubleClickEventListeners();
-	
+	displayNext2ConnectionsButton();
 
 }
 
 function displayNextLevelButton()
 {
 	var domEl = document.getElementById('nextLevelBtn');
-	domEl.style.position = "absolute";
-	domEl.style.visibility = "visible";
 	domEl.style.display = "inline-block";
-	domEl.style.top = "150px";
-	domEl.style.right = "20px";
 	domEl.onclick = goToNextLevel;
 }
 function displayBack2SetupButton()
 {
 	var domEl = document.getElementById('back2SetupLevelBtn');
-	domEl.style.visibility = "visible";
 	domEl.style.display = "inline-block";
-	domEl.style.position = "absolute";
-	domEl.style.top = "150px";
-	domEl.style.left = "20px";
 	domEl.onclick = goBack2SetUpLevel;
 }
-
+function displayNext2ConnectionsButton()
+{
+	var domEl = document.getElementById('next2ConnectionsBtn');
+	domEl.style.display = "inline-block";
+	domEl.onclick = go2Connections;
+}
+function hideNext2ConnectionsButton()
+{
+	domEl = document.getElementById('next2ConnectionsBtn');
+	domEl.style.display = "none";
+}
 function goToNextLevel(event){
 	console.log("next level...");
 }
 function goBack2SetUpLevel(event){
 	console.log("back 2 setup level...");
 	var domEl = document.getElementById('back2SetupLevelBtn');
-	domEl.style.visibility = "hidden";
-	domEl = document.getElementById('back2SetupLevelBtn');
-	domEl.style.visibility = "hidden";
-	
+	domEl.style.display = "none";
+	domEl = document.getElementById('nextLevelBtn');
+	domEl.style.display = "none";
+	displayNext2ConnectionsButton();
+	switch2Setup();
 }
 
 
@@ -371,13 +385,14 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 	var connection = {
 		source:sourceWordUI,
 		destination:destinationWordUI,
-		shape:null,
+		shape:new createjs.Shape(new createjs.Graphics()),
 		lineTo:function (point){
 			this.shape.graphics.clear();
 			var startPoint = this.getStartPoint();
 			this.shape.graphics.setStrokeStyle(3, 1).beginStroke(0xFF0000).moveTo(startPoint.x, startPoint.y).lineTo(point.x, point.y).endStroke();
 		},
 		cleanUp:function(){
+			this.shape.removeEventListener("click", onConnectionLineClick);
 			this.shape.parent.removeChild(this.shape);
 			this.shape.graphics.clear();
 			this.shape = null;
@@ -387,6 +402,9 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 			{
 				delete(this[i]);
 			}
+		},
+		update:function(){
+			this.lineTo(this.getEndPoint());
 		},
 		endConnection:function(){
 			var point = this.getEndPoint();
@@ -410,14 +428,48 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 			return this.destination.localToGlobal(bounds.width/2, -BOARD_Y);
 		}
 	};
-	var graphic = new createjs.Graphics();
-	connection.shape = new createjs.Shape(graphic);
+	connection.shape.addEventListener("click", onConnectionLineClick);
 	return connection;
 }
-
+function onConnectionLineClick(event){
+	if(_isDrawPaths)
+	{
+		return;
+	}
+	_currentConnection = getConnectionByShape(event.target);
+	displayDeleteConnectionAlert();
+}
+function deleteCurrentConnection()
+{
+	for(var i = 0; i < _currentConnections.length; i++)
+	{
+		if(_currentConnection == _currentConnections[i])
+		{
+			_currentConnections.splice(i, 1);
+			break;
+		}
+	}
+	_currentConnection.cleanUp();
+	_currentConnection = null;
+}
+function getConnectionByShape(shape)
+{
+	for(var i = 0; i < _currentConnections.length; i++)
+	{
+		if(_currentConnections[i].shape == shape)
+		{
+			return _currentConnections[i];
+		}
+	}
+	return null;
+}
 function onBoardWordDoubleClick(event){
 	event.preventDefault();
 	event.stopImmediatePropagation();
+	go2Connections();
+}
+function go2Connections()
+{
 	removeMoveEventListeners();
 	switch2DrawPaths();
 }
@@ -465,7 +517,12 @@ function onBoardWordPressUp(event){
 
 function updateLiveConnections()
 {
-	//for(var i = 0; i < _currentConnections.length; )
+	for(var i = 0; i < _currentConnections.length; i++)
+	{
+		var connection = _currentConnections[i];
+		connection.update();
+		
+	}
 }
 
 function onBoardWordMouseDown(event){
@@ -545,7 +602,7 @@ function createWordUI(wordObj)
 	var _width = displayText.getMeasuredWidth()+10;
 	var _height = displayText.getMeasuredHeight()+20;
 	graphix.beginFill('#FF66CC').drawRoundRect(0,0,_width,_height,10).ef();
-	wordUI.shadow = new createjs.Shadow("#000000", 0, 0, 15);
+	wordUI.shadow = new createjs.Shadow("#000000", 0, 0, 10);
 	container.addChild(displayText);
 	container.setBounds(0, 0, _width, _height);
 	container.setShadow = function (value){
