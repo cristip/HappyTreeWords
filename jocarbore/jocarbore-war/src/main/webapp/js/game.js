@@ -278,6 +278,7 @@ function onWordPressMove(event)
 {
 	update = true;
 	var wordUI = event.currentTarget;
+	wordUI.removeEventListener('click', onWordUIClick, true);
 	var point = wordUI.parent.globalToLocal(event.stageX, event.stageY);
 	wordUI.x = point.x - wordUI._currentLocalX;
 	wordUI.y = point.y - wordUI._currentLocalY;
@@ -290,6 +291,7 @@ function onWordPressMove(event)
 function onWordPressUp(event)
 {
 	var wordUI = event.currentTarget;
+	wordUI.addEventListener('click', onWordUIClick, true);
 	wordUI.setShadow(10);
 	if(wordUI.y < 80)
 	{
@@ -320,10 +322,17 @@ function onWordUIClick(event)
 	trace("word clicked...");
 	var radios = document.getElementById("radios");
 	var raza = 230;
+	var raza2 = 120;
 	var pas = 2 * Math.PI/radios.children.length;
 	//var x = event.stageX;
 	//var y = event.stageY;
 	$("#partiPropWord").text(event.currentTarget._data.text);
+	$("#cancelPartiProp").click(function()
+	{
+		event.currentTarget.setParteVorbire("?");
+		$("#partiProp").hide();
+		$(".modalDialog").hide();
+	});
 	var setParteVorbireClick = function(evt){
 		event.currentTarget.setParteVorbire(this.lastChild.nodeValue);
 		$("#partiProp").hide();
@@ -331,8 +340,8 @@ function onWordUIClick(event)
 	};
 	for(var i = 0, j = 0; i < radios.children.length; i++, j+=pas)
 	{
-		radios.children[i].style.left = (225 + raza * Math.cos(j))+"px";
-		radios.children[i].style.top = (230 + raza * Math.sin(j))+"px";
+		radios.children[i].style.left = (225 + raza * Math.cos(j) - radios.children[i].offsetWidth/2)+"px";
+		radios.children[i].style.top = (130 + raza2 * Math.sin(j))+"px";
 		radios.children[i].onclick = setParteVorbireClick;
 	}
 	$(".modalDialog").show();

@@ -113,6 +113,7 @@
         <p>Nu ai obtinut suficient puncte pentru a trece la nivelul urmator. Mai încearcă!</p>
       </div>
       <div id="partiProp" title="Alege partea de propozitie">
+      		<p>Alege partea de propziție potrivită pentru cuvântul selectat:</p>
       		<div id="radios">
 				<label class="myButton" for="sbj"><input id="sbj" type="radio" name="partProp">sbj.</label>
 				<label class="myButton" for="cd"><input id="cd" type="radio" name="partProp">c.d.</label>
@@ -139,6 +140,9 @@
 				<label class="myButton" for="cccond"><input id="cccond" type="radio" name="partProp">c.c.cond.</label>
 			</div>
 			<h2 id="partiPropWord">&nbsp;</h2>
+			<div>
+			<a class="myButton" id="cancelPartiProp">Anulează</a>
+			</div>
       </div>
   </div>
 <%
