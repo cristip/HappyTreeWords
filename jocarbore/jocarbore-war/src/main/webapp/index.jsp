@@ -116,6 +116,7 @@
       		<p>Alege partea de propziție potrivită pentru cuvântul selectat:</p>
       		<div id="radios">
 				<label class="myButton" for="sbj"><input id="sbj" type="radio" name="partProp">sbj.</label>
+				<label class="myButton" for="pred"><input id="pred" type="radio" name="partProp">pred.</label>
 				<label class="myButton" for="cd"><input id="cd" type="radio" name="partProp">c.d.</label>
 				<label class="myButton" for="punct"><input id="punct" type="radio" name="partProp">punct.</label>
 				<label class="myButton" for="neg"><input id="neg" type="radio" name="partProp">neg.</label>
