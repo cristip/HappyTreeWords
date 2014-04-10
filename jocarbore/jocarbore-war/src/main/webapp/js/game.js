@@ -304,6 +304,7 @@ function onWordPressUp(event)
 	{
 		stage.removeChild(wordUI);
 		wordUI.y -= BOARD_Y;
+		wordUI.addEventListener('click', onWordUIClick, true);
 		board.addChild(wordUI);
 		boardDroppedWords.push(wordUI);
 		snapToGrid(wordUI);
@@ -312,12 +313,37 @@ function onWordPressUp(event)
 			displayStartConnectionsButton();
 		}
 	}
-	
-	
-	
-	
+}
+
+function onWordUIClick(event)
+{
+	trace("word clicked...");
+	var radios = document.getElementById("radios");
+	var raza = 230;
+	var pas = 2 * Math.PI/radios.children.length;
+	//var x = event.stageX;
+	//var y = event.stageY;
+	$("#partiPropWord").text(event.currentTarget._data.text);
+	var setParteVorbireClick = function(evt){
+		event.currentTarget.setParteVorbire(this.lastChild.nodeValue);
+		$("#partiProp").hide();
+		$(".modalDialog").hide();
+	};
+	for(var i = 0, j = 0; i < radios.children.length; i++, j+=pas)
+	{
+		radios.children[i].style.left = (225 + raza * Math.cos(j))+"px";
+		radios.children[i].style.top = (230 + raza * Math.sin(j))+"px";
+		radios.children[i].onclick = setParteVorbireClick;
+	}
+	$(".modalDialog").show();
+	$("#partiProp").show();
+//	$("#partiProp").click(function(){
+//		$("#partiProp").hide();
+//		$(".modalDialog").hide();
+//	});
 	
 }
+
 function removeWordMoveEventListeners(wordUI)
 {
 	wordUI.removeEventListener('pressup', onWordPressUp, true);
@@ -414,7 +440,6 @@ function hideNext2ConnectionsButton()
 	domEl.style.display = "none";
 }
 function goToNextLevel(event){
-	console.log("next level...");
 	var userLevelData = '{"connections":[';
 	for(var i = 0; i < _currentConnections.length; i++)
 	{
@@ -445,7 +470,6 @@ function hideNextLevelBtn()
 }
 
 function goBack2SetUpLevel(event){
-	console.log("back 2 setup level...");
 	hideBack2SetupLevelBtn();
 	hideNextLevelBtn();
 	displayNext2ConnectionsButton();
@@ -668,7 +692,7 @@ function snapToGrid(wordUI)
  *	head:string,
  *	lemma:string,
  *	postag:string,
- *	dprel:string,
+ *	deprel:string,
  *	parent:word,
  *	kids:word[],
  *  isPunctuation:bool
@@ -683,19 +707,37 @@ function createWordUI(wordObj)
 	var wordUI = new createjs.Shape(graphix);
 	container._data = wordObj;
 	container.addChild(wordUI);
-
+	var parteVorbireText = new createjs.Text('', '16px HammersmithOne', '#000000');
+	parteVorbireText.y = is_firefox?12:6;
 	var displayText = new createjs.Text(wordObj.text,'24px HammersmithOne','#000000');
 	displayText.x = 5;
-	displayText.y = is_firefox?12:6;
-	var _width = displayText.getMeasuredWidth()+10;
-	var _height = displayText.getMeasuredHeight()+20;
+	displayText.y = (is_firefox?12:6)+20;
+	var _compWidth = displayText.getMeasuredWidth()+10;
+	if(_compWidth < 30)
+	{
+		var hDiff = 30 - _compWidth;
+		displayText.x += hDiff/2;
+		_compWidth = 30;
+	}
+	container.addChild(parteVorbireText);
+	//container.parteVorbireText = parteVorbireText;
+	var _width = _compWidth;
+	var _height = displayText.getMeasuredHeight()+40;
 	graphix.beginFill('#FF66CC').drawRoundRect(0,0,_width,_height,10).ef();
 	wordUI.shadow = new createjs.Shadow("#000000", 0, 0, 10);
 	container.addChild(displayText);
 	container.setBounds(0, 0, _width, _height);
+	container._width = _width;
 	container.setShadow = function (value){
 		wordUI.shadow = new createjs.Shadow("#000000", 0, 0, value);
 	};
+	container.setParteVorbire = function(parteVorbireStr){
+		parteVorbireText.text = parteVorbireStr;
+		var pvWidth = parteVorbireText.getMeasuredWidth();
+		parteVorbireText.x = this._width/2 - pvWidth/2;
+		stage.update();
+	};
+	container.setParteVorbire("?");
 	return container;
 }
 function drawTree()
@@ -708,4 +750,16 @@ function drawTree()
     	bmp.image = (e.target);
 	    stage.update();
 	};
+}
+
+function trace()
+{
+	if(!console || !console.log)
+	{
+		return;
+	}
+	for(var i = 0; i < arguments.length; i++)
+	{
+		console.log(arguments[i]);
+	}
 }

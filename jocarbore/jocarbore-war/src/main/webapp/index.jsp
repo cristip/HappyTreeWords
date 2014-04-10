@@ -94,6 +94,7 @@
     <a class="myButton" id="back2SetupLevelBtn" title="Click pentru a reveni la pozitionare">Inapoi la pozitionare</a>
     <a class="myButton" id="nextLevelBtn" title="Click pentru a merge la nivelul urmator">Nivelul Urmator</a>
     <a class="myButton" id="next2ConnectionsBtn" title="Click pentru a intra in modul conexiuni">Conexiuni</a>
+    
   </div>
   <div class="modalDialog">
       <div id="firstHelpTip" title="Apasă pentru a închide">
@@ -110,7 +111,34 @@
       </div>
       <div id="samelevelDialog" title="Apasă pentru a închide">
         <p>Nu ai obtinut suficient puncte pentru a trece la nivelul urmator. Mai încearcă!</p>
-        
+      </div>
+      <div id="partiProp" title="Alege partea de propozitie">
+      		<div id="radios">
+				<label class="myButton" for="sbj"><input id="sbj" type="radio" name="partProp">sbj.</label>
+				<label class="myButton" for="cd"><input id="cd" type="radio" name="partProp">c.d.</label>
+				<label class="myButton" for="punct"><input id="punct" type="radio" name="partProp">punct.</label>
+				<label class="myButton" for="neg"><input id="neg" type="radio" name="partProp">neg.</label>
+				<label class="myButton" for="aux"><input id="aux" type="radio" name="partProp">aux.</label>
+				<label class="myButton" for="prep"><input id="prep" type="radio" name="partProp">prep.</label>
+				<label class="myButton" for="aadj"><input id="aadj" type="radio" name="partProp">a.adj.</label>
+				<label class="myButton" for="det"><input id="det" type="radio" name="partProp">det.</label>
+				<label class="myButton" for="ci"><input id="ci" type="radio" name="partProp">c.i.</label>
+				<label class="myButton" for="asubst"><input id="asubst" type="radio" name="partProp">a.subst.</label>
+				<label class="myButton" for="subord"><input id="subord" type="radio" name="partProp">subord.</label>
+				<label class="myButton" for="refl"><input id="refl" type="radio" name="partProp">refl.</label>
+				<label class="myButton" for="npred"><input id="npred" type="radio" name="partProp">n.pred.</label>
+				<label class="myButton" for="ccl"><input id="ccl" type="radio" name="partProp">c.c.l.</label>
+				<label class="myButton" for="coord"><input id="coord" type="radio" name="partProp">coord.</label>
+				<label class="myButton" for="cct"><input id="cct" type="radio" name="partProp">c.c.t.</label>
+				<label class="myButton" for="part"><input id="part" type="radio" name="partProp">part.</label>
+				<label class="myButton" for="ccm"><input id="ccm" type="radio" name="partProp">c.c.m.</label>
+				<label class="myButton" for="cccz"><input id="cccz" type="radio" name="partProp">c.c.cz.</label>
+				<label class="myButton" for="ccscop"><input id="ccscop" type="radio" name="partProp">c.c.scop.</label>
+				<label class="myButton" for="cccons"><input id="cccons" type="radio" name="partProp">c.c.cons.</label>
+				<label class="myButton" for="ccconc"><input id="ccconc" type="radio" name="partProp">c.c.conc.</label>
+				<label class="myButton" for="cccond"><input id="cccond" type="radio" name="partProp">c.c.cond.</label>
+			</div>
+			<h2 id="partiPropWord">&nbsp;</h2>
       </div>
   </div>
 <%
