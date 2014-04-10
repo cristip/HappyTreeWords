@@ -10,6 +10,7 @@
 var BOARD_HEIGHT = 600;
 var BOARD_WIDTH = 1050;
 var BOARD_Y = 50;
+var MIN_WORD_WIDTH = 70;
 var _currentConnections = [];
 var _currentConnection = null;
 var _levelsPlayed = 0;
@@ -716,17 +717,17 @@ function createWordUI(wordObj)
 	var wordUI = new createjs.Shape(graphix);
 	container._data = wordObj;
 	container.addChild(wordUI);
-	var parteVorbireText = new createjs.Text('', '16px HammersmithOne', '#000000');
+	var parteVorbireText = new createjs.Text('', '16px HammersmithOne', '#FFFFFF');
 	parteVorbireText.y = is_firefox?12:6;
 	var displayText = new createjs.Text(wordObj.text,'24px HammersmithOne','#000000');
 	displayText.x = 5;
 	displayText.y = (is_firefox?12:6)+20;
 	var _compWidth = displayText.getMeasuredWidth()+10;
-	if(_compWidth < 30)
+	if(_compWidth < MIN_WORD_WIDTH)
 	{
-		var hDiff = 30 - _compWidth;
+		var hDiff = MIN_WORD_WIDTH - _compWidth;
 		displayText.x += hDiff/2;
-		_compWidth = 30;
+		_compWidth = MIN_WORD_WIDTH;
 	}
 	container.addChild(parteVorbireText);
 	//container.parteVorbireText = parteVorbireText;
