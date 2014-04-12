@@ -14,6 +14,7 @@ var MIN_WORD_WIDTH = 70;
 var _currentConnections = [];
 var _currentConnection = null;
 var _levelsPlayed = 0;
+var _currentWordUI = null;
 /**
  * related to the connection action
  * is connection while the mouse is pressed 
@@ -57,6 +58,13 @@ function newGame()
   	stage.addChild(board);
   	loadData(_currentLevel);
   	createjs.Ticker.addEventListener("tick", tick);
+  	
+  	$("#cancelPartiProp").click(function()
+	{
+		_currentWordUI.setParteVorbire("?");
+		$("#partiProp").hide();
+		$(".modalDialog").hide();
+	});
 
 }
 
@@ -321,6 +329,8 @@ function onWordPressUp(event)
 function onWordUIClick(event)
 {
 	trace("word clicked...");
+	var wordUI = event.currentTarget;
+	_currentWordUI = wordUI;
 	var radios = document.getElementById("radios");
 	var raza = 230;
 	var raza2 = 120;
@@ -328,12 +338,6 @@ function onWordUIClick(event)
 	//var x = event.stageX;
 	//var y = event.stageY;
 	$("#partiPropWord").text(event.currentTarget._data.text);
-	$("#cancelPartiProp").click(function()
-	{
-		event.currentTarget.setParteVorbire("?");
-		$("#partiProp").hide();
-		$(".modalDialog").hide();
-	});
 	var setParteVorbireClick = function(evt){
 		event.currentTarget.setParteVorbire(this.lastChild.nodeValue);
 		$("#partiProp").hide();
@@ -347,11 +351,6 @@ function onWordUIClick(event)
 	}
 	$(".modalDialog").show();
 	$("#partiProp").show();
-//	$("#partiProp").click(function(){
-//		$("#partiProp").hide();
-//		$(".modalDialog").hide();
-//	});
-	
 }
 
 function removeWordMoveEventListeners(wordUI)
@@ -386,9 +385,11 @@ function switch2DrawPaths()
 	{
 		return;
 	}
+	
 	_isDrawPaths = true;
 	displayNextLevelButton();
 	displayBack2SetupButton();
+	displayClearAllButton();
 	hideNext2ConnectionsButton();
 	for(var i = 0; i < boardDroppedWords.length; i++)
 	{
@@ -431,6 +432,22 @@ function displayNextLevelButton()
 	var domEl = document.getElementById('nextLevelBtn');
 	domEl.style.display = "inline-block";
 	domEl.onclick = goToNextLevel;
+}
+function hideClearAllButton()
+{
+	$("#deleteAllConnectionsBtn").hide();
+}
+function displayClearAllButton()
+{
+	$("#deleteAllConnectionsBtn").show();
+	$("#deleteAllConnectionsBtn").click(function(){
+		while(_currentConnections.length>0)
+		{
+			var conn = _currentConnections.pop();
+			conn.cleanUp();
+		}
+		_currentConnection = null;
+	});
 }
 function displayBack2SetupButton()
 {
@@ -482,6 +499,7 @@ function hideNextLevelBtn()
 function goBack2SetUpLevel(event){
 	hideBack2SetupLevelBtn();
 	hideNextLevelBtn();
+	hideClearAllButton();
 	displayNext2ConnectionsButton();
 	switch2Setup();
 }
@@ -496,7 +514,23 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 		lineTo:function (point){
 			this.shape.graphics.clear();
 			var startPoint = this.getStartPoint();
-			this.shape.graphics.setStrokeStyle(5, 1).beginStroke(0xFF0000).moveTo(startPoint.x, startPoint.y).lineTo(point.x, point.y).endStroke();
+			var lineColor = 0xFF0000;
+			this.shape.graphics.setStrokeStyle(5, 1).beginStroke(lineColor).moveTo(startPoint.x, startPoint.y).lineTo(point.x, point.y).endStroke();
+			var dx = startPoint.x - point.x;
+			var dy = startPoint.y - point.y; 
+			var theta = Math.atan2(dx, -dy);
+			var p1 = {x:-15, y:-25}; 
+			var p2 = {x:0, y:-14};
+			var p3 = {x:+15, y:-25};
+			var p0 = {x:0, y:8};
+			var matrix = new createjs.Matrix2D();
+			matrix.rotate(theta);
+			matrix.translate(point.x, point.y);
+			matrix.transformPoint(p1.x, p1.y, p1);
+			matrix.transformPoint(p2.x, p2.y, p2);
+			matrix.transformPoint(p3.x, p3.y, p3);
+			matrix.transformPoint(p0.x, p0.y, p0);
+			this.shape.graphics.beginFill(lineColor).moveTo(p0.x, p0.y).lineTo(p1.x, p1.y).lineTo(p2.x ,p2.y).lineTo(p3.x, p3.y).endFill();
 		},
 		cleanUp:function(){
 			this.shape.removeEventListener("click", onConnectionLineClick);

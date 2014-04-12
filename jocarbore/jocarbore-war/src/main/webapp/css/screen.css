@@ -183,6 +183,13 @@ a:visited{
 	right:20px;
 	display: none;
 }
+#deleteAllConnectionsBtn{
+	z-index: 2;
+	position: absolute;
+	top:150px;
+	left: 220px;
+	display:none; 
+}
 #radios{
 	position: absolute;
 }
