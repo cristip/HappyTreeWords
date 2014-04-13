@@ -1,4 +1,5 @@
 /* css screen */
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,600);
 @font-face
 {
 	font-family:HammersmithOne;
@@ -10,7 +11,8 @@ body
 	text-align: center;
 	padding: 0;
 	margin: 0;
-	background-image: url(../assets/images/bg.png);
+	background-image: url(../assets/images/bgrep.png);
+	color: #FFFFFF;
 }
 a{
 	text-decoration: none;
@@ -37,11 +39,7 @@ a:visited{
 {
 	position:absolute;
 	width:1050px; 
-/* 	left: 50%; */
-/* 	margin-left: -525px; */
 	left:0px;
-	background-color: #333333;
-	color: #FFFFFF;
 }
 #user
 {
@@ -55,10 +53,6 @@ a:visited{
 {
 	display: none;
 }
-#dprelBtn
-{
-	display: none;
-}
 #sentenceText
 {
 	
@@ -67,6 +61,7 @@ a:visited{
 {
 	
 	display:none;
+	border: 1px solid #cccccc;
 
 }
 #startGame
@@ -142,7 +137,7 @@ a:visited{
 	display:inline-block;
 	cursor:pointer;
 	color:#ffffff;
-	font-family:arial;
+	font-family: 'Open Sans', sans-serif;
 	font-size:15px;
 	padding:9px 23px;
 	text-decoration:none;
@@ -190,15 +185,15 @@ a:visited{
 	left: 220px;
 	display:none; 
 }
-#radios{
+#radios,#radios_inner{
 	position: absolute;
 }
-#radios label{
+#radios label, #radios_inner label{
 	position: absolute;
 	padding: 2px;
 	padding-left: 3px;
 	padding-right: 3px;
-	z-index:4;
+	z-index:3;
 	transition:All .1s ease;
 	-webkit-transition:All .1s ease;
 	-moz-transition:All .1s ease;
@@ -212,8 +207,9 @@ a:visited{
 	
 	
 	}
-#radios label:hover{
+#radios label:hover, #radios_inner label:hover{
 	z-index:5;
+	padding: 5px;
 	transform: rotate(0deg) scale(2) skew(0deg) translate(0px);
 	-webkit-transform: rotate(0deg) scale(2) skew(0deg) translate(0px);
 	-moz-transform: rotate(0deg) scale(2) skew(0deg) translate(0px);
@@ -222,7 +218,7 @@ a:visited{
 	
 	
 }
-#radios input{
+#radios input,#radios_inner input{
 	display:none;
 }
 #partiProp

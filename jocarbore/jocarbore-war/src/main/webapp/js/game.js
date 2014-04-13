@@ -11,6 +11,7 @@ var BOARD_HEIGHT = 600;
 var BOARD_WIDTH = 1050;
 var BOARD_Y = 50;
 var MIN_WORD_WIDTH = 70;
+var PARTE_VORBIRE_NESETAT = "?";
 var _currentConnections = [];
 var _currentConnection = null;
 var _levelsPlayed = 0;
@@ -48,7 +49,6 @@ function newGame()
 	$("#startGame").hide();
 	$('#gameCanvas').show();
 	$('#helpBtn').show();
-	$('#dprelBtn').show();
 	
 	stage = new createjs.Stage("gameCanvas");
 	createjs.Touch.enable(stage);
@@ -61,7 +61,7 @@ function newGame()
   	
   	$("#cancelPartiProp").click(function()
 	{
-		_currentWordUI.setParteVorbire("?");
+		_currentWordUI.setParteVorbire(PARTE_VORBIRE_NESETAT);
 		$("#partiProp").hide();
 		$(".modalDialog").hide();
 	});
@@ -80,6 +80,7 @@ function initLevel()
 	_isDrawPaths = false;
 	hideNext2ConnectionsButton();
 	hideBack2SetupLevelBtn();
+	hideClearAllButton();
 	hideNextLevelBtn();
 	while(_currentConnections.length > 0)
 	{
@@ -305,7 +306,9 @@ function onWordPressUp(event)
 	if(wordUI.y < 80)
 	{
 			 createjs.Tween.get(wordUI).to({x:wordUI.initialPosition.x,y:wordUI.initialPosition.y}, 300).call(function(){
-			 	//update = false;
+			 	update = false;
+			 	updateLiveConnections();
+			 	stage.update();
 			 });
 			 return;
 	}
@@ -324,31 +327,41 @@ function onWordPressUp(event)
 			displayStartConnectionsButton();
 		}
 	}
+	update = false;
+	stage.update();
 }
+
+
 
 function onWordUIClick(event)
 {
-	trace("word clicked...");
+	
+	var elipseWords = function(strContainerId, raza1, raza2){
+		var setParteVorbireClick = function(evt){
+			event.currentTarget.setParteVorbire(this.lastChild.nodeValue);
+			$("#partiProp").hide();
+			$(".modalDialog").hide();
+		};
+		var radios = document.getElementById(strContainerId);
+		var pas = 2 * Math.PI/radios.children.length;
+		for(var i = 0, j = 0; i < radios.children.length; i++, j+=pas)
+		{
+			//radios.children[i].style.left = (225 + raza1 * Math.cos(j) - radios.children[i].offsetWidth/2)+"px";
+			radios.children[i].style.left = (243 + raza1 * Math.cos(j) - 30)+"px";
+			radios.children[i].style.top = (122 + raza2 * Math.sin(j))+"px";
+			radios.children[i].style.width = "60px";
+			radios.children[i].onclick = setParteVorbireClick;
+		}
+	};
+
 	var wordUI = event.currentTarget;
 	_currentWordUI = wordUI;
-	var radios = document.getElementById("radios");
-	var raza = 230;
-	var raza2 = 120;
-	var pas = 2 * Math.PI/radios.children.length;
-	//var x = event.stageX;
-	//var y = event.stageY;
+	
+	elipseWords("radios", 230, 120);
+	//elipseWords("radios_inner", 150, 80);
 	$("#partiPropWord").text(event.currentTarget._data.text);
-	var setParteVorbireClick = function(evt){
-		event.currentTarget.setParteVorbire(this.lastChild.nodeValue);
-		$("#partiProp").hide();
-		$(".modalDialog").hide();
-	};
-	for(var i = 0, j = 0; i < radios.children.length; i++, j+=pas)
-	{
-		radios.children[i].style.left = (225 + raza * Math.cos(j) - radios.children[i].offsetWidth/2)+"px";
-		radios.children[i].style.top = (130 + raza2 * Math.sin(j))+"px";
-		radios.children[i].onclick = setParteVorbireClick;
-	}
+	;
+	
 	$(".modalDialog").show();
 	$("#partiProp").show();
 }
@@ -400,6 +413,8 @@ function switch2DrawPaths()
 		wordUI.setShadow(2);
 	}
 }
+
+
 function switch2Setup()
 {
 	_isDrawPaths = false;
@@ -414,6 +429,7 @@ function switch2Setup()
 		wordUI.addEventListener('pressmove', onWordPressMove, true);
 		wordUI.addEventListener('pressup', onWordPressUp, true);
 	}
+	stage.update();
 }
 function displayStartConnectionsButton()
 {
@@ -429,6 +445,11 @@ function displayStartConnectionsButton()
 
 function displayNextLevelButton()
 {
+	if(!_isDrawPaths || !haveAllParteVorbire())
+	{
+		hideNextLevelBtn();
+		return;
+	}
 	var domEl = document.getElementById('nextLevelBtn');
 	domEl.style.display = "inline-block";
 	domEl.onclick = goToNextLevel;
@@ -447,6 +468,7 @@ function displayClearAllButton()
 			conn.cleanUp();
 		}
 		_currentConnection = null;
+		stage.update();
 	});
 }
 function displayBack2SetupButton()
@@ -607,6 +629,7 @@ function deleteCurrentConnection()
 	}
 	_currentConnection.cleanUp();
 	_currentConnection = null;
+	stage.update();
 }
 function getConnectionByShape(shape)
 {
@@ -643,14 +666,21 @@ function getWordUnderPoint(x, y)
 	return null;
 }
 function onBoardWordPressUp(event){
+	
 	_isConnecting = false;
 	var wordUI = event.currentTarget;
 	event.stopImmediatePropagation();
 	var connection = _currentConnection;
-	if(wordUI != _currentConnection.source)
+	var cancelConnection = function()
 	{
 		_currentConnection = null;
 		connection.cleanUp();
+		update = false;
+		stage.update();
+	};
+	if(wordUI != _currentConnection.source)
+	{
+		cancelConnection();
 		return;
 	}
 
@@ -660,15 +690,23 @@ function onBoardWordPressUp(event){
 		!targetWordUI.hasOwnProperty('_data')
 	  )
 	{
-		_currentConnection = null;
-		connection.cleanUp();
+		cancelConnection();
 		return;
+	}
+	for(var i = 0; i < _currentConnections.length; i++)
+	{
+		if(_currentConnections[i].source == _currentConnection.source && _currentConnections[i].destination == targetWordUI)
+		{
+			cancelConnection();
+			return;
+		}
 	}
 	connection.destination = targetWordUI;
 	connection.endConnection();
 	_currentConnections.push(connection);
 	_currentConnection = null;
-	
+	update = false;
+	stage.update();
 }
 
 function updateLiveConnections()
@@ -682,6 +720,7 @@ function updateLiveConnections()
 }
 
 function onBoardWordMouseDown(event){
+	update = true;
 	var wordUI = event.currentTarget;
 	event.stopImmediatePropagation();
 	if(_isConnecting)
@@ -727,6 +766,7 @@ function snapToGrid(wordUI)
 			break;
 		}
 	}
+	stage.update();
 }
 
 /**
@@ -775,14 +815,37 @@ function createWordUI(wordObj)
 	container.setShadow = function (value){
 		wordUI.shadow = new createjs.Shadow("#000000", 0, 0, value);
 	};
+	container.hasParteVorbire = function(){
+		return parteVorbireText.text != PARTE_VORBIRE_NESETAT;
+	};
+	container.getParteVorbire = function(){
+		return parteVorbireText.text;
+	};
 	container.setParteVorbire = function(parteVorbireStr){
+		//container.dispatchEvent("parte_vorbire");
 		parteVorbireText.text = parteVorbireStr;
 		var pvWidth = parteVorbireText.getMeasuredWidth();
 		parteVorbireText.x = this._width/2 - pvWidth/2;
 		stage.update();
+		displayNextLevelButton();
 	};
-	container.setParteVorbire("?");
+	container.setParteVorbire(PARTE_VORBIRE_NESETAT);
 	return container;
+}
+function haveAllParteVorbire()
+{
+	if(!boardDroppedWords || boardDroppedWords.length != currentProcessedSentence.length)
+	{
+		return;
+	}
+	for(var i = 0; i < boardDroppedWords.length; i++)
+	{
+		if(!boardDroppedWords[i].hasParteVorbire())
+		{
+			return false;
+		}
+	}
+	return true;
 }
 function drawTree()
 {
