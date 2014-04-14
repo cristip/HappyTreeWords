@@ -22,6 +22,15 @@ import com.google.appengine.api.users.User;
 public final class GameUserProfileService extends AbstractService {
 	private static GameUserProfileService Me;
 	private static final Logger log = Logger.getLogger(ImportSentencesServlet.class.getName());
+	private static final String ID_FIELD_NAME = "id";
+	private static final String DEPREL_FIELD_NAME = "deprel";
+	private static final String HEAD_FIELD_NAME = "head";
+	private static final String SOURCE_FIELD_NAME = "source";
+	private static final String DESTINATION_FIELD_NAME = "destination";
+	private static final String LEVEL_FIELD_NAME = "level";
+	private static final String POINTS_FIELD_NAME = "points";
+	private static final String CONNECTIONS_JSON_FIELD_NAME = "connections";
+	private static final String WORDS_JSON_FIELD_NAME = "words";
 	
 	private GameUserProfileService()
 	{
@@ -43,19 +52,19 @@ public final class GameUserProfileService extends AbstractService {
 		}
 		String userEmail = user.getEmail();
 		
-		Entity userEntity = getSingle(Utils.USER_ENTITY, "email" , userEmail);
+		Entity userEntity = getSingle(Utils.USER_ENTITY, Utils.EMAIL_FIELD_NAME , userEmail);
 		Map<String, String> profileMap = new HashMap<String, String>();
-		profileMap.put("email", userEmail);
+		profileMap.put(Utils.EMAIL_FIELD_NAME, userEmail);
 		Date time = new Date();
 		
 		if(null == userEntity)
 		{
 			userEntity = new Entity(Utils.USER_ENTITY);
-			userEntity.setProperty("email", userEmail);
-			userEntity.setProperty("level", 0);
-			profileMap.put("level", "0");
-			userEntity.setProperty("points", 0);
-			profileMap.put("points", "0");
+			userEntity.setProperty(Utils.EMAIL_FIELD_NAME, userEmail);
+			userEntity.setProperty(LEVEL_FIELD_NAME, 0);
+			profileMap.put(LEVEL_FIELD_NAME, "0");
+			userEntity.setProperty(POINTS_FIELD_NAME, 0);
+			profileMap.put(POINTS_FIELD_NAME, "0");
 			userEntity.setProperty("active", true);
 			userEntity.setProperty("joinDate",  time);
 		}
@@ -65,8 +74,8 @@ public final class GameUserProfileService extends AbstractService {
 			{
 				throw new UserBannedException("not active");
 			}
-			profileMap.put("level", userEntity.getProperty("level").toString());
-			profileMap.put("points", userEntity.getProperty("points").toString());
+			profileMap.put(LEVEL_FIELD_NAME, userEntity.getProperty(LEVEL_FIELD_NAME).toString());
+			profileMap.put(POINTS_FIELD_NAME, userEntity.getProperty(POINTS_FIELD_NAME).toString());
 		}
 		userEntity.setProperty("lastplaydate", time);
 		update(userEntity);
@@ -78,7 +87,7 @@ public final class GameUserProfileService extends AbstractService {
 	public void startGameSession(User user)
 	{
 		Entity gameSession = new Entity(Utils.GAME_SESSION_ENTITY);
-		gameSession.setProperty("email", user.getEmail());
+		gameSession.setProperty(Utils.EMAIL_FIELD_NAME, user.getEmail());
 		gameSession.setProperty("date", new Date());
 		update(gameSession);
 	}
@@ -103,15 +112,15 @@ public final class GameUserProfileService extends AbstractService {
 		}
 		String userEmail = user.getEmail();
 		
-		Entity userEntity = getSingle(Utils.USER_ENTITY, "email" , userEmail);
-		int currentPoints = ((Long)userEntity.getProperty("points")).intValue();
+		Entity userEntity = getSingle(Utils.USER_ENTITY, Utils.EMAIL_FIELD_NAME, userEmail);
+		int currentPoints = ((Long)userEntity.getProperty(POINTS_FIELD_NAME)).intValue();
 		currentPoints -= points;
-		userEntity.setProperty("points", currentPoints);
+		userEntity.setProperty(POINTS_FIELD_NAME, currentPoints);
 		update(userEntity);
 	}
 	public int getUserPoints(User user) {
-		Entity userEntity = getSingle(Utils.USER_ENTITY, "email" , user.getEmail());
-		Long points = (Long) userEntity.getProperty("points");
+		Entity userEntity = getSingle(Utils.USER_ENTITY, Utils.EMAIL_FIELD_NAME , user.getEmail());
+		Long points = (Long) userEntity.getProperty(POINTS_FIELD_NAME);
 		if(null == points)
 		{
 			return 0;
@@ -120,13 +129,16 @@ public final class GameUserProfileService extends AbstractService {
 	}
 		
 	public int validateUserSentence(JSONObject json, int level, User user) throws JSONException {
-		JSONArray connections = json.getJSONArray("connections");
+		JSONArray connections = json.getJSONArray(CONNECTIONS_JSON_FIELD_NAME);
+		JSONArray words = json.getJSONArray(WORDS_JSON_FIELD_NAME);
 		Sentence sentence = getSentenceByLevel(level);
 		int points = 0;
-		for(int i = 0; i < connections.length(); i++)
+		List<Map<String, String>> sentenceWords = sentence.getWords();
+		
+		for(int i = 0; i < words.length(); i++)
 		{
-			JSONObject connection = connections.getJSONObject(i);
-			if(isConnectionInWords(connection, sentence.getWords()))
+			JSONObject word = words.getJSONObject(i);
+			if(isDeprel(word, sentenceWords))
 			{
 				points += 30;
 			}else
@@ -134,18 +146,61 @@ public final class GameUserProfileService extends AbstractService {
 				points -= 30;
 			}
 		}
-		Entity userEntity = getSingle(Utils.USER_ENTITY, "email" , user.getEmail());
-		int currentPoints = ((Long) userEntity.getProperty("points")).intValue();
+		
+		for(int i = 0; i < connections.length(); i++)
+		{
+			JSONObject connection = connections.getJSONObject(i);
+			if(isConnectionInWords(connection, sentenceWords))
+			{
+				points += 30;
+			}else
+			{
+				points -= 30;
+			}
+		}
+		Entity userEntity = getSingle(Utils.USER_ENTITY, Utils.EMAIL_FIELD_NAME , user.getEmail());
+		int currentPoints = ((Long) userEntity.getProperty(POINTS_FIELD_NAME)).intValue();
 		currentPoints += points;
-		userEntity.setProperty("points", currentPoints);
+		userEntity.setProperty(POINTS_FIELD_NAME, currentPoints);
 		if(points > 0)
 		{
-			userEntity.setProperty("level", level+1);
+			userEntity.setProperty(LEVEL_FIELD_NAME, level+1);
 		}
 		update(userEntity);
 		return points;
 	}
-	/*
+	/**
+	 * 
+	 * @param word {id:int,deprel:string}
+	 * @param sentenceWords 
+	 * @return
+	 * @throws JSONException 
+	 */
+	private boolean isDeprel(JSONObject jsonWord,
+			List<Map<String, String>> sentenceWords) throws JSONException {
+		
+		for(Map<String, String> word:sentenceWords){
+			if(word.get(ID_FIELD_NAME).equals(jsonWord.getString(ID_FIELD_NAME)))
+			{
+				if(word.containsKey(DEPREL_FIELD_NAME))
+				{
+					if(word.get(DEPREL_FIELD_NAME).equals(jsonWord.getString(DEPREL_FIELD_NAME)))
+					{
+						return true;
+					}
+				}else
+				{
+					if(jsonWord.getString(DEPREL_FIELD_NAME).isEmpty())
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+		}
+		return false;
+	}
+	/**
 	 * connections:
 	 * [{source:n, destination:m}...
 	 * sentence:
@@ -156,7 +211,7 @@ public final class GameUserProfileService extends AbstractService {
 	{
 		for(Map<String, String> word:words)
 		{
-			if( word.get("head").equals(connection.getString("source")) && word.get("id").equals(connection.getString("destination")))
+			if( word.get(HEAD_FIELD_NAME).equals(connection.getString(SOURCE_FIELD_NAME)) && word.get(ID_FIELD_NAME).equals(connection.getString(DESTINATION_FIELD_NAME)))
 			{
 				return true;
 			}

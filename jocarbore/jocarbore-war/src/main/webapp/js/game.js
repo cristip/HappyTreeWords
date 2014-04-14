@@ -11,6 +11,8 @@ var BOARD_HEIGHT = 600;
 var BOARD_WIDTH = 1050;
 var BOARD_Y = 50;
 var MIN_WORD_WIDTH = 70;
+var PARTI_VORBIRE_NECOMPLETATE = "Nu ai completat cu toate partile de propozitie.<br/><br/>Click pe un cuvant ca sa selectezi partile de propozitie!<br/>";
+var CUVINTE_NECONECTATE = "Nu ai conectat toate cuvintele.<br/><br/>Click pe un Predicat ca să îl unești cu o parte de propoziție subordonată!<br/>";
 var PARTE_VORBIRE_NESETAT = "?";
 var _currentConnections = [];
 var _currentConnection = null;
@@ -445,7 +447,7 @@ function displayStartConnectionsButton()
 
 function displayNextLevelButton()
 {
-	if(!_isDrawPaths || !haveAllParteVorbire())
+	if(!_isDrawPaths)
 	{
 		hideNextLevelBtn();
 		return;
@@ -488,7 +490,28 @@ function hideNext2ConnectionsButton()
 	domEl = document.getElementById('next2ConnectionsBtn');
 	domEl.style.display = "none";
 }
+function displayValidationError(errorMsg)
+{
+	$("#validationDialog").show();
+	$(".modalDialog").show();
+	$("#validationDialogError").html(errorMsg);
+	$("#validationDialog").click(function(){
+		$("#validationDialog").hide();
+		$(".modalDialog").hide();
+	});
+}
 function goToNextLevel(event){
+	if(!haveAllParteVorbire())
+	{
+		displayValidationError(PARTI_VORBIRE_NECOMPLETATE);
+		return;
+	}
+	if(!haveAllConnectedWords())
+	{
+		displayValidationError(CUVINTE_NECONECTATE);
+		return;
+	}
+	
 	var userLevelData = '{"connections":[';
 	for(var i = 0; i < _currentConnections.length; i++)
 	{
@@ -497,6 +520,15 @@ function goToNextLevel(event){
 			userLevelData += ',';
 		}
 		userLevelData += _currentConnections[i].toJSON();
+	}
+	userLevelData += '],"words":[';
+	for(var i = 0; i < boardDroppedWords.length; i++)
+	{
+		if(i > 0)
+		{
+			userLevelData += ',';
+		}
+		userLevelData += boardDroppedWords[i].toJSON();
 	}
 	userLevelData += ']}';
 	_levelsPlayed++;
@@ -822,21 +854,62 @@ function createWordUI(wordObj)
 		return parteVorbireText.text;
 	};
 	container.setParteVorbire = function(parteVorbireStr){
-		//container.dispatchEvent("parte_vorbire");
 		parteVorbireText.text = parteVorbireStr;
 		var pvWidth = parteVorbireText.getMeasuredWidth();
 		parteVorbireText.x = this._width/2 - pvWidth/2;
 		stage.update();
-		displayNextLevelButton();
+	};
+	container.toJSON = function(){
+		var json = '{';
+		json += '"id":"' + this._data.id+'",';
+		var strDeprel = this.getParteVorbire();
+		if(strDeprel == "pred.")
+		{
+			json += '"deprel":""';
+		}else
+		{
+			json += '"deprel":"' + strDeprel +'"';
+		}
+		
+		json += '}';
+		return json;
 	};
 	container.setParteVorbire(PARTE_VORBIRE_NESETAT);
 	return container;
 }
+
+function haveAllConnectedWords()
+{
+	if(!boardDroppedWords || boardDroppedWords.length != currentProcessedSentence.length)
+	{
+		return false;
+	}
+	var isWordConnected = function(wordUI)
+	{
+		for(var i = 0; i < _currentConnections.length; i++)
+		{
+			if(wordUI == _currentConnections[i].source || wordUI == _currentConnections[i].destination)
+			{
+				return true;
+			}
+		}
+		return false;
+	};
+	for(var i = 0; i < boardDroppedWords.length; i++)
+	{
+		if(!isWordConnected(boardDroppedWords[i]))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 function haveAllParteVorbire()
 {
 	if(!boardDroppedWords || boardDroppedWords.length != currentProcessedSentence.length)
 	{
-		return;
+		return false;
 	}
 	for(var i = 0; i < boardDroppedWords.length; i++)
 	{

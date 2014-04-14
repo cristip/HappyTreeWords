@@ -95,7 +95,7 @@ a:visited{
 	z-index: 3;
 	background-color: rgba(0,0,0,0.3);
 }
-#firstHelpTip,#secondHelpTip,#deleteDialog,#samelevelDialog,#partiProp
+#firstHelpTip,#secondHelpTip,#deleteDialog,#samelevelDialog,#partiProp,#validationDialog
 {
 	display:none;
 	background-color: #333333;

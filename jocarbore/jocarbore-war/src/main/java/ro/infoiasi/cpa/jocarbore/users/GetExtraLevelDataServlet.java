@@ -48,8 +48,9 @@ public class GetExtraLevelDataServlet extends HttpServlet {
 			resp.sendError(500);
 			return;
 		}
-		GameUserProfileService.getInstance().removeUserPoints(150);
+		//GameUserProfileService.getInstance().removeUserPoints(150);
 		resp.setContentType(Utils.JSON_CONTENT_TYPE);
+		resp.setCharacterEncoding(Utils.UTF8);
 		PrintWriter pw = resp.getWriter();
 		pw.print(sentence.toUserString(true));
 		pw.flush();

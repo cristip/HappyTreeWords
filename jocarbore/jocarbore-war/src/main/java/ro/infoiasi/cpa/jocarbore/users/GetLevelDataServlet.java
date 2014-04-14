@@ -82,7 +82,6 @@ public class GetLevelDataServlet extends HttpServlet {
 		}
 		int level = Integer.parseInt(levelStr);
 		
-		
 		JSONObject json = null;
 		try {
 			log.info("trying to parse the level string: " + jsonStr);
@@ -108,13 +107,13 @@ public class GetLevelDataServlet extends HttpServlet {
 	{
 		int points = GameUserProfileService.getInstance().getUserPoints(user);
 		Sentence sentence = null;
-		Sentence previousSentence = null;
+//		Sentence previousSentence = null;
 		try {
 			sentence = GameUserProfileService.getInstance().getSentenceByLevel(level);
-			if(level > 0)
-			{
-				previousSentence = GameUserProfileService.getInstance().getSentenceByLevel(level-1);
-			}
+//			if(level > 0)
+//			{
+//				previousSentence = GameUserProfileService.getInstance().getSentenceByLevel(level-1);
+//			}
 			if(null == sentence)
 			{
 				resp.sendError(404);
@@ -126,14 +125,14 @@ public class GetLevelDataServlet extends HttpServlet {
 			return;
 		}
 		resp.setContentType(Utils.JSON_CONTENT_TYPE);
-		resp.setCharacterEncoding("utf-8");
+		resp.setCharacterEncoding(Utils.UTF8);
 		
 		String responseJSON = "{\"points\":\""+points+"\",";
 		responseJSON += "\"level\":\""+level+"\",";
-		if(null != previousSentence)
-		{
-			responseJSON += "\"previousSentence\":"+previousSentence.toUserCompleteString()+",";
-		}
+//		if(null != previousSentence)
+//		{
+//			responseJSON += "\"previousSentence\":"+previousSentence.toUserCompleteString()+",";
+//		}
 		PrintWriter pw = resp.getWriter();
 		String sentenceStr = sentence.toUserString(false);
 		responseJSON += "\"sentence\":"+sentenceStr+"}";

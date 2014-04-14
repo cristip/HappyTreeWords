@@ -113,6 +113,9 @@
       <div id="samelevelDialog" title="Apasă pentru a închide">
         <p>Nu ai obtinut suficient puncte pentru a trece la nivelul urmator. Mai încearcă!</p>
       </div>
+      <div id="validationDialog" title="Apasă pentru a închide">
+        <p><span id="validationDialogError">&nbsp;</span><br/>Continuă</p>
+      </div>
       <div id="partiProp" title="Alege partea de propozitie">
       		<p>Alege partea de propziție potrivită pentru cuvântul selectat:</p>
       		<div id="radios">

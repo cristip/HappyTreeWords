@@ -134,10 +134,10 @@ public class Sentence implements Serializable{
 			JSONObject json = new JSONObject(getWords().get(i));
 			if(!hasDprel){
 				json.remove("deprel");
+				json.remove("head");
+				json.remove("postag");
+				json.remove("chunk");
 			}
-			json.remove("head");
-			json.remove("postag");
-			json.remove("chunk");
 			sb.append(json.toString());
 		}
 		return "["+sb.toString()+"]";

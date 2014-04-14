@@ -23,6 +23,8 @@ public class Utils {
 	public static final String GAME_LEVEL_ENTITY 	= "GameLevel";
 	public static final String USER_ENTITY 			= "User";
 	public static final String GAME_SESSION_ENTITY	= "GameSession";
+	public static final String EMAIL_FIELD_NAME		= "email";
+	public static final String UTF8					= "utf-8";
 	public static User getCurrentUser()
 	{
 		UserService userService = UserServiceFactory.getUserService();
