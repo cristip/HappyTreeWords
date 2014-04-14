@@ -37,9 +37,11 @@ a:visited{
 }
 #gameBox
 {
-	position:absolute;
+/* 	position:absolute; */
 	width:1050px; 
-	left:0px;
+	margin-left: auto ;
+  	margin-right: auto ;
+/* 	left:0px; */
 }
 #user
 {
@@ -68,7 +70,7 @@ a:visited{
 {
 	position: absolute;
 	background-image: url(../assets/images/tree.png);
-	background-color: #336533;
+/* 	background-color: #336533; */
 	width:1050px; 
 	height:650px;
 	text-align: left;
@@ -85,6 +87,10 @@ a:visited{
 	text-shadow: 0px 0px 20px rgba(255, 255, 255, 1);
 	font-size: 25px;
 	margin-top: 40px;	
+}
+#startGame ol li:hover
+{
+	text-shadow: 0px 0px 10px rgba(255, 255, 255, 1);
 }
 .modalDialog
 {
