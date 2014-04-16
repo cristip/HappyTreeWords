@@ -29,7 +29,7 @@ public final class GameUserProfileService extends AbstractService {
 	private static final String DESTINATION_FIELD_NAME = "destination";
 	private static final String LEVEL_FIELD_NAME = "level";
 	private static final String POINTS_FIELD_NAME = "points";
-	private static final String CONNECTIONS_JSON_FIELD_NAME = "connections";
+	public static final String CONNECTIONS_JSON_FIELD_NAME = "connections";
 	private static final String WORDS_JSON_FIELD_NAME = "words";
 	
 	private GameUserProfileService()
@@ -79,16 +79,19 @@ public final class GameUserProfileService extends AbstractService {
 		}
 		userEntity.setProperty("lastplaydate", time);
 		update(userEntity);
-		//startGameSession(user);
 		return profileMap;
 		
 	}
 	
-	public void startGameSession(User user)
+	public void recordGameSession(User user, int level, int points, String connections, String screenData)
 	{
 		Entity gameSession = new Entity(Utils.GAME_SESSION_ENTITY);
 		gameSession.setProperty(Utils.EMAIL_FIELD_NAME, user.getEmail());
 		gameSession.setProperty("date", new Date());
+		gameSession.setProperty("level", level);
+		gameSession.setProperty("connectionsJSON", connections);
+		gameSession.setProperty("screenData", screenData);
+		gameSession.setProperty("points", points);
 		update(gameSession);
 	}
 	

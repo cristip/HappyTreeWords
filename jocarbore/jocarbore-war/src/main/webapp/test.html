@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>fisier de teste</title>
+	<link rel="stylesheet" type="text/css" href="css/screen.css">
+	<script src="http://code.createjs.com/createjs-2013.12.12.min.js" type="text/javascript"></script>
+	<!--<script src="http://code.jquery.com/jquery-2.1.0.min.js" type="text/javascript"></script>-->
+	<script type="text/javascript">
+	var stage;
+	var button;
+	var spriteSheet;
+	function init()
+	{
+		stage = new createjs.Stage("testCanvas");
+		createjs.Ticker.addEventListener("tick", stage);
+		stage.enableMouseOver();
+		var data = {
+			images: ["assets/images/btn_next.png"],
+			frames: {width:224, height:40, count:3},
+			animations: {out:0, over:1, down:2}
+		};
+		spriteSheet = new createjs.SpriteSheet(data);
+		button = new createjs.Sprite(spriteSheet, "out").set({x:100, y:30});
+		button.shadow = new createjs.Shadow("#000000", 0, 0, 10);
+		var helper = new createjs.ButtonHelper(button);
+		
+		//stage.addChild(button);
+		button.addEventListener("click", onBtnClick);
+		
+		
+		
+		
+		stage.addChild(button);
+		stage.update();
+		//createjs.Ticker.setFPS(60);
+		//createjs.Ticker.addListener(stage,false);
+	}
+	function onBtnClick(event){
+		console.log("click: " + event);
+	}
+	</script>
+</head>
+<body onload="init();">
+	<canvas id="testCanvas" width="1024" height="768">
+		canvas nu e suportat...
+	</canvas>
+</body>
+</html>

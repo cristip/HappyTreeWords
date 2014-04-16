@@ -128,7 +128,6 @@ a:visited{
 	height: 228px;
 	margin-top:-114px;
 }
-
 .myButton {
 	-moz-box-shadow:inset 0px -3px 7px 0px #29bbff;
 	-webkit-box-shadow:inset 0px -3px 7px 0px #29bbff;
@@ -140,7 +139,7 @@ a:visited{
 	background:-ms-linear-gradient(top, #2dabf9 5%, #0688fa 100%);
 	background:linear-gradient(to bottom, #2dabf9 5%, #0688fa 100%);
 	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#2dabf9', endColorstr='#0688fa',GradientType=0);
-	background-color:#2dabf9;
+	background-color:#0060c5;
 	-moz-border-radius:3px;
 	-webkit-border-radius:3px;
 	border-radius:3px;
@@ -202,57 +201,27 @@ a:visited{
 	left: 220px;
 	display:none; 
 }
-#radios,#radios_inner{
-	position: absolute;
-}
 #radios label, #radios_inner label{
-	position: absolute;
-	padding: 2px;
-	padding-left: 3px;
-	padding-right: 3px;
-	z-index:3;
-	transition:All .1s ease;
-	-webkit-transition:All .1s ease;
-	-moz-transition:All .1s ease;
-	-o-transition:All .1s ease;
-	transform: rotate(0deg) scale(1) skew(0deg) translate(0px);
-	-webkit-transform: rotate(0deg) scale(1) skew(0deg) translate(0px);
-	-moz-transform: rotate(0deg) scale(1) skew(0deg) translate(0px);
-	-o-transform: rotate(0deg) scale(1) skew(0deg) translate(0px);
-	-ms-transform: rotate(0deg) scale(1) skew(0deg) translate(0px);
-	
-	
-	
-	}
-#radios label:hover, #radios_inner label:hover{
-	z-index:5;
-	padding: 5px;
-	transform: rotate(0deg) scale(2) skew(0deg) translate(0px);
-	-webkit-transform: rotate(0deg) scale(2) skew(0deg) translate(0px);
-	-moz-transform: rotate(0deg) scale(2) skew(0deg) translate(0px);
-	-o-transform: rotate(0deg) scale(2) skew(0deg) translate(0px);
-	-ms-transform: rotate(0deg) scale(2) skew(0deg) translate(0px);
-	
-	
+	width:350px;
+}
+.underlined{
+	text-decoration: underline;
 }
 #radios input,#radios_inner input{
 	display:none;
 }
 #partiProp
 {
-	width:500px;
-	height: 370px;
-	margin-left: -250px;
-	margin-top: -185px;	
+	width:850px;
+	height: 670px;
+	margin-left: -425px;
+	margin-top: -335px;	
 	cursor: default;
 }
 #cancelPartiProp
 {
-	margin-top: 125px;
+	margin-top: 5px;
 }
 #partiProp h2
 {
-	margin-top: 130px;
-	margin-left: 50px;
-	margin-right: 50px;
 }

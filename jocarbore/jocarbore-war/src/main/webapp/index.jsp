@@ -11,7 +11,6 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta name="google-site-verification" content="is86mFdH_mJWiNHA3SfYDuU-lDa2KheLAYJB0Ko9hAk" />
 	<title>Arbore Sintactic</title>
 	<link rel="stylesheet" type="text/css" href="css/screen.css">
 <%
@@ -118,38 +117,34 @@
       </div>
       <div id="partiProp" title="Alege partea de propozitie">
       		<p>Alege partea de propziție potrivită pentru cuvântul selectat:</p>
+      		<h2 id="partiPropWord">&nbsp;</h2>
       		<div id="radios">
-				<label class="myButton" for="sbj" title="Subiect"><input id="sbj" type="radio" name="partProp">sbj.</label>
-				<label class="myButton" for="pred" title="Predicat"><input id="pred" type="radio" name="partProp">pred.</label>
-				<label class="myButton" for="cd" title="Complement Direct"><input id="cd" type="radio" name="partProp">c.d.</label>
-				<label class="myButton" for="punct" title="Semn de Punctuație"><input id="punct" type="radio" name="partProp">punct.</label>
-				<label class="myButton" for="neg" title="Particulă de Negație"><input id="neg" type="radio" name="partProp">neg.</label>
-				<label class="myButton" for="aux" title="Auxiliar"><input id="aux" type="radio" name="partProp">aux.</label>
-				<label class="myButton" for="prep" title="Relație Prepoziționala"><input id="prep" type="radio" name="partProp">prep.</label>
-				<label class="myButton" for="aadj" title="Atribut Adjectival"><input id="aadj" type="radio" name="partProp">a.adj.</label>
-				<label class="myButton" for="det" title="Relatie Comparativă"><input id="det" type="radio" name="partProp">det.</label>
-				<label class="myButton" for="ci"  title="Complement Indirect"><input id="ci" type="radio" name="partProp">c.i.</label>
-				<label class="myButton" for="asubst" title="Atribut Substantival"><input id="asubst" type="radio" name="partProp">a.subst.</label>
-				<label class="myButton" for="subord" title="Subord"><input id="subord" type="radio" name="partProp">subord.</label>
-				<label class="myButton" for="refl" title="Reflexiv"><input id="refl" type="radio" name="partProp">refl.</label>
-<!-- 			</div> -->
-<!-- 			<div id="radios_inner"> -->
-				<label class="myButton" for="npred" title="Nume Predicativ"><input id="npred" type="radio" name="partProp">n.pred.</label>
-				<label class="myButton" for="ccl" title="Complement Circumstanțial de Loc"><input id="ccl" type="radio" name="partProp">c.c.l.</label>
-				<label class="myButton" for="coord" title="Coordonare"><input id="coord" type="radio" name="partProp">coord.</label>
-				<label class="myButton" for="cct" title="Complement Circumstanțial de Timp"><input id="cct" type="radio" name="partProp">c.c.t.</label>
-				<label class="myButton" for="part" title="Particulă"><input id="part" type="radio" name="partProp">part.</label>
-				<label class="myButton" for="ccm" title="Complement Circumstantial de Mod"><input id="ccm" type="radio" name="partProp">c.c.m.</label>
-				<label class="myButton" for="cccz" title="Complement Circumstantial de Caz"><input id="cccz" type="radio" name="partProp">c.c.cz.</label>
-				<label class="myButton" for="ccscop" title="Complement Circumstantial de Scop"><input id="ccscop" type="radio" name="partProp">c.c.scop.</label>
-				<label class="myButton" for="cccons" title="Complement Circumstantial Consecutiv"><input id="cccons" type="radio" name="partProp">c.c.cons.</label>
-				<label class="myButton" for="ccconc" title="Complement Circumstantial Concesiv"><input id="ccconc" type="radio" name="partProp">c.c.conc.</label>
-				<label class="myButton" for="cccond" title="Complement Circumstantial Conditional"><input id="cccond" type="radio" name="partProp">c.c.cond.</label>
+					<label class="myButton" for="sbj" title="Subiect"><input id="sbj" type="radio" name="partProp">Subiect (sbj.)</label>
+					<label class="myButton" for="pred" title="Predicat"><input id="pred" type="radio" name="partProp">Predicat (pred.)</label>
+					<label class="myButton" for="cd" title="Complement Direct"><input id="cd" type="radio" name="partProp">Complement Direct (c.d.)</label>
+					<label class="myButton" for="punct" title="Semn de Punctuație"><input id="punct" type="radio" name="partProp">Semn de Punctuație (punct.)</label>
+					<label class="myButton" for="neg" title="Particulă de Negație"><input id="neg" type="radio" name="partProp">Particulă de Negație (neg.)</label>
+					<label class="myButton" for="aux" title="Auxiliar"><input id="aux" type="radio" name="partProp">Auxiliar (aux).</label>
+					<label class="myButton" for="prep" title="Relație Prepoziționala"><input id="prep" type="radio" name="partProp">Relație Prepoziționala (prep.)</label>
+					<label class="myButton" for="aadj" title="Atribut Adjectival"><input id="aadj" type="radio" name="partProp">Atribut Adjectival (a.adj.)</label>
+					<label class="myButton" for="det" title="Relatie Comparativă"><input id="det" type="radio" name="partProp">Relatie Comparativă (det.)</label>
+					<label class="myButton" for="ci"  title="Complement Indirect"><input id="ci" type="radio" name="partProp">Complement Indirect (c.i.)</label>
+					<label class="myButton" for="asubst" title="Atribut Substantival"><input id="asubst" type="radio" name="partProp">Atribut Substantival (a.subst.)</label>
+					<label class="myButton" for="subord" title="Subord"><input id="subord" type="radio" name="partProp">Subordonare (subord.)</label>
+					<label class="myButton" for="refl" title="Reflexiv"><input id="refl" type="radio" name="partProp">Reflexiv (refl.)</label>
+					<label class="myButton" for="npred" title="Nume Predicativ"><input id="npred" type="radio" name="partProp">Nume Predicativ (n.pred.)</label>
+					<label class="myButton" for="ccl" title="Complement Circumstanțial de Loc"><input id="ccl" type="radio" name="partProp">Complement Circumstanțial de Loc (c.c.l.)</label>
+					<label class="myButton" for="coord" title="Coordonare"><input id="coord" type="radio" name="partProp">Coordonare (coord.)</label>
+					<label class="myButton" for="cct" title="Complement Circumstanțial de Timp"><input id="cct" type="radio" name="partProp">Complement Circumstanțial de Timp (c.c.t.)</label>
+					<label class="myButton" for="part" title="Particulă"><input id="part" type="radio" name="partProp">Particulă (part.)</label>
+					<label class="myButton" for="ccm" title="Complement Circumstantial de Mod"><input id="ccm" type="radio" name="partProp">Complement Circumstantial de Mod (c.c.m.)</label>
+					<label class="myButton" for="cccz" title="Complement Circumstantial de Caz"><input id="cccz" type="radio" name="partProp">Complement Circumstantial de Caz (c.c.cz.)</label>
+					<label class="myButton" for="ccscop" title="Complement Circumstantial de Scop"><input id="ccscop" type="radio" name="partProp">Complement Circumstantial de Scop (c.c.scop.)</label>
+					<label class="myButton" for="cccons" title="Complement Circumstantial Consecutiv"><input id="cccons" type="radio" name="partProp">Complement Circumstantial Consecutiv (c.c.cons.)</label>
+					<label class="myButton" for="ccconc" title="Complement Circumstantial Concesiv"><input id="ccconc" type="radio" name="partProp">Complement Circumstantial Concesiv (c.c.conc.)</label>
+					<label class="myButton" for="cccond" title="Complement Circumstantial Conditional"><input id="cccond" type="radio" name="partProp">Complement Circumstantial Conditional (c.c.cond.)</label>
 			</div>
-			<h2 id="partiPropWord">&nbsp;</h2>
-			<div>
 			<a class="myButton" id="cancelPartiProp">Anulează</a>
-			</div>
       </div>
   </div>
 <%
@@ -158,7 +153,7 @@
 %>
 </head>
 <body>
-	 <h1>Bună! Pentru a juca trebuie să te <a href="<%= userService.createLoginURL(request.getRequestURI()) %>">înregistrezi</a></h1>
+	 <h1>Bună! Pentru a juca trebuie să te <a class="underlined" href="<%= userService.createLoginURL(request.getRequestURI()) %>">înregistrezi</a></h1>
 	 <p>Aplicația foloseste Google pentru autentificare.</p>
 <%
 	}

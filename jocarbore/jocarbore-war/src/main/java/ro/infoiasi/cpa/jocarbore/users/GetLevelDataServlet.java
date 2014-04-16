@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.geronimo.mail.util.Base64;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -84,10 +86,15 @@ public class GetLevelDataServlet extends HttpServlet {
 		
 		JSONObject json = null;
 		try {
-			log.info("trying to parse the level string: " + jsonStr);
+			//log.info("trying to parse the level string: " + jsonStr);
 			json = new JSONObject(jsonStr);
+			String screen = json.getString("screen");
 			
+			//log.info("screen coordinates: " + screen);
+			String connections = json.getString(GameUserProfileService.CONNECTIONS_JSON_FIELD_NAME);
 			int pointsGained = GameUserProfileService.getInstance().validateUserSentence(json, level, user);
+			GameUserProfileService.getInstance().recordGameSession(user, level, pointsGained, connections, screen);
+			
 			if(pointsGained > 0)
 			{
 				level ++;
@@ -120,7 +127,7 @@ public class GetLevelDataServlet extends HttpServlet {
 				return;
 			}
 		} catch (JSONException e) {
-			e.printStackTrace();
+			log.severe(e.toString());
 			resp.sendError(500);
 			return;
 		}
@@ -136,7 +143,7 @@ public class GetLevelDataServlet extends HttpServlet {
 		PrintWriter pw = resp.getWriter();
 		String sentenceStr = sentence.toUserString(false);
 		responseJSON += "\"sentence\":"+sentenceStr+"}";
-		log.info("Sentence processed: " + responseJSON);
+		//log.info("Sentence processed: " + responseJSON);
 		pw.print(responseJSON);
 		pw.flush();
 	}

@@ -337,7 +337,6 @@ function onWordPressUp(event)
 
 function onWordUIClick(event)
 {
-	
 	var elipseWords = function(strContainerId, raza1, raza2){
 		var setParteVorbireClick = function(evt){
 			event.currentTarget.setParteVorbire(this.lastChild.nodeValue);
@@ -349,20 +348,25 @@ function onWordUIClick(event)
 		for(var i = 0, j = 0; i < radios.children.length; i++, j+=pas)
 		{
 			//radios.children[i].style.left = (225 + raza1 * Math.cos(j) - radios.children[i].offsetWidth/2)+"px";
-			radios.children[i].style.left = (243 + raza1 * Math.cos(j) - 30)+"px";
-			radios.children[i].style.top = (122 + raza2 * Math.sin(j))+"px";
-			radios.children[i].style.width = "60px";
+			radios.children[i].style.left = (360 + raza1 * Math.cos(j))+"px";
+			radios.children[i].style.top = (280 + raza2 * Math.sin(j))+"px";
+			radios.children[i].style.width = "160px";
 			radios.children[i].onclick = setParteVorbireClick;
 		}
 	};
-
+	$("#radios>label").click(function(){
+		var str = String(this.lastChild.nodeValue);
+		event.currentTarget.setParteVorbire(str.substring(str.lastIndexOf("(")+1, str.lastIndexOf(")")));
+		$("#partiProp").hide();
+		$(".modalDialog").hide();
+	});
 	var wordUI = event.currentTarget;
 	_currentWordUI = wordUI;
 	
-	elipseWords("radios", 230, 120);
+	//elipseWords("radios", 330, 330);
 	//elipseWords("radios_inner", 150, 80);
 	$("#partiPropWord").text(event.currentTarget._data.text);
-	;
+	
 	
 	$(".modalDialog").show();
 	$("#partiProp").show();
@@ -522,15 +526,20 @@ function goToNextLevel(event){
 		userLevelData += _currentConnections[i].toJSON();
 	}
 	userLevelData += '],"words":[';
+	var uiCoords = "[";
 	for(var i = 0; i < boardDroppedWords.length; i++)
 	{
 		if(i > 0)
 		{
 			userLevelData += ',';
+			uiCoords +=",";
 		}
+		uiCoords += '{"x":"'+boardDroppedWords[i].x+'", "y":"'+boardDroppedWords[i].y+'"}';
 		userLevelData += boardDroppedWords[i].toJSON();
 	}
-	userLevelData += ']}';
+	uiCoords += "]";
+	userLevelData += '],"screen":';
+	userLevelData += uiCoords+'}';
 	_levelsPlayed++;
 	$.ajax({
 			url:"leveldata?level="+_currentLevel,
