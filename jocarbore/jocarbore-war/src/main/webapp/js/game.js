@@ -67,7 +67,12 @@ function newGame()
 		$("#partiProp").hide();
 		$(".modalDialog").hide();
 	});
-
+  	$("#radios>label").click(function(evt){
+		var str = String(this.lastChild.nodeValue);
+		_currentWordUI.setParteVorbire(str.substring(str.lastIndexOf("(")+1, str.lastIndexOf(")")));
+		$("#partiProp").hide();
+		$(".modalDialog").hide();
+	});
 }
 
 function initLevel()
@@ -337,29 +342,24 @@ function onWordPressUp(event)
 
 function onWordUIClick(event)
 {
-	var elipseWords = function(strContainerId, raza1, raza2){
-		var setParteVorbireClick = function(evt){
-			event.currentTarget.setParteVorbire(this.lastChild.nodeValue);
-			$("#partiProp").hide();
-			$(".modalDialog").hide();
-		};
-		var radios = document.getElementById(strContainerId);
-		var pas = 2 * Math.PI/radios.children.length;
-		for(var i = 0, j = 0; i < radios.children.length; i++, j+=pas)
-		{
-			//radios.children[i].style.left = (225 + raza1 * Math.cos(j) - radios.children[i].offsetWidth/2)+"px";
-			radios.children[i].style.left = (360 + raza1 * Math.cos(j))+"px";
-			radios.children[i].style.top = (280 + raza2 * Math.sin(j))+"px";
-			radios.children[i].style.width = "160px";
-			radios.children[i].onclick = setParteVorbireClick;
-		}
-	};
-	$("#radios>label").click(function(){
-		var str = String(this.lastChild.nodeValue);
-		event.currentTarget.setParteVorbire(str.substring(str.lastIndexOf("(")+1, str.lastIndexOf(")")));
-		$("#partiProp").hide();
-		$(".modalDialog").hide();
-	});
+//	var elipseWords = function(strContainerId, raza1, raza2){
+//		var setParteVorbireClick = function(evt){
+//			event.currentTarget.setParteVorbire(this.lastChild.nodeValue);
+//			$("#partiProp").hide();
+//			$(".modalDialog").hide();
+//		};
+//		var radios = document.getElementById(strContainerId);
+//		var pas = 2 * Math.PI/radios.children.length;
+//		for(var i = 0, j = 0; i < radios.children.length; i++, j+=pas)
+//		{
+//			//radios.children[i].style.left = (225 + raza1 * Math.cos(j) - radios.children[i].offsetWidth/2)+"px";
+//			radios.children[i].style.left = (360 + raza1 * Math.cos(j))+"px";
+//			radios.children[i].style.top = (280 + raza2 * Math.sin(j))+"px";
+//			radios.children[i].style.width = "160px";
+//			radios.children[i].onclick = setParteVorbireClick;
+//		}
+//	};
+	
 	var wordUI = event.currentTarget;
 	_currentWordUI = wordUI;
 	
