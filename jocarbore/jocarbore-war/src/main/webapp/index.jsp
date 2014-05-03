@@ -6,7 +6,6 @@
 <%@ page import="com.google.appengine.api.users.UserService" %>
 <%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -26,6 +25,7 @@
 	<script src="http://code.createjs.com/createjs-2013.12.12.min.js" type="text/javascript"></script>
 	<script src="http://code.jquery.com/jquery-2.1.0.min.js" type="text/javascript"></script>
 	<script src="js/game.js"></script>
+	<script src="js/msdJS.js"></script>
 	<script>
 	var stage;
 	var update = false;
@@ -59,12 +59,6 @@
       <div class="centerAlign">
         <h2 id="sentenceText">Hai să incepem</h2>
       </div>
-      <div id="buttonsContainer">
-	      <a class="myButton" id="back2SetupLevelBtn" title="Click pentru a reveni la pozitionare">Inapoi la pozitionare</a>
-	      <a class="myButton" id="deleteAllConnectionsBtn" title="Sterge toate conexiunile existente">Sterge toate conexiunile</a>
-	      <a class="myButton" id="nextLevelBtn" title="Click pentru a merge la nivelul urmator">Nivelul Urmator</a>
-	      <a class="myButton" id="next2ConnectionsBtn" title="Click pentru a intra in modul conexiuni">Conexiuni</a>
-      </div>
     </div>
     <div id="startGame">
         <ol>
@@ -92,9 +86,18 @@
           <li><a href="#despre">Despre această aplicație</a></li>
         </ol>
     </div>
-    <canvas id="gameCanvas" width="1050" height="650">
-      Browserul dvs nu este suportat. Recomandam Chrome, Firefox sau Internet Explorer 11.
-    </canvas>
+    <div id="gameContainer">
+    	<div id="buttonsContainer">
+	      <a class="myButton" id="back2SetupLevelBtn" title="Click pentru a reveni la pozitionare">Inapoi la pozitionare</a>
+	      <a class="myButton" id="deleteAllConnectionsBtn" title="Sterge toate conexiunile existente">Sterge toate conexiunile</a>
+	      <a class="myButton" id="nextLevelBtn" title="Click pentru a merge la nivelul urmator">Nivelul Urmator</a>
+	      <a class="myButton" id="next2ConnectionsBtn" title="Click pentru a intra in modul conexiuni">Conexiuni</a>
+      </div>
+    	<span id="statusText">&nbsp;</span>
+	    <canvas id="gameCanvas" width="1050" height="650">
+	      Browserul dvs nu este suportat. Recomandam Chrome, Firefox sau Internet Explorer 11.
+	    </canvas>
+    </div>
   </div>
   <div class="modalDialog">
       <div id="firstHelpTip" title="Apasă pentru a închide">

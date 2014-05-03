@@ -135,7 +135,6 @@ public class Sentence implements Serializable{
 			if(!hasDprel){
 				json.remove("deprel");
 				json.remove("head");
-				json.remove("postag");
 				json.remove("chunk");
 			}
 			sb.append(json.toString());

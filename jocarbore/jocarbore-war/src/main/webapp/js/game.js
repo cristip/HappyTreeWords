@@ -11,9 +11,9 @@ var BOARD_HEIGHT = 600;
 var BOARD_WIDTH = 1050;
 var BOARD_Y = 50;
 var MIN_WORD_WIDTH = 70;
-var PARTI_VORBIRE_NECOMPLETATE = "Nu ai completat cu toate partile de propozitie.<br/><br/>Click pe un cuvant ca sa selectezi partile de propozitie!<br/>";
-var CUVINTE_NECONECTATE = "Nu ai conectat toate cuvintele.<br/><br/>Click pe un Predicat ca să îl unești cu o parte de propoziție subordonată!<br/>";
-var PARTE_VORBIRE_NESETAT = "?";
+var PARTI_PROPOZITIE_NECOMPLETATE = "Nu ai completat cu toate partile de propozitie.<br/><br/>Click pe o conexiune ca să selectezi parțile de propoziție!<br/>";
+var CUVINTE_NECONECTATE = "Nu ai conectat toate cuvintele.<br/><br/>Click pe un Predicat ca să îl unești cu o parte de propoziție subordonată și completează cu partea de propoziție!<br/>";
+var PARTE_PROPOZITIE_NESETAT = "?";
 var _currentConnections = [];
 var _currentConnection = null;
 var _levelsPlayed = 0;
@@ -49,27 +49,30 @@ var boardDroppedWords;
 function newGame()
 {
 	$("#startGame").hide();
-	$('#gameCanvas').show();
+	$('#gameContainer').show();
 	$('#helpBtn').show();
-	
 	stage = new createjs.Stage("gameCanvas");
+
 	createjs.Touch.enable(stage);
   	board = new createjs.Container();
   	board.y = BOARD_Y;
   	drawTree();
   	stage.addChild(board);
   	loadData(_currentLevel);
+  	createjs.Ticker.setFPS(60);
   	createjs.Ticker.addEventListener("tick", tick);
   	
   	$("#cancelPartiProp").click(function()
 	{
-		_currentWordUI.setParteVorbire(PARTE_VORBIRE_NESETAT);
+		_currentConnection.setPartePropozitie(PARTE_PROPOZITIE_NESETAT);
 		$("#partiProp").hide();
 		$(".modalDialog").hide();
 	});
   	$("#radios>label").click(function(evt){
 		var str = String(this.lastChild.nodeValue);
-		_currentWordUI.setParteVorbire(str.substring(str.lastIndexOf("(")+1, str.lastIndexOf(")")));
+		_currentConnection.setPartePropozitie(str.substring(str.lastIndexOf("(")+1, str.lastIndexOf(")")));
+		_currentConnection = null;
+		stage.update();
 		$("#partiProp").hide();
 		$(".modalDialog").hide();
 	});
@@ -136,10 +139,11 @@ function displaySameLevel()
 }
 
 function tick(event){
-    if(update){
-      stage.update();    
+    if(update)
+    {
+    	stage.update();    
     }
-  }
+}
 /**
  * pregateste board pentru un nou arbore,
  * este curatat arborele vechi si aplicat gridul
@@ -192,6 +196,7 @@ function onLevelDataLoaded(response)
 		currentProcessedSentence.push({
 			id:parseInt(words[i].id),
 			text:words[i].form,
+			postag:words[i].postag,
 			parent:null,
 			kids:[]
 		});
@@ -265,6 +270,7 @@ function displayInitialSentence()
 	for(var i = 0; i < currentProcessedSentence.length; i++)
 	{
 		var word = createWordUI(currentProcessedSentence[i]);
+		word.addEventListener('click', onWordClick, true);
 		word.addEventListener('mousedown', onWordMouseDown, true);
 		word.addEventListener('pressmove', onWordPressMove, true);
 		word.addEventListener('pressup', onWordPressUp, true);
@@ -275,6 +281,20 @@ function displayInitialSentence()
 		stage.addChild(word);
 	}
 	boardDroppedWords = [];
+}
+function onWordClick(event)
+{
+	var wordUI = event.currentTarget;
+	var postag = wordUI._data.postag;
+	var decoded = "";
+	try{
+		decoded = msdJS.decode(postag);
+	}catch(e)
+	{
+		decoded = "";
+		trace(e);
+	}
+	$("#statusText").text(wordUI._data.text + ' - '+ decoded);
 }
 /**
  * event handler, mouse down pe un cuvant
@@ -342,30 +362,35 @@ function onWordPressUp(event)
 
 function onWordUIClick(event)
 {
-//	var elipseWords = function(strContainerId, raza1, raza2){
-//		var setParteVorbireClick = function(evt){
-//			event.currentTarget.setParteVorbire(this.lastChild.nodeValue);
-//			$("#partiProp").hide();
-//			$(".modalDialog").hide();
-//		};
-//		var radios = document.getElementById(strContainerId);
-//		var pas = 2 * Math.PI/radios.children.length;
-//		for(var i = 0, j = 0; i < radios.children.length; i++, j+=pas)
-//		{
-//			//radios.children[i].style.left = (225 + raza1 * Math.cos(j) - radios.children[i].offsetWidth/2)+"px";
-//			radios.children[i].style.left = (360 + raza1 * Math.cos(j))+"px";
-//			radios.children[i].style.top = (280 + raza2 * Math.sin(j))+"px";
-//			radios.children[i].style.width = "160px";
-//			radios.children[i].onclick = setParteVorbireClick;
-//		}
-//	};
+	//not implemented...
+}
+
+function displayPartiPropozitieDialog()
+{
+	//	var elipseWords = function(strContainerId, raza1, raza2){
+	//	var setParteVorbireClick = function(evt){
+	//		event.currentTarget.setParteVorbire(this.lastChild.nodeValue);
+	//		$("#partiProp").hide();
+	//		$(".modalDialog").hide();
+	//	};
+	//	var radios = document.getElementById(strContainerId);
+	//	var pas = 2 * Math.PI/radios.children.length;
+	//	for(var i = 0, j = 0; i < radios.children.length; i++, j+=pas)
+	//	{
+	//		//radios.children[i].style.left = (225 + raza1 * Math.cos(j) - radios.children[i].offsetWidth/2)+"px";
+	//		radios.children[i].style.left = (360 + raza1 * Math.cos(j))+"px";
+	//		radios.children[i].style.top = (280 + raza2 * Math.sin(j))+"px";
+	//		radios.children[i].style.width = "160px";
+	//		radios.children[i].onclick = setParteVorbireClick;
+	//	}
+	//};
 	
-	var wordUI = event.currentTarget;
-	_currentWordUI = wordUI;
+	var wordUI = _currentConnection.destination;
+
 	
 	//elipseWords("radios", 330, 330);
 	//elipseWords("radios_inner", 150, 80);
-	$("#partiPropWord").text(event.currentTarget._data.text);
+	$("#partiPropWord").text(wordUI._data.text);
 	
 	
 	$(".modalDialog").show();
@@ -491,7 +516,7 @@ function displayNext2ConnectionsButton()
 }
 function hideNext2ConnectionsButton()
 {
-	domEl = document.getElementById('next2ConnectionsBtn');
+	var domEl = document.getElementById('next2ConnectionsBtn');
 	domEl.style.display = "none";
 }
 function displayValidationError(errorMsg)
@@ -505,11 +530,6 @@ function displayValidationError(errorMsg)
 	});
 }
 function goToNextLevel(event){
-	if(!haveAllParteVorbire())
-	{
-		displayValidationError(PARTI_VORBIRE_NECOMPLETATE);
-		return;
-	}
 	if(!haveAllConnectedWords())
 	{
 		displayValidationError(CUVINTE_NECONECTATE);
@@ -525,20 +545,18 @@ function goToNextLevel(event){
 		}
 		userLevelData += _currentConnections[i].toJSON();
 	}
-	userLevelData += '],"words":[';
+	userLevelData += '],';
 	var uiCoords = "[";
 	for(var i = 0; i < boardDroppedWords.length; i++)
 	{
 		if(i > 0)
 		{
-			userLevelData += ',';
 			uiCoords +=",";
 		}
 		uiCoords += '{"x":"'+boardDroppedWords[i].x+'", "y":"'+boardDroppedWords[i].y+'"}';
-		userLevelData += boardDroppedWords[i].toJSON();
 	}
 	uiCoords += "]";
-	userLevelData += '],"screen":';
+	userLevelData += '"screen":';
 	userLevelData += uiCoords+'}';
 	_levelsPlayed++;
 	$.ajax({
@@ -573,6 +591,7 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 	var connection = {
 		source:sourceWordUI,
 		destination:destinationWordUI,
+		textDeprel:getNewDeprelText(),
 		shape:new createjs.Shape(new createjs.Graphics()),
 		lineTo:function (point){
 			this.shape.graphics.clear();
@@ -586,6 +605,7 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 			var p2 = {x:0, y:-14};
 			var p3 = {x:+15, y:-25};
 			var p0 = {x:0, y:8};
+			var pointDeprel = {x:0, y:0};
 			var matrix = new createjs.Matrix2D();
 			matrix.rotate(theta);
 			matrix.translate(point.x, point.y);
@@ -593,6 +613,12 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 			matrix.transformPoint(p2.x, p2.y, p2);
 			matrix.transformPoint(p3.x, p3.y, p3);
 			matrix.transformPoint(p0.x, p0.y, p0);
+			var matrix = new createjs.Matrix2D();
+			matrix.rotate(theta);
+			matrix.translate(startPoint.x - dx/2, startPoint.y - dy/2);
+			matrix.transformPoint(0, 0, pointDeprel);
+			this.textDeprel.x = pointDeprel.x;
+			this.textDeprel.y = pointDeprel.y;
 			this.shape.graphics.beginFill(lineColor).moveTo(p0.x, p0.y).lineTo(p1.x, p1.y).lineTo(p2.x ,p2.y).lineTo(p3.x, p3.y).endFill();
 		},
 		cleanUp:function(){
@@ -634,15 +660,20 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 			var bounds = this.destination.getBounds();
 			return this.destination.localToGlobal(bounds.width/2, -BOARD_Y);
 		},
+		setPartePropozitie:function(value){
+			this.deprel = value;
+			this.textDeprel.setText(value);
+		},
 		toJSON:function()
 		{
 			if(!this.source||!this.destination)
 			{
-				return;
+				return null;
 			}
 			var json = '{';
 			json += '"source":"' + this.source._data.id+'",';
-			json += '"destination":"' + this.destination._data.id+'"';
+			json += '"destination":"' + this.destination._data.id+'",';
+			json += '"deprel":"' + this.deprel + '"';
 			json += '}';
 			return json;
 		}
@@ -745,7 +776,8 @@ function onBoardWordPressUp(event){
 	connection.destination = targetWordUI;
 	connection.endConnection();
 	_currentConnections.push(connection);
-	_currentConnection = null;
+	displayPartiPropozitieDialog();
+	//_currentConnection = null;
 	update = false;
 	stage.update();
 }
@@ -772,6 +804,7 @@ function onBoardWordMouseDown(event){
 	_isConnecting = true;
 	var connection = getNewConnection(wordUI, null);
 	board.addChild(connection.shape);
+	board.addChild(connection.textDeprel);
 	_currentConnection = connection;
 }	
 
@@ -832,11 +865,9 @@ function createWordUI(wordObj)
 	var wordUI = new createjs.Shape(graphix);
 	container._data = wordObj;
 	container.addChild(wordUI);
-	var parteVorbireText = new createjs.Text('', '16px HammersmithOne', '#FFFFFF');
-	parteVorbireText.y = is_firefox?12:6;
 	var displayText = new createjs.Text(wordObj.text,'24px HammersmithOne','#000000');
 	displayText.x = 5;
-	displayText.y = (is_firefox?12:6)+20;
+	displayText.y = (is_firefox?12:6)+0;
 	var _compWidth = displayText.getMeasuredWidth()+10;
 	if(_compWidth < MIN_WORD_WIDTH)
 	{
@@ -844,10 +875,8 @@ function createWordUI(wordObj)
 		displayText.x += hDiff/2;
 		_compWidth = MIN_WORD_WIDTH;
 	}
-	container.addChild(parteVorbireText);
-	//container.parteVorbireText = parteVorbireText;
 	var _width = _compWidth;
-	var _height = displayText.getMeasuredHeight()+40;
+	var _height = displayText.getMeasuredHeight()+20;
 	graphix.beginFill('#FF66CC').drawRoundRect(0,0,_width,_height,10).ef();
 	wordUI.shadow = new createjs.Shadow("#000000", 0, 0, 10);
 	container.addChild(displayText);
@@ -856,35 +885,32 @@ function createWordUI(wordObj)
 	container.setShadow = function (value){
 		wordUI.shadow = new createjs.Shadow("#000000", 0, 0, value);
 	};
-	container.hasParteVorbire = function(){
-		return parteVorbireText.text != PARTE_VORBIRE_NESETAT;
-	};
-	container.getParteVorbire = function(){
-		return parteVorbireText.text;
-	};
-	container.setParteVorbire = function(parteVorbireStr){
-		parteVorbireText.text = parteVorbireStr;
-		var pvWidth = parteVorbireText.getMeasuredWidth();
-		parteVorbireText.x = this._width/2 - pvWidth/2;
-		stage.update();
-	};
-	container.toJSON = function(){
-		var json = '{';
-		json += '"id":"' + this._data.id+'",';
-		var strDeprel = this.getParteVorbire();
-		if(strDeprel == "pred.")
-		{
-			json += '"deprel":""';
-		}else
-		{
-			json += '"deprel":"' + strDeprel +'"';
-		}
-		
-		json += '}';
-		return json;
-	};
-	container.setParteVorbire(PARTE_VORBIRE_NESETAT);
 	return container;
+}
+
+function getNewDeprelText()
+{
+	var deprelTextUI = new createjs.Container();
+	var text = new createjs.Text('', '12px HammersmithOne', '#FFFFFF');
+	text.y = is_firefox?9:3;
+	text.x = 5;
+	var graphix = new createjs.Graphics();
+	var deprelUI = new createjs.Shape(graphix);
+	deprelTextUI.addChild(deprelUI);
+	deprelTextUI.addChild(text);
+	
+	deprelTextUI.setText = function(value){
+		text.text = value;
+		graphix.clear();
+		if(!value){
+			return;
+		}
+		var _width = text.getMeasuredWidth()+10;
+		var _height = text.getMeasuredHeight()+15;
+		graphix.beginFill('#333333').drawRoundRect(0,0,_width,_height,5).ef();
+	};
+	
+	return deprelTextUI;
 }
 
 function haveAllConnectedWords()
@@ -892,6 +918,13 @@ function haveAllConnectedWords()
 	if(!boardDroppedWords || boardDroppedWords.length != currentProcessedSentence.length)
 	{
 		return false;
+	}
+	for(var i = 0; i < _currentConnections.length; i++)
+	{
+		if(!_currentConnections[i].deprel)
+		{
+			return false;
+		}
 	}
 	var isWordConnected = function(wordUI)
 	{
@@ -914,21 +947,6 @@ function haveAllConnectedWords()
 	return true;
 }
 
-function haveAllParteVorbire()
-{
-	if(!boardDroppedWords || boardDroppedWords.length != currentProcessedSentence.length)
-	{
-		return false;
-	}
-	for(var i = 0; i < boardDroppedWords.length; i++)
-	{
-		if(!boardDroppedWords[i].hasParteVorbire())
-		{
-			return false;
-		}
-	}
-	return true;
-}
 function drawTree()
 {
 	var bmp =  new createjs.Bitmap(null);
