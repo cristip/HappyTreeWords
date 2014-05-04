@@ -133,27 +133,34 @@ public final class GameUserProfileService extends AbstractService {
 		
 	public int validateUserSentence(JSONObject json, int level, User user) throws JSONException {
 		JSONArray connections = json.getJSONArray(CONNECTIONS_JSON_FIELD_NAME);
-		JSONArray words = json.getJSONArray(WORDS_JSON_FIELD_NAME);
+		//JSONArray words = json.getJSONArray(WORDS_JSON_FIELD_NAME);
 		Sentence sentence = getSentenceByLevel(level);
 		int points = 0;
 		List<Map<String, String>> sentenceWords = sentence.getWords();
 		
-		for(int i = 0; i < words.length(); i++)
+//		for(int i = 0; i < words.length(); i++)
+//		{
+//			JSONObject word = words.getJSONObject(i);
+//			if(isDeprel(word, sentenceWords))
+//			{
+//				points += 30;
+//			}else
+//			{
+//				points -= 30;
+//			}
+//		}
+		
+		for(int i = 0; i < connections.length(); i++)
 		{
-			JSONObject word = words.getJSONObject(i);
-			if(isDeprel(word, sentenceWords))
+			JSONObject connection = connections.getJSONObject(i);
+			if(isConnectionInWords(connection, sentenceWords))
 			{
 				points += 30;
 			}else
 			{
 				points -= 30;
 			}
-		}
-		
-		for(int i = 0; i < connections.length(); i++)
-		{
-			JSONObject connection = connections.getJSONObject(i);
-			if(isConnectionInWords(connection, sentenceWords))
+			if(isDeprel(connection, sentenceWords))
 			{
 				points += 30;
 			}else
@@ -179,21 +186,21 @@ public final class GameUserProfileService extends AbstractService {
 	 * @return
 	 * @throws JSONException 
 	 */
-	private boolean isDeprel(JSONObject jsonWord,
+	private boolean isDeprel(JSONObject connection,
 			List<Map<String, String>> sentenceWords) throws JSONException {
 		
 		for(Map<String, String> word:sentenceWords){
-			if(word.get(ID_FIELD_NAME).equals(jsonWord.getString(ID_FIELD_NAME)))
+			if(word.get(ID_FIELD_NAME).equals(connection.getString(DESTINATION_FIELD_NAME)))
 			{
 				if(word.containsKey(DEPREL_FIELD_NAME))
 				{
-					if(word.get(DEPREL_FIELD_NAME).equals(jsonWord.getString(DEPREL_FIELD_NAME)))
+					if(word.get(DEPREL_FIELD_NAME).equals(connection.getString(DEPREL_FIELD_NAME)))
 					{
 						return true;
 					}
 				}else
 				{
-					if(jsonWord.getString(DEPREL_FIELD_NAME).isEmpty())
+					if(connection.getString(DEPREL_FIELD_NAME).isEmpty())
 					{
 						return true;
 					}

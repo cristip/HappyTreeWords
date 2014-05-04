@@ -212,6 +212,12 @@ a:visited{
 #radios input,#radios_inner input{
 	display:none;
 }
+#partiPropWord,#sourceWord
+{
+	text-decoration: underline;
+	font-style: oblique;
+	font-size: larger;
+}
 #partiProp
 {
 	width:850px;

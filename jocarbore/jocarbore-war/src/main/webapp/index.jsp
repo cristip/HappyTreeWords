@@ -119,8 +119,9 @@
         <p><span id="validationDialogError">&nbsp;</span><br/>Continuă</p>
       </div>
       <div id="partiProp" title="Alege partea de propozitie">
-      		<p>Alege partea de propziție potrivită pentru cuvântul selectat:</p>
-      		<h2 id="partiPropWord">&nbsp;</h2>
+      		<p>Alege relatia potrivită pentru cuvântul selectat: <span id="partiPropWord">&nbsp;</span> în raport cu <span id="sourceWord">&nbsp;</span></p>
+      		
+      		
       		<div id="radios">
 					<label class="myButton" for="sbj" title="Subiect"><input id="sbj" type="radio" name="partProp">Subiect (sbj.)</label>
 					<label class="myButton" for="pred" title="Predicat"><input id="pred" type="radio" name="partProp">Predicat (pred.)</label>

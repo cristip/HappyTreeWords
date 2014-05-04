@@ -64,7 +64,9 @@ function newGame()
   	
   	$("#cancelPartiProp").click(function()
 	{
-		_currentConnection.setPartePropozitie(PARTE_PROPOZITIE_NESETAT);
+		//_currentConnection.setPartePropozitie(PARTE_PROPOZITIE_NESETAT);
+  		_currentConnection.cleanUp();
+  		stage.update();
 		$("#partiProp").hide();
 		$(".modalDialog").hide();
 	});
@@ -367,32 +369,8 @@ function onWordUIClick(event)
 
 function displayPartiPropozitieDialog()
 {
-	//	var elipseWords = function(strContainerId, raza1, raza2){
-	//	var setParteVorbireClick = function(evt){
-	//		event.currentTarget.setParteVorbire(this.lastChild.nodeValue);
-	//		$("#partiProp").hide();
-	//		$(".modalDialog").hide();
-	//	};
-	//	var radios = document.getElementById(strContainerId);
-	//	var pas = 2 * Math.PI/radios.children.length;
-	//	for(var i = 0, j = 0; i < radios.children.length; i++, j+=pas)
-	//	{
-	//		//radios.children[i].style.left = (225 + raza1 * Math.cos(j) - radios.children[i].offsetWidth/2)+"px";
-	//		radios.children[i].style.left = (360 + raza1 * Math.cos(j))+"px";
-	//		radios.children[i].style.top = (280 + raza2 * Math.sin(j))+"px";
-	//		radios.children[i].style.width = "160px";
-	//		radios.children[i].onclick = setParteVorbireClick;
-	//	}
-	//};
-	
-	var wordUI = _currentConnection.destination;
-
-	
-	//elipseWords("radios", 330, 330);
-	//elipseWords("radios_inner", 150, 80);
-	$("#partiPropWord").text(wordUI._data.text);
-	
-	
+	$("#partiPropWord").text(_currentConnection.destination._data.text);
+	$("#sourceWord").text(_currentConnection.source._data.text);
 	$(".modalDialog").show();
 	$("#partiProp").show();
 }
@@ -613,7 +591,7 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 			matrix.transformPoint(p2.x, p2.y, p2);
 			matrix.transformPoint(p3.x, p3.y, p3);
 			matrix.transformPoint(p0.x, p0.y, p0);
-			var matrix = new createjs.Matrix2D();
+			matrix = new createjs.Matrix2D();
 			matrix.rotate(theta);
 			matrix.translate(startPoint.x - dx/2, startPoint.y - dy/2);
 			matrix.transformPoint(0, 0, pointDeprel);
@@ -628,6 +606,11 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 				this.shape.parent.removeChild(this.shape);
 			}
 			this.shape.graphics.clear();
+			if(this.textDeprel.parent)
+			{
+				this.textDeprel.parent.removeChild(this.textDeprel);
+			}
+			this.textDeprel = null;
 			this.shape = null;
 			this.source = null;
 			this.destination = null;
@@ -678,7 +661,13 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 			return json;
 		}
 	};
+	connection.textDeprel.connection = connection;
 	connection.shape.addEventListener("click", onConnectionLineClick);
+	var onDeprelClick = function(event){
+		_currentConnection = event.currentTarget.connection;
+		displayPartiPropozitieDialog();
+	};
+	connection.textDeprel.addEventListener("click", onDeprelClick, true);
 	return connection;
 }
 function onConnectionLineClick(event){
@@ -891,6 +880,7 @@ function createWordUI(wordObj)
 function getNewDeprelText()
 {
 	var deprelTextUI = new createjs.Container();
+	deprelTextUI.connection = null;
 	var text = new createjs.Text('', '12px HammersmithOne', '#FFFFFF');
 	text.y = is_firefox?9:3;
 	text.x = 5;
@@ -918,13 +908,6 @@ function haveAllConnectedWords()
 	if(!boardDroppedWords || boardDroppedWords.length != currentProcessedSentence.length)
 	{
 		return false;
-	}
-	for(var i = 0; i < _currentConnections.length; i++)
-	{
-		if(!_currentConnections[i].deprel)
-		{
-			return false;
-		}
 	}
 	var isWordConnected = function(wordUI)
 	{

@@ -29,10 +29,10 @@ public class AdminService extends AbstractService {
 	public int importDocument(Document doc)
 	{
 		Entity lastEntity = getLast(Utils.GAME_LEVEL_ENTITY, "value");
-		int lastLevel = 0;
+		Long lastLevel = 0L;
 		if(null != lastEntity)
 		{
-			lastLevel = (Integer) lastEntity.getProperty("value");
+			lastLevel = (Long) lastEntity.getProperty("value");
 		}
 		NodeList sentenceNodes = doc.getElementsByTagName(SENTENCE_TAG_NAME);
 		int numEntries = sentenceNodes.getLength();
