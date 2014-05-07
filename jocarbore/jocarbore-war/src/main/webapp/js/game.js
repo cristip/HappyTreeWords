@@ -46,6 +46,69 @@ var boardDroppedWords;
 /**
  * starts a new game
  */
+
+
+var stage;
+var update = false;
+var board;
+var boardGrid;
+/** integ nivelul curent, incepand cu 0 pentru primul nivel */
+var _currentLevel = 0;
+
+/** masoara in mod diferit fata de IE sau WebKit) boolean */
+var is_firefox;
+function init () {
+	is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+	$("#startGameBtn").click(newGame);
+	_currentLevel = parseInt(initialUserProfile.level);
+	$("#gameLevel").text(_currentLevel+1);
+	$("#points").text(initialUserProfile.points);
+	$("#cancelPartiProp").click(function()
+	{
+		//_currentConnection.setPartePropozitie(PARTE_PROPOZITIE_NESETAT);
+		for(var i = 0; i < _currentConnections.length; i++)
+		{
+			if(_currentConnections[i] == _currentConnection)
+			{
+				_currentConnections.splice(i, 1);
+				break;
+			}
+		}
+		_currentConnection.cleanUp();
+		stage.update();
+		$("#partiProp").hide();
+		$(".modalDialog").hide();
+	});
+	$("#radios>label").click(function(evt){
+		var str = String(this.lastChild.nodeValue);
+		if(!_currentConnection)
+		{
+			return;
+		}
+		_currentConnection.setPartePropozitie(str.substring(str.lastIndexOf("(")+1, str.lastIndexOf(")")));
+		_currentConnection = null;
+		stage.update();
+		$("#partiProp").hide();
+		$(".modalDialog").hide();
+	});
+	$("#clasamentBtn").click(showClasament);
+	$("#clasamentContainer>.myButton").click(hideClasament);
+}
+
+function showClasament()
+{
+	$("#sentenceText").text("Top Jucatori");
+	$("#startGame").hide();
+	$("#clasamentContainer").show();
+	$.ajax("topjucatori").done(onTopLoaded);
+}
+function hideClasament()
+{
+	$("#sentenceText").text("Hai să începem!");
+	$("#startGame").show();
+	$("#clasamentContainer").hide();
+}
+
 function newGame()
 {
 	$("#startGame").hide();
@@ -59,27 +122,25 @@ function newGame()
   	drawTree();
   	stage.addChild(board);
   	loadData(_currentLevel);
-  	createjs.Ticker.setFPS(60);
   	createjs.Ticker.addEventListener("tick", tick);
-  	
-  	$("#cancelPartiProp").click(function()
-	{
-		//_currentConnection.setPartePropozitie(PARTE_PROPOZITIE_NESETAT);
-  		_currentConnection.cleanUp();
-  		stage.update();
-		$("#partiProp").hide();
-		$(".modalDialog").hide();
-	});
-  	$("#radios>label").click(function(evt){
-		var str = String(this.lastChild.nodeValue);
-		_currentConnection.setPartePropozitie(str.substring(str.lastIndexOf("(")+1, str.lastIndexOf(")")));
-		_currentConnection = null;
-		stage.update();
-		$("#partiProp").hide();
-		$(".modalDialog").hide();
-	});
 }
-
+function onTopLoaded(result)
+{
+	var htmlStr = "";
+	for(var i = 0; i < result.users.length; i++)
+	{
+		htmlStr += "<tr>";
+		htmlStr += "<td>"+result.users[i].loc+"</td>";
+		htmlStr += "<td>"+result.users[i].email+"</td>";
+		htmlStr += "<td>"+result.users[i].nivel+"</td>";
+		htmlStr += "<td>"+result.users[i].puncte+"</td>";
+		htmlStr += "</tr>";
+	}
+	$("#listaTopJucatori").html(htmlStr);
+}
+/**
+ * intialize the view to be able to display a new level
+ */
 function initLevel()
 {
 	clearBoard();
@@ -316,6 +377,7 @@ function onWordMouseDown(event)
 function onWordPressMove(event)
 {
 	update = true;
+	$("#statusText").text("");
 	var wordUI = event.currentTarget;
 	wordUI.removeEventListener('click', onWordUIClick, true);
 	var point = wordUI.parent.globalToLocal(event.stageX, event.stageY);
@@ -712,6 +774,7 @@ function go2Connections()
 {
 	removeMoveEventListeners();
 	switch2DrawPaths();
+	stage.update();
 }
 function getWordUnderPoint(x, y)
 {

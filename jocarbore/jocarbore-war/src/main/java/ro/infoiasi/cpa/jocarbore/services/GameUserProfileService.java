@@ -15,8 +15,13 @@ import ro.infoiasi.cpa.jocarbore.admin.ImportSentencesServlet;
 import ro.infoiasi.cpa.jocarbore.exceptions.UserBannedException;
 import ro.infoiasi.cpa.jocarbore.model.Sentence;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Text;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.users.User;
 
 public final class GameUserProfileService extends AbstractService {
@@ -227,6 +232,15 @@ public final class GameUserProfileService extends AbstractService {
 			}
 		}
 		return false;
+	}
+	public List<Entity> getTopPlayers() {
+		
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		Query query = new Query(Utils.USER_ENTITY).addSort("points", SortDirection.DESCENDING);
+		List<Entity> users = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(100));
+		
+				
+		return users;
 	}
 
 }

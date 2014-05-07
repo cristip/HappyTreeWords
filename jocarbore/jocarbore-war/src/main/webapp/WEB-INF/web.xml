@@ -19,6 +19,22 @@
     	<servlet-name>extraleveldata</servlet-name>
     	<servlet-class>ro.infoiasi.cpa.jocarbore.users.GetExtraLevelDataServlet</servlet-class>
     </servlet>
+    <servlet>
+    	<servlet-name>topjucatori</servlet-name>
+    	<servlet-class>ro.infoiasi.cpa.jocarbore.users.TopPlayersServlet</servlet-class>
+    </servlet>
+    <servlet>
+    	<servlet-name>nightlyreport</servlet-name>
+    	<servlet-class>ro.infoiasi.cpa.jocarbore.admin.NightlyReportServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+    	<servlet-name>topjucatori</servlet-name>
+    	<url-pattern>/topjucatori</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+    	<servlet-name>nightlyreport</servlet-name>
+    	<url-pattern>/nightlyreport</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
     	<servlet-name>userprofile</servlet-name>
     	<url-pattern>/userprofile</url-pattern>

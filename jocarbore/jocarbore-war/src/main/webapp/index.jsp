@@ -24,26 +24,11 @@
 %>
 	<script src="http://code.createjs.com/createjs-2013.12.12.min.js" type="text/javascript"></script>
 	<script src="http://code.jquery.com/jquery-2.1.0.min.js" type="text/javascript"></script>
-	<script src="js/game.js"></script>
+<!-- 	<meta name="viewport" content="width=1050, user-scalable=no" /> -->
 	<script src="js/msdJS.js"></script>
+	<script src="js/game.js"></script>
 	<script>
-	var stage;
-	var update = false;
-	var board;
-	var boardGrid;
-	/** integ nivelul curent, incepand cu 0 pentru primul nivel */
-	var _currentLevel = 0;
 	var initialUserProfile = ${userProfile};
-	/** masoara in mod diferit fata de IE sau WebKit) boolean */
-	var is_firefox;
-	function init () {
-	  is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-	  $("#startGameBtn").click(newGame);
-	  _currentLevel = parseInt(initialUserProfile.level);
-	  $("#gameLevel").text(_currentLevel+1);
-	  $("#points").text(initialUserProfile.points);
-	  
-	}
 	</script>
 </head>
 <body onload="init();">
@@ -73,17 +58,17 @@
           {
           %>
           <li><a href="#startJoc" id="startGameBtn">Să jucăm în continuare</a></li>
-	      	  <%
-	      		if(Integer.parseInt( userProfileMap.get("level")) < 5)
-	      		{
-	      	  %>
-      	  <li><a href="#resetJoc">Începe de la primul nivel</a></li>
-          <%
-          		}
-          }
-          %>
-          <li><a href="#clasament">Vezi clasamentul</a></li>
-          <li><a href="#despre">Despre această aplicație</a></li>
+<%
+ 	      		if(Integer.parseInt( userProfileMap.get("level")) < 5)
+ 	      		{
+%>
+<!--       	  <li><a href="#resetJoc">Începe de la primul nivel</a></li> -->
+<%
+           		}
+           }
+%>
+          <li><a id="clasamentBtn" href="#clasament">Vezi clasamentul</a></li>
+          <li><a href="https://github.com/cristip/HappyTreeWords/blob/master/README" target="_blank">Despre această aplicație</a></li>
         </ol>
     </div>
     <div id="gameContainer">
@@ -97,6 +82,22 @@
 	    <canvas id="gameCanvas" width="1050" height="650">
 	      Browserul dvs nu este suportat. Recomandam Chrome, Firefox sau Internet Explorer 11.
 	    </canvas>
+    </div>
+    <div id="clasamentContainer">
+    	<button class="myButton">&laquo;Inapoi</button>
+    	<table>
+    		<thead>
+    			<tr>
+    				<td>Loc</td>
+    				<td>Nume</td>
+    				<td>Nivel</td>
+    				<td>Puncte</td>
+    			</tr>
+    		</thead>
+    		<tbody id="listaTopJucatori">
+    			
+    		</tbody>
+    	</table>
     </div>
   </div>
   <div class="modalDialog">
@@ -124,7 +125,6 @@
       		
       		<div id="radios">
 					<label class="myButton" for="sbj" title="Subiect"><input id="sbj" type="radio" name="partProp">Subiect (sbj.)</label>
-					<label class="myButton" for="pred" title="Predicat"><input id="pred" type="radio" name="partProp">Predicat (pred.)</label>
 					<label class="myButton" for="cd" title="Complement Direct"><input id="cd" type="radio" name="partProp">Complement Direct (c.d.)</label>
 					<label class="myButton" for="punct" title="Semn de Punctuație"><input id="punct" type="radio" name="partProp">Semn de Punctuație (punct.)</label>
 					<label class="myButton" for="neg" title="Particulă de Negație"><input id="neg" type="radio" name="partProp">Particulă de Negație (neg.)</label>
