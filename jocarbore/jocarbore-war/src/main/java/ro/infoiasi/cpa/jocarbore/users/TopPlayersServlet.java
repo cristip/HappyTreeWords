@@ -47,6 +47,7 @@ public class TopPlayersServlet extends HttpServlet {
 			sb.append("\"nivel\":\"");
 			sb.append(user.getProperty("level"));
 			sb.append("\"}");
+			index++;
 		}
 		sb.append("]}");
 		
