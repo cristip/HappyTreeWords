@@ -1,11 +1,5 @@
-  //se ia propozita
-  //se face arborele ca lista inlantuita (simplu, dupa atributul head)
-  //se prezinta propozita ca un grup de cuvinte in ordinea lor in propozitie.
-  //utlizatorul plaseaza cuvintele pe board si  le uneste
-  //cand e gata, apasa butonul si valideaza
-  //pentru tutorial, alege cate un cuvant si acesta este plasat automat unde trebuie
-  //legaturile sunt facute de la sine si primeste punctaj maxim (din partea casei)
-
+//Jocul de Arobore sintactic
+//mailto:cristian.parascan@info.uaic.ro
 
 var BOARD_HEIGHT = 600;
 var BOARD_WIDTH = 1050;
@@ -14,16 +8,31 @@ var MIN_WORD_WIDTH = 70;
 var PARTI_PROPOZITIE_NECOMPLETATE = "Nu ai completat cu toate partile de propozitie.<br/><br/>Click pe o conexiune ca să selectezi parțile de propoziție!<br/>";
 var CUVINTE_NECONECTATE = "Nu ai conectat toate cuvintele.<br/><br/>Click pe un Predicat ca să îl unești cu o parte de propoziție subordonată și completează cu partea de propoziție!<br/>";
 var PARTE_PROPOZITIE_NESETAT = "?";
+/**
+ * lista ce contine elemente de tip conexiune
+ */
 var _currentConnections = [];
+/**
+ * referinta catre conexiunea curenta
+ */
 var _currentConnection = null;
+/**
+ * numarul de nivele jucate
+ */
 var _levelsPlayed = 0;
+/**
+ * referinta catre cuvantul curent
+ */
 var _currentWordUI = null;
 /**
  * related to the connection action
  * is connection while the mouse is pressed 
  */
 var _isConnecting = false;
-//related to the application state
+/**
+ * related to the application state
+ * true daca este in modul de conexiuni
+ */
 var _isDrawPaths = false;
 /**
  * Array de word{
@@ -43,20 +52,32 @@ var currentProcessedSentence;
  * wordUI care au fost plasate deja pe board;
  */
 var boardDroppedWords;
+
 /**
- * starts a new game
+ * Stage, referinta la elementul Stage din canvas
  */
-
-
 var stage;
+/**
+ * flag, boolean true daca e nevoie sa se faca update la canvas
+ */
 var update = false;
+/**
+ * Container, referinta catre locul unde se plaseaza cuvintele WordUI
+ */
 var board;
+/**
+ * @deprecated
+ * referinta catre un grid
+ */
 var boardGrid;
 /** integ nivelul curent, incepand cu 0 pentru primul nivel */
 var _currentLevel = 0;
 
 /** masoara in mod diferit fata de IE sau WebKit) boolean */
 var is_firefox;
+/**
+ * initializeaza aplicatia
+ */
 function init () {
 	is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 	$("#startGameBtn").click(newGame);
@@ -94,7 +115,9 @@ function init () {
 	$("#clasamentBtn").click(showClasament);
 	$("#clasamentContainer>.myButton").click(hideClasament);
 }
-
+/**
+ * se afiseaza clasamentul
+ */
 function showClasament()
 {
 	$("#sentenceText").text("Top Jucatori");
@@ -102,18 +125,43 @@ function showClasament()
 	$("#clasamentContainer").show();
 	$.ajax("topjucatori").done(onTopLoaded);
 }
+/**
+ * se ascunde clasamentul
+ */
 function hideClasament()
 {
 	$("#sentenceText").text("Hai să începem!");
 	$("#startGame").show();
 	$("#clasamentContainer").hide();
 }
-
+/**
+ * incepe un nou joc
+ */
 function newGame()
 {
 	$("#startGame").hide();
 	$('#gameContainer').show();
 	$('#helpBtn').show();
+	$('#helpBtn').click(function(){
+		var message = "";
+		if(boardDroppedWords.length != currentProcessedSentence.length)
+		{
+			message = "Plasează toate cuvintele pe scena.<br/><br/><br/>";
+		}else
+		if(!_isDrawPaths)
+		{
+			message = "Aranjeaza cuvintele sub forma de arbore si cand esti multumit intra in modul conexiuni: click pe butonul conexiuni.<br/><br/>";
+		}
+		else if(!haveAllConnectedWords())
+		{
+			message = "Conecteaza toate cuvintele: click pe părinte și cu mouse apăsat, mută mouse pe cuvantul subordonat și eliberează.<br/><br/><br/>";
+		}
+		else
+		{
+			message = "Apasa butonul \"Nivelul Urmator\" pentru a trece la nivelul urmator.<br/><br/><br/>";
+		}
+		displayValidationError(message);
+	});
 	stage = new createjs.Stage("gameCanvas");
 
 	createjs.Touch.enable(stage);
@@ -124,6 +172,10 @@ function newGame()
   	loadData(_currentLevel);
   	createjs.Ticker.addEventListener("tick", tick);
 }
+/**
+ * event handler, s-a incarcat raspunsul cu topul jucatorilor
+ * @param result
+ */
 function onTopLoaded(result)
 {
 	var htmlStr = "";
@@ -162,7 +214,9 @@ function initLevel()
 	}
 	
 }
-
+/**
+ * se afiseaza un dialog cu ajutor pentru partea de plasare a cuvintelor
+ */
 function displayFirstHelpTip()
 {
 	$('.modalDialog').show();
@@ -172,6 +226,9 @@ function displayFirstHelpTip()
 		$('#firstHelpTip').hide();
 	});
 }
+/**
+ * se afiseaza un dialog cu ajutor pentru partea de conexiuni
+ */
 function displaySecondHelpTip()
 {
 	$('.modalDialog').show();
@@ -181,6 +238,9 @@ function displaySecondHelpTip()
 		$('#secondHelpTip').hide();
 	});
 }
+/**
+ * s-a facut click pe stergere sageata
+ */
 function displayDeleteConnectionAlert()
 {
 	$('.modalDialog').show();
@@ -191,6 +251,9 @@ function displayDeleteConnectionAlert()
 	});
 	$('#deleteConnectionBtn').click(deleteCurrentConnection);
 }
+/**
+ * nu s-a reusit un punctaj corespunzator
+ */
 function displaySameLevel()
 {
 	$('.modalDialog').show();
@@ -200,7 +263,10 @@ function displaySameLevel()
 		$('#samelevelDialog').hide();
 	});
 }
-
+/**
+ * Se apeleaze periodic pentru a face refresh la canvas
+ * @param event
+ */
 function tick(event){
     if(update)
     {
@@ -225,7 +291,10 @@ function loadData(level)
 {
 	$.ajax("leveldata?level="+_currentLevel).done(onLevelDataLoaded);
 }
-
+/**
+ * event handler, s-a incarcat raspunsul serverului pentru un nou nivel
+ * @param response
+ */
 function onLevelDataLoaded(response)
 {
 //	var strData = levels[level];
@@ -274,9 +343,13 @@ function onLevelDataLoaded(response)
 	displayTextSentence(strSentence);
 	stage.update();
 }
+/**
+ * se afiseaza propozita corecta
+ * @param solvedSentence
+ */
 function displaySolvedSentence(solvedSentence)
 {
-	//TODO: show the correct tree
+	//TODO: trebuie discutat cu toata lumea daca se doreste asa ceva
 }
 /**
  *@param Object word {
@@ -345,6 +418,10 @@ function displayInitialSentence()
 	}
 	boardDroppedWords = [];
 }
+/**
+ * event handler s-a facut click pe un cuvant
+ * @param event
+ */
 function onWordClick(event)
 {
 	var wordUI = event.currentTarget;
@@ -379,7 +456,6 @@ function onWordPressMove(event)
 	update = true;
 	$("#statusText").text("");
 	var wordUI = event.currentTarget;
-	wordUI.removeEventListener('click', onWordUIClick, true);
 	var point = wordUI.parent.globalToLocal(event.stageX, event.stageY);
 	wordUI.x = point.x - wordUI._currentLocalX;
 	wordUI.y = point.y - wordUI._currentLocalY;
@@ -392,7 +468,6 @@ function onWordPressMove(event)
 function onWordPressUp(event)
 {
 	var wordUI = event.currentTarget;
-	wordUI.addEventListener('click', onWordUIClick, true);
 	wordUI.setShadow(10);
 	if(wordUI.y < 80)
 	{
@@ -409,7 +484,6 @@ function onWordPressUp(event)
 	{
 		stage.removeChild(wordUI);
 		wordUI.y -= BOARD_Y;
-		wordUI.addEventListener('click', onWordUIClick, true);
 		board.addChild(wordUI);
 		boardDroppedWords.push(wordUI);
 		snapToGrid(wordUI);
@@ -423,12 +497,9 @@ function onWordPressUp(event)
 }
 
 
-
-function onWordUIClick(event)
-{
-	//not implemented...
-}
-
+/**
+ * se afiseaza un popup modal din care se pot selecta parti de propozitie
+ */
 function displayPartiPropozitieDialog()
 {
 	$("#partiPropWord").text(_currentConnection.destination._data.text);
@@ -436,13 +507,19 @@ function displayPartiPropozitieDialog()
 	$(".modalDialog").show();
 	$("#partiProp").show();
 }
-
+/**
+ * se elimina event haldlers pentru un wordUI
+ * @param wordUI
+ */
 function removeWordMoveEventListeners(wordUI)
 {
 	wordUI.removeEventListener('pressup', onWordPressUp, true);
 	wordUI.removeEventListener('mousedown', onWordMouseDown, true);
 	wordUI.removeEventListener('pressmove', onWordPressMove, true);
 }
+/**
+ * se elimina event haldlers pentru toate wordUI
+ */
 function removeMoveEventListeners()
 {
 	for(var i = 0; i < boardDroppedWords.length; i++)
@@ -451,18 +528,28 @@ function removeMoveEventListeners()
 		removeWordMoveEventListeners(wordUI);
 	}
 }
+/**
+ * se adauga event handler pentru un cuvant
+ * @param wordUI
+ */
 function addWordDoubleClickEventListener(wordUI)
 {
 	wordUI.addEventListener('dblclick', onBoardWordDoubleClick, true);
 }
+/**
+ * se adauga event hanler pentru toate cuvintele pentru evenimentul de dublu click
+ */
 function addDoubleClickEventListeners()
 {
 	for(var i = 0; i < boardDroppedWords.length; i++)
 	{
 		var wordUI = boardDroppedWords[i];
 		addWordDoubleClickEventListener(wordUI);
-	}
+	};
 }
+/**
+ * se trece la modul de conexiuni
+ */
 function switch2DrawPaths()
 {
 	if(_isDrawPaths)
@@ -482,10 +569,12 @@ function switch2DrawPaths()
 		wordUI.addEventListener('mousedown', onBoardWordMouseDown, true);
 		wordUI.addEventListener('pressmove', onBoardWordPressMove, true);
 		wordUI.setShadow(2);
-	}
+	};
 }
 
-
+/**
+ * se trece la modul de pozitionares
+ */
 function switch2Setup()
 {
 	_isDrawPaths = false;
@@ -502,6 +591,9 @@ function switch2Setup()
 	}
 	stage.update();
 }
+/**
+ * se fiseaza butonul de conexiuni.
+ */
 function displayStartConnectionsButton()
 {
 	if(_currentLevel == 0)
@@ -513,7 +605,9 @@ function displayStartConnectionsButton()
 	displayNext2ConnectionsButton();
 
 }
-
+/**
+ * se afiseaza butonul pentru a trece la nivelul urmator
+ */
 function displayNextLevelButton()
 {
 	if(!_isDrawPaths)
@@ -525,10 +619,16 @@ function displayNextLevelButton()
 	domEl.style.display = "inline-block";
 	domEl.onclick = goToNextLevel;
 }
+/**
+ * se ascunde butonul de stergere toate conexiunile
+ */
 function hideClearAllButton()
 {
 	$("#deleteAllConnectionsBtn").hide();
 }
+/**
+ * se afiseaza butonul de stergere toate conexiunile
+ */
 function displayClearAllButton()
 {
 	$("#deleteAllConnectionsBtn").show();
@@ -542,23 +642,36 @@ function displayClearAllButton()
 		stage.update();
 	});
 }
+/**
+ * se afiseaza butonul de trecere inapoi la conexinu
+ */
 function displayBack2SetupButton()
 {
 	var domEl = document.getElementById('back2SetupLevelBtn');
 	domEl.style.display = "inline-block";
 	domEl.onclick = goBack2SetUpLevel;
 }
+/**
+ * se afiseaza butonul pentru a trece la conexiuni
+ */
 function displayNext2ConnectionsButton()
 {
 	var domEl = document.getElementById('next2ConnectionsBtn');
 	domEl.style.display = "inline-block";
 	domEl.onclick = go2Connections;
 }
+/**
+ * se ascunde butonul pentru a trece la conexiuni
+ */
 function hideNext2ConnectionsButton()
 {
 	var domEl = document.getElementById('next2ConnectionsBtn');
 	domEl.style.display = "none";
 }
+/**
+ * afiseaza un popup cu textul din errorMsg
+ * @param errorMsg
+ */
 function displayValidationError(errorMsg)
 {
 	$("#validationDialog").show();
@@ -569,6 +682,10 @@ function displayValidationError(errorMsg)
 		$(".modalDialog").hide();
 	});
 }
+/**
+ * event handler se trece la nivelul urmator
+ * @param event
+ */
 function goToNextLevel(event){
 	if(!haveAllConnectedWords())
 	{
@@ -605,18 +722,26 @@ function goToNextLevel(event){
 			data:userLevelData
 	}).done(onLevelDataLoaded);
 }
-
+/**
+ * ascunde butonul de inapoi
+ */
 function hideBack2SetupLevelBtn()
 {
 	var domEl = document.getElementById('back2SetupLevelBtn');
 	domEl.style.display = "none";
 }
+/**
+ * ascunde butonul de next
+ */
 function hideNextLevelBtn()
 {
 	var domEl = document.getElementById('nextLevelBtn');
 	domEl.style.display = "none";
 }
-
+/**
+ * event handler s-a facut click pe inapoi la conexiuni
+ * @param event
+ */
 function goBack2SetUpLevel(event){
 	hideBack2SetupLevelBtn();
 	hideNextLevelBtn();
@@ -625,7 +750,25 @@ function goBack2SetUpLevel(event){
 	switch2Setup();
 }
 
-
+/**
+ * se creeaza o noua conexiune intre doua UI cuvinte
+ * @param sourceWordUI wordUI
+ * @param destinationWordUI wordUI
+ * @returns un obiect de tip conexiune
+ * {
+ * 	source:wordUI,
+ *  destination:wordUI,
+ *  textDeprel:String,
+ *  shape:Shape(sageata),
+ *  lineTo:Function(Point):void,
+ *  cleanUp:Function,
+ *  update:Function,
+ *  endConnection:Function,
+ *  getStartPoint:Function,
+ *  setPartePropozitie:Function,
+ *  getJSON:Function
+ * }
+ */
 function getNewConnection(sourceWordUI, destinationWordUI)
 {
 	var connection = {
@@ -732,6 +875,10 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 	connection.textDeprel.addEventListener("click", onDeprelClick, true);
 	return connection;
 }
+/**
+ * event handler, s-a facut click pe conexiunea curenta
+ * @param event
+ */
 function onConnectionLineClick(event){
 	if(!_isDrawPaths)
 	{
@@ -740,6 +887,9 @@ function onConnectionLineClick(event){
 	_currentConnection = getConnectionByShape(event.target);
 	displayDeleteConnectionAlert();
 }
+/**
+ * declanseaza o stegere a conexiunii care este tocmai desenata (s-a apasat anulare)
+ */
 function deleteCurrentConnection()
 {
 	for(var i = 0; i < _currentConnections.length; i++)
@@ -754,6 +904,11 @@ function deleteCurrentConnection()
 	_currentConnection = null;
 	stage.update();
 }
+/**
+ * pentru un shape (sageata) se returneaza conexiunea din care face parte
+ * @param shape
+ * @returns
+ */
 function getConnectionByShape(shape)
 {
 	for(var i = 0; i < _currentConnections.length; i++)
@@ -765,17 +920,30 @@ function getConnectionByShape(shape)
 	}
 	return null;
 }
+/**
+ * event handler se face dublu click pe un cuvant
+ * @param event
+ */
 function onBoardWordDoubleClick(event){
 	event.preventDefault();
 	event.stopImmediatePropagation();
 	go2Connections();
 }
+/**
+ * se trece la nivelul urmator
+ */
 function go2Connections()
 {
 	removeMoveEventListeners();
 	switch2DrawPaths();
 	stage.update();
 }
+/**
+ * pentru coordonatele mouse-ului x, y returneaza primul cuvant gasit
+ * @param x Number, coordonata x a mouse-ului
+ * @param y Number, coordonata y a mouse-ului
+ * @returns wordUI UI de cuvant
+ */
 function getWordUnderPoint(x, y)
 {
 	for(var i = 0; i < boardDroppedWords.length; i++)
@@ -789,6 +957,10 @@ function getWordUnderPoint(x, y)
 	}
 	return null;
 }
+/**
+ * event handler, se face release la un UI de cuvant de pe board
+ * @param event
+ */
 function onBoardWordPressUp(event){
 	
 	_isConnecting = false;
@@ -833,7 +1005,9 @@ function onBoardWordPressUp(event){
 	update = false;
 	stage.update();
 }
-
+/**
+ * se face update la conexiuni
+ */
 function updateLiveConnections()
 {
 	for(var i = 0; i < _currentConnections.length; i++)
@@ -843,7 +1017,10 @@ function updateLiveConnections()
 		
 	}
 }
-
+/**
+ * event handler s-a apasat peste cuvant
+ * @param event
+ */
 function onBoardWordMouseDown(event){
 	update = true;
 	var wordUI = event.currentTarget;
@@ -859,7 +1036,10 @@ function onBoardWordMouseDown(event){
 	board.addChild(connection.textDeprel);
 	_currentConnection = connection;
 }	
-
+/**
+ * event handler, se tine apasat si se misca peste un UI de cuvant
+ * @param event
+ */
 function onBoardWordPressMove(event){
 	var wordUI = event.currentTarget;
 	event.stopImmediatePropagation();
@@ -877,8 +1057,8 @@ function onBoardWordPressMove(event){
 
 
 /**
- *
- *
+ * asigura faptul ca avem cuvintele plasate
+ * pe nivele discrete pe orizontala
  */
 function snapToGrid(wordUI)
 {
@@ -939,7 +1119,10 @@ function createWordUI(wordObj)
 	};
 	return container;
 }
-
+/**
+ * Deseneaza si returneaza UI-ul pentru eticheta de Parte de propozitie
+ * @returns Container
+ */
 function getNewDeprelText()
 {
 	var deprelTextUI = new createjs.Container();
@@ -965,7 +1148,10 @@ function getNewDeprelText()
 	
 	return deprelTextUI;
 }
-
+/**
+ * returneaza true daca toate cuvintele sunt conectate
+ * @returns {Boolean}
+ */
 function haveAllConnectedWords()
 {
 	if(!boardDroppedWords || boardDroppedWords.length != currentProcessedSentence.length)
@@ -992,7 +1178,9 @@ function haveAllConnectedWords()
 	}
 	return true;
 }
-
+/**
+ * deseneaza background
+ */
 function drawTree()
 {
 	var bmp =  new createjs.Bitmap(null);
@@ -1004,7 +1192,9 @@ function drawTree()
 	    stage.update();
 	};
 }
-
+/**
+ * pentru debug
+ */
 function trace()
 {
 	if(!console || !console.log)

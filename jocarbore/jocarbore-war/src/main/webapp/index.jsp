@@ -47,7 +47,7 @@
     </div>
     <div id="startGame">
         <ol>
-          <li><a href="#tutorial">Vezi tutorial</a></li>
+          <li><a href="https://vimeo.com/97918890" target="_blank">Vezi tutorial</a></li>
           <%
           if(hasPlayedBefore)
           {
@@ -67,8 +67,8 @@
            		}
            }
 %>
-          <li><a id="clasamentBtn" href="#clasament">Vezi clasamentul</a></li>
-          <li><a href="https://github.com/cristip/HappyTreeWords/blob/master/README" target="_blank">Despre această aplicație</a></li>
+           <li><a id="clasamentBtn" href="#clasament">Vezi clasamentul</a></li> 
+          <li><a href="http://cristip.github.io/HappyTreeWords/" target="_blank">Manual de utilizare</a></li>
         </ol>
     </div>
     <div id="gameContainer">
