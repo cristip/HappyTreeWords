@@ -5,6 +5,12 @@
 	font-family:HammersmithOne;
 	src: url(../assets/fonts/HammersmithOne-Regular.ttf);
 }
+body, canvas {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select:none;
+}
 body
 {
 	font-family:HammersmithOne;
