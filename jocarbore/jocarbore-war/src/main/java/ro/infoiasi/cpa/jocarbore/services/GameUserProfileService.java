@@ -72,6 +72,7 @@ public final class GameUserProfileService extends AbstractService {
 			profileMap.put(POINTS_FIELD_NAME, "0");
 			userEntity.setProperty("active", true);
 			userEntity.setProperty("joinDate",  time);
+			userEntity.setProperty(Utils.USERNAME_FIELD_NAME, Utils.getRandomUserName());
 		}
 		else
 		{

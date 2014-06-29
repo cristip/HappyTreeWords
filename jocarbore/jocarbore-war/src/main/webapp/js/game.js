@@ -1,13 +1,10 @@
 //Jocul de Arobore sintactic
 //mailto:cristian.parascan@info.uaic.ro
-
-var BOARD_HEIGHT = 600;
-var BOARD_WIDTH = 1050;
 var BOARD_Y = 50;
 var MIN_WORD_WIDTH = 70;
 var PARTI_PROPOZITIE_NECOMPLETATE = "Nu ai completat cu toate partile de propozitie.<br/><br/>Click pe o conexiune ca să selectezi parțile de propoziție!<br/>";
 var CUVINTE_NECONECTATE = "Nu ai conectat toate cuvintele.<br/><br/>Click pe un Predicat ca să îl unești cu o parte de propoziție subordonată și completează cu partea de propoziție!<br/>";
-var PARTE_PROPOZITIE_NESETAT = "?";
+
 /**
  * lista ce contine elemente de tip conexiune
  */
@@ -48,6 +45,7 @@ var _isDrawPaths = false;
  *}
  */
 var currentProcessedSentence;
+
 /**
  * wordUI care au fost plasate deja pe board;
  */
@@ -65,6 +63,10 @@ var update = false;
  * Container, referinta catre locul unde se plaseaza cuvintele WordUI
  */
 var board;
+/**
+ * imaginea de fundal
+ */
+var treeBg;
 /**
  * @deprecated
  * referinta catre un grid
@@ -84,9 +86,9 @@ function init () {
 	_currentLevel = parseInt(initialUserProfile.level);
 	$("#gameLevel").text(_currentLevel+1);
 	$("#points").text(initialUserProfile.points);
+	$("#myProfile").click(openMyProfile);
 	$("#cancelPartiProp").click(function()
 	{
-		//_currentConnection.setPartePropozitie(PARTE_PROPOZITIE_NESETAT);
 		for(var i = 0; i < _currentConnections.length; i++)
 		{
 			if(_currentConnections[i] == _currentConnection)
@@ -98,6 +100,11 @@ function init () {
 		_currentConnection.cleanUp();
 		stage.update();
 		$("#partiProp").hide();
+		$(".modalDialog").hide();
+	});
+	$("#deleteAllConfirmConnectionBtn").click(deleteAllConnections);
+	$("#cancelDeleteAllConnectionBtn").click(function(){
+		$("#deleteAllDialog").hide();
 		$(".modalDialog").hide();
 	});
 	$("#radios>label").click(function(evt){
@@ -112,9 +119,38 @@ function init () {
 		$("#partiProp").hide();
 		$(".modalDialog").hide();
 	});
+	$( window ).resize(windowResizeHandler);
+	
 	$("#clasamentBtn").click(showClasament);
-	$("#clasamentContainer>.myButton").click(hideClasament);
+	$("#clasamentContainer>.myButton").click(goToHome);
+	$("#myProfieContainer>.myButton").click(saveMyProfile);
 }
+
+
+function saveMyProfile()
+{
+	var nick = $("#nicknameTextInput").value();
+	var school = $("#schoolTextInput").value();
+	$.ajax({
+		url:"myprofile",
+		type:"POST",
+		data:"{\"nick\":\"" + nick + "\", \"school\":\"" + school + "\"}"
+	}).done(function(){
+		displayValidationError("Profilul a fost salvat!");
+	});
+	goToHome();
+}
+
+function windowResizeHandler()
+{
+	var cvs = document.getElementById("gameCanvas");
+	var ctx = cvs.getContext("2d");
+	ctx.canvas.width  = window.innerWidth;
+	ctx.canvas.height = window.innerHeight - 120;
+	treeBg.x = window.innerWidth/2 - 525;
+	stage.update();
+}
+
 /**
  * se afiseaza clasamentul
  */
@@ -128,11 +164,12 @@ function showClasament()
 /**
  * se ascunde clasamentul
  */
-function hideClasament()
+function goToHome()
 {
 	$("#sentenceText").text("Hai să începem!");
 	$("#startGame").show();
 	$("#clasamentContainer").hide();
+	$("#myProfieContainer").hide();
 }
 /**
  * incepe un nou joc
@@ -146,15 +183,15 @@ function newGame()
 		var message = "";
 		if(boardDroppedWords.length != currentProcessedSentence.length)
 		{
-			message = "Plasează toate cuvintele pe scena.<br/><br/><br/>";
+			message = "Plasează toate cuvintele pe scena.<br/>Trage de cuvânt cu mouse-ul și eliberează cuvântul sub linia gri.<br/><br/><br/>";
 		}else
 		if(!_isDrawPaths)
 		{
-			message = "Aranjeaza cuvintele sub forma de arbore si cand esti multumit intra in modul conexiuni: click pe butonul conexiuni.<br/><br/>";
+			message = "Aranjeaza cuvintele sub forma arborelui sintactic si cand esti multumit intra in modul conexiuni: click pe butonul conexiuni.<br/>Cuvintele subordonate trebuie să se afle ca poziție sub relația lor: De exemplu un subiect se află sub un predicat<br/>";
 		}
 		else if(!haveAllConnectedWords())
 		{
-			message = "Conecteaza toate cuvintele: click pe părinte și cu mouse apăsat, mută mouse pe cuvantul subordonat și eliberează.<br/><br/><br/>";
+			message = "Conecteaza toate cuvintele: click pe părinte și cu mouse apăsat, mută mouse pe cuvantul subordonat și eliberează.<br/> De exemplu săgeata pleacă dinspre predicat spre Subiect iar relația este de Subiect<br/><br/>";
 		}
 		else
 		{
@@ -162,8 +199,11 @@ function newGame()
 		}
 		displayValidationError(message);
 	});
+	var cvs = document.getElementById("gameCanvas");
+	var ctx = cvs.getContext("2d");
+	ctx.canvas.width  = window.innerWidth;
+	ctx.canvas.height = window.innerHeight - 120;
 	stage = new createjs.Stage("gameCanvas");
-
 	createjs.Touch.enable(stage);
   	board = new createjs.Container();
   	board.y = BOARD_Y;
@@ -403,6 +443,7 @@ function displayTextSentence(strSentence)
 function displayInitialSentence()
 {
 	var lastx = 10;
+	update = true;
 	for(var i = 0; i < currentProcessedSentence.length; i++)
 	{
 		var word = createWordUI(currentProcessedSentence[i]);
@@ -410,8 +451,14 @@ function displayInitialSentence()
 		word.addEventListener('mousedown', onWordMouseDown, true);
 		word.addEventListener('pressmove', onWordPressMove, true);
 		word.addEventListener('pressup', onWordPressUp, true);
-		word.x = lastx;
+		//word.x = lastx;
+		word.x = lastx + 400;
 		word.y = 10;
+		word.alpha = 0;
+		//createjs.Tween.get(word).wait(i*250).to({x:lastx,y:10}, 500 + i*200, createjs.Ease.elasticOut).call(function(){
+		createjs.Tween.get(word).wait(i*150).to({x:lastx,y:10, alpha:100}, 500 + i*100, createjs.Ease.bounceOut).call(function(){
+			
+		 });
 		var bounds = word.getBounds();
 		lastx = lastx+bounds.width+15;
 		stage.addChild(word);
@@ -633,15 +680,24 @@ function displayClearAllButton()
 {
 	$("#deleteAllConnectionsBtn").show();
 	$("#deleteAllConnectionsBtn").click(function(){
-		while(_currentConnections.length>0)
-		{
-			var conn = _currentConnections.pop();
-			conn.cleanUp();
-		}
-		_currentConnection = null;
-		stage.update();
+		$(".modalDialog").show();
+		$("#deleteAllDialog").show();
 	});
 }
+
+function deleteAllConnections()
+{
+	while(_currentConnections.length>0)
+	{
+		var conn = _currentConnections.pop();
+		conn.cleanUp();
+	}
+	_currentConnection = null;
+	stage.update();
+	$("#deleteAllDialog").hide();
+	$(".modalDialog").hide();
+}
+
 /**
  * se afiseaza butonul de trecere inapoi la conexinu
  */
@@ -789,6 +845,7 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 			var p3 = {x:+15, y:-25};
 			var p0 = {x:0, y:8};
 			var pointDeprel = {x:0, y:0};
+			//transform matrix pentru sageata
 			var matrix = new createjs.Matrix2D();
 			matrix.rotate(theta);
 			matrix.translate(point.x, point.y);
@@ -796,6 +853,7 @@ function getNewConnection(sourceWordUI, destinationWordUI)
 			matrix.transformPoint(p2.x, p2.y, p2);
 			matrix.transformPoint(p3.x, p3.y, p3);
 			matrix.transformPoint(p0.x, p0.y, p0);
+			//transform matrix pentru eticheta partii de propozitie
 			matrix = new createjs.Matrix2D();
 			matrix.rotate(theta);
 			matrix.translate(startPoint.x - dx/2, startPoint.y - dy/2);
@@ -1062,7 +1120,8 @@ function onBoardWordPressMove(event){
  */
 function snapToGrid(wordUI)
 {
-	for(var i = 65; i < BOARD_HEIGHT; i += 60)
+	var _height = window.innerHeight - 120;
+	for(var i = 65; i < _height; i += 60)
 	{
 		if(wordUI.y > i && wordUI.y < i +35)
 		{
@@ -1082,10 +1141,6 @@ function snapToGrid(wordUI)
  *	head:string,
  *	lemma:string,
  *	postag:string,
- *	deprel:string,
- *	parent:word,
- *	kids:word[],
- *  isPunctuation:bool
  *}
  * returneaza un Container
  */
@@ -1183,14 +1238,24 @@ function haveAllConnectedWords()
  */
 function drawTree()
 {
-	var bmp =  new createjs.Bitmap(null);
-	stage.addChild(bmp);
+	treeBg =  new createjs.Bitmap(null);
+	stage.addChild(treeBg);
+	treeBg.x = window.innerWidth/2 - 525;
 	var img = new Image();
-	img.src = "assets/images/header_flash_extra_small.png";
+	//img.src = "assets/images/header_flash_extra_small.png";
+	img.src = "assets/images/tree.png";
 	img.onload = function (e) {
-    	bmp.image = (e.target);
+		treeBg.image = (e.target);
 	    stage.update();
 	};
+}
+function openMyProfile()
+{
+	$("#startGame").hide();
+	$("#gameContainer").hide();
+	$("#clasamentContainer").hide();
+	$("#myProfieContainer").show();
+	$("#sentenceText").text("Profilul meu");
 }
 /**
  * pentru debug

@@ -24,7 +24,7 @@
 %>
 	<script src="http://code.createjs.com/createjs-2013.12.12.min.js" type="text/javascript"></script>
 	<script src="http://code.jquery.com/jquery-2.1.0.min.js" type="text/javascript"></script>
-<!-- 	<meta name="viewport" content="width=1050, user-scalable=no" /> -->
+	<meta name="viewport" content="user-scalable=no" />
 	<script src="js/msdJS.js"></script>
 	<script src="js/game.js"></script>
 	<script>
@@ -35,7 +35,7 @@
   <div id="gameBox">
     <div id="gameStats">
       <div class="leftAlign">
-        <p id="user">${fn:escapeXml(user.nickname)}, Nivelul <span id="gameLevel">15</span><br/><span id="points">2134</span> puncte</p>
+        <p id="user"><a href="#" id="myProfile">${fn:escapeXml(user.nickname)}</a>, Nivelul <span id="gameLevel">15</span>:&nbsp;<span id="points">2134</span> puncte</p>
       </div>
       <div class="rightAlign">
         
@@ -74,11 +74,12 @@
     <div id="gameContainer">
     	<div id="buttonsContainer">
 	      <a class="myButton" id="back2SetupLevelBtn" title="Click pentru a reveni la pozitionare">Inapoi la pozitionare</a>
-	      <a class="myButton" id="deleteAllConnectionsBtn" title="Sterge toate conexiunile existente">Sterge toate conexiunile</a>
+ 	      <a class="myButton" id="deleteAllConnectionsBtn" title="Sterge toate conexiunile existente">Sterge toate conexiunile</a>
 	      <a class="myButton" id="nextLevelBtn" title="Click pentru a merge la nivelul urmator">Nivelul Urmator</a>
 	      <a class="myButton" id="next2ConnectionsBtn" title="Click pentru a intra in modul conexiuni">Conexiuni</a>
       </div>
     	<span id="statusText">&nbsp;</span>
+    	<hr id="boardLine" />
 	    <canvas id="gameCanvas" width="1050" height="650">
 	      Browserul dvs nu este suportat. Recomandam Chrome, Firefox sau Internet Explorer 11.
 	    </canvas>
@@ -99,6 +100,23 @@
     		</tbody>
     	</table>
     </div>
+  	<div id="myProfieContainer">
+  		<button class="myButton">&laquo;Inapoi</button>
+  		<form id="myProfileForm" action="#">
+  			<fieldset>
+  				<legend>profilul meu</legend>
+  				Nume de afișat: <input id="nicknameTextInput" type="text" maxlength="25" value="${fn:escapeXml(user.nickname)}"/><br/>
+  				Școala/Liceul/Facultatea: <input id="schoolTextInput" type="text" maxlength="150"/><br/>
+  			</fieldset>
+  			<fieldset>
+  				<legend>realizările mele</legend>
+  				<p>Elemente cucerite:</p>
+  				<span id="elementeCucerite">&nbsp;</span>		
+  			</fieldset>
+  		</form>
+  		
+  		
+  	</div>
   </div>
   <div class="modalDialog">
       <div id="firstHelpTip" title="Apasă pentru a închide">
@@ -109,9 +127,15 @@
         <p>Conectează cuvintele respectînd ordinea sintactică!</p>
         <p><img src="assets/images/hint_conectare.png" alt="cuvinte conectate"/><br/>Dublu click pe un cuvant pentru a-l conecta</p>
       </div>
-      <div id="deleteDialog" title="Apasă pentru a închide">
-        <p>Vrei sa stergi aceasta conexiune?</p>
-        <a class="myButton" id="deleteConnectionBtn">Sterge</a>&nbsp;&nbsp;<a class="myButton" id="cancelDeleteConnectionBtn">Anulează</a>
+      <div id="deleteDialog">
+        <p>Vrei să ștergi această relație?</p>
+        <a class="myButton" id="deleteConnectionBtn">Șterge</a>&nbsp;&nbsp;<a class="myButton" id="cancelDeleteConnectionBtn">Anulează</a>
+      </div>
+      <div id="deleteAllDialog">
+        <p>Vrei să ștergi toate relațiile?</p>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+        <a class="myButton" id="deleteAllConfirmConnectionBtn">Șterge</a>&nbsp;&nbsp;<a class="myButton" id="cancelDeleteAllConnectionBtn">Anulează</a>
       </div>
       <div id="samelevelDialog" title="Apasă pentru a închide">
         <p>Nu ai obtinut suficient puncte pentru a trece la nivelul urmator. Mai încearcă!</p>

@@ -8,7 +8,7 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <appengine.target.version>1.9.4</appengine.target.version>
+    <appengine.target.version>1.9.6</appengine.target.version>
   </properties>
 
   <build>
@@ -18,6 +18,11 @@
                   <groupId>com.google.appengine</groupId>
                   <artifactId>appengine-maven-plugin</artifactId>
                   <version>${appengine.target.version}</version>
+				  <configuration>
+					 <enableJarClasses>false</enableJarClasses>
+					 <port>8080</port>
+					 <address>0.0.0.0</address>
+				  </configuration>
               </plugin>
           </plugins>
       </pluginManagement>
