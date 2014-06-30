@@ -297,11 +297,22 @@ a:visited{
 	position: absolute;
 	top: 150px;
 	left: 0;
-	width: 100%;
-	margin: 0;
-	padding: 0;
+	right: 0;
+	padding: 20px;
+	margin:10px;
 }
-#myProfileForm
+#myProfile
 {
-	width: 100%;
+	text-decoration: underline;
+}
+#myProfieContainer label
+{
+	display:block;
+	width: 500px;
+}
+#myProfieContainer input
+{
+	float:right;
+	width: 250px;
+	font-family: HammersmithOne;
 }

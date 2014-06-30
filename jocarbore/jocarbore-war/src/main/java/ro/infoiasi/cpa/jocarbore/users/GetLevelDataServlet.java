@@ -52,6 +52,12 @@ public class GetLevelDataServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		User user = Utils.getCurrentUser();
+		if(null == user)
+		{
+			resp.sendError(401);
+			return;
+		}
 		ServletInputStream is = req.getInputStream();
 		BufferedReader br = new BufferedReader( new InputStreamReader(is) );
 		String jsonStr, line = br.readLine();
@@ -62,12 +68,7 @@ public class GetLevelDataServlet extends HttpServlet {
 		{
 			jsonStr += line;
 		}
-		User user = Utils.getCurrentUser();
-		if(null == user)
-		{
-			resp.sendError(401);
-			return;
-		}
+		
 		
 		
 		

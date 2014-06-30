@@ -126,18 +126,62 @@ function init () {
 	$("#myProfieContainer>.myButton").click(saveMyProfile);
 }
 
+function trimmSpaces(value)
+{
+	if(!value)
+	{
+		return null;
+	}
+	return value.split(" ").join("");
+}
 
 function saveMyProfile()
 {
-	var nick = $("#nicknameTextInput").value();
-	var school = $("#schoolTextInput").value();
-	$.ajax({
-		url:"myprofile",
-		type:"POST",
-		data:"{\"nick\":\"" + nick + "\", \"school\":\"" + school + "\"}"
-	}).done(function(){
-		displayValidationError("Profilul a fost salvat!");
-	});
+	var nick = $("#nicknameTextInput").val();
+	var school = $("#schoolTextInput").val();
+
+	if(nick == oldNick && school == oldSchool)
+	{
+		goToHome();
+		return;
+	}
+	
+	
+	if(!trimmSpaces(nick))
+	{
+		displayValidationError("Numele de utilizator lipseste");
+		return;
+	}
+	var nick_validation =  nick.match(/^[a-zA-Z0-9_.]{3,25}$/);
+	if(!nick_validation || nick_validation[0] != nick)
+	{
+		displayValidationError("Numele de utilizator trebuie sa contina doar caractere alfanumerice sau punct");
+		return;
+	}
+	
+	if(!trimmSpaces(school))
+	{
+		school = "fără școală";
+	}else
+	{
+		if(school.match(/^[a-zA-ZȘșȚțăĂîÎâÂ 0-9_.-]{3,50}$/)[0] != school){
+			displayValidationError("Numele de utilizator trebuie sa contina doar caractere alfanumerice, punct sau cratimă");
+			return;
+		}
+		
+		$.ajax({
+			contentType:"application/x-www-form-urlencoded; charset=UTF-80",
+			url:"myprofile",
+			type:"POST",
+			data:"{\"nick\":\"" + nick + "\", \"school\":\"" + school + "\"}"
+		}).done(function(){
+			displayValidationError("Profilul a fost salvat!");
+			$("#myProfile").text(nick);
+		});
+	}
+	
+	
+	
 	goToHome();
 }
 
@@ -1249,8 +1293,12 @@ function drawTree()
 	    stage.update();
 	};
 }
+var oldNick;
+var	oldSchool; 
 function openMyProfile()
 {
+	oldNick = $("#nicknameTextInput").val();
+	oldSchool = $("#schoolTextInput").val();
 	$("#startGame").hide();
 	$("#gameContainer").hide();
 	$("#clasamentContainer").hide();

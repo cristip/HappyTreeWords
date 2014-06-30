@@ -27,6 +27,14 @@
     	<servlet-name>nightlyreport</servlet-name>
     	<servlet-class>ro.infoiasi.cpa.jocarbore.admin.NightlyReportServlet</servlet-class>
     </servlet>
+    <servlet>
+    	<servlet-name>myprofile</servlet-name>
+    	<servlet-class>ro.infoiasi.cpa.jocarbore.users.SaveUserProfileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+    	<servlet-name>myprofile</servlet-name>
+    	<url-pattern>/myprofile</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
     	<servlet-name>topjucatori</servlet-name>
     	<url-pattern>/topjucatori</url-pattern>

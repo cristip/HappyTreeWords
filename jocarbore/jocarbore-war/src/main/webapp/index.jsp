@@ -18,6 +18,9 @@
 	if (user != null) {
     	pageContext.setAttribute("user", user);
     	Map<String, String> userProfileMap = GameUserProfileService.getInstance().getUserProfile();
+    	pageContext.setAttribute("userName", userProfileMap.get(Utils.USERNAME_FIELD_NAME));
+    	pageContext.setAttribute("userSchool", userProfileMap.get(Utils.SCHOOL_FIELD_NAME));
+    	
     	Boolean hasPlayedBefore = Integer.parseInt( userProfileMap.get("level")) == 0 && Integer.parseInt( userProfileMap.get("points")) == 0;
     	pageContext.setAttribute("userProfile", Utils.jsonFromMap(userProfileMap));
     	
@@ -35,7 +38,7 @@
   <div id="gameBox">
     <div id="gameStats">
       <div class="leftAlign">
-        <p id="user"><a href="#" id="myProfile">${fn:escapeXml(user.nickname)}</a>, Nivelul <span id="gameLevel">15</span>:&nbsp;<span id="points">2134</span> puncte</p>
+        <p id="user"><a href="#" id="myProfile">${fn:escapeXml(userName == null?user.nickname:userName)}</a>, Nivelul <span id="gameLevel">15</span>:&nbsp;<span id="points">2134</span> puncte</p>
       </div>
       <div class="rightAlign">
         
@@ -102,18 +105,52 @@
     </div>
   	<div id="myProfieContainer">
   		<button class="myButton">&laquo;Inapoi</button>
-  		<form id="myProfileForm" action="#">
   			<fieldset>
   				<legend>profilul meu</legend>
-  				Nume de afișat: <input id="nicknameTextInput" type="text" maxlength="25" value="${fn:escapeXml(user.nickname)}"/><br/>
-  				Școala/Liceul/Facultatea: <input id="schoolTextInput" type="text" maxlength="150"/><br/>
+  				<label for="nicknameTextInput">Nume de afișat: <input id="nicknameTextInput" type="text" maxlength="25" required="required" value="${fn:escapeXml(userName == null? "" :  userName)}"/></label><br/>
+  				<label for="schoolTextInput">Școala/Liceul/Facultatea: <input id="schoolTextInput" type="text" maxlength="150" value="${fn:escapeXml(userSchool == null? "fara scoala" :  userSchool)}"/></label><br/>
   			</fieldset>
   			<fieldset>
-  				<legend>realizările mele</legend>
+  				<legend>Nivel ierahic</legend>
   				<p>Elemente cucerite:</p>
+  				<p>
+  				<%
+  				int level = Integer.parseInt( userProfileMap.get("level"));
+  				switch(level)
+  				{
+  				case 0:
+  					%>Ucenic: Abia am ajuns aici!<%
+  					break;
+  				case 1:
+  					%>Junior: Încep să descopăr împrejurimile!<%
+  					break;
+  				case 2:
+  				case 3:
+  					%>Explorator: Încep să cunosc zona!<%
+  					break;
+  				case 4:
+  				case 5:
+  				case 6:
+  					%>Agent: Cunosc împrejurimile!<%
+  					break;
+  				case 7:
+  				case 8:
+  				case 9:
+  					%>Agent superior: Cunosc zona!<%
+  					break;
+  				case 10:
+  				case 11:
+  				case 12:
+  					%>Senior!<%
+  					break;
+  				default:
+  					%>Campion!<%
+  				}
+  				
+  				%>
+  				</p>
   				<span id="elementeCucerite">&nbsp;</span>		
   			</fieldset>
-  		</form>
   		
   		
   	</div>

@@ -25,6 +25,7 @@ public class Utils {
 	public static final String GAME_SESSION_ENTITY	= "GameSession";
 	public static final String EMAIL_FIELD_NAME		= "email";
 	public static final String USERNAME_FIELD_NAME	= "name";
+	public static final String SCHOOL_FIELD_NAME 	= "scoala";
 	public static final String UTF8					= "utf-8";
 	
 	public static User getCurrentUser()

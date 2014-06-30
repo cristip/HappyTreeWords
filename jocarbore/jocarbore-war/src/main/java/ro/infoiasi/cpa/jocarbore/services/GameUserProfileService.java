@@ -82,11 +82,40 @@ public final class GameUserProfileService extends AbstractService {
 			}
 			profileMap.put(LEVEL_FIELD_NAME, userEntity.getProperty(LEVEL_FIELD_NAME).toString());
 			profileMap.put(POINTS_FIELD_NAME, userEntity.getProperty(POINTS_FIELD_NAME).toString());
+			Object nameValue = userEntity.getProperty(Utils.USERNAME_FIELD_NAME);
+			if(null == nameValue)
+			{
+				profileMap.put(Utils.USERNAME_FIELD_NAME, null);
+			}else
+			{
+				profileMap.put(Utils.USERNAME_FIELD_NAME, nameValue.toString());
+			}
+			Object schoolValue = userEntity.getProperty(Utils.SCHOOL_FIELD_NAME);
+			if(null == schoolValue)
+			{
+				profileMap.put(Utils.SCHOOL_FIELD_NAME, null);
+			}else
+			{
+				profileMap.put(Utils.SCHOOL_FIELD_NAME, schoolValue.toString());
+				
+			}
 		}
 		userEntity.setProperty("lastplaydate", time);
 		update(userEntity);
 		return profileMap;
 		
+	}
+	/**
+	 * updates the data for the user having the email from the profile map
+	 * @param pofile as defined in getProfileMap
+	 * @see getProfileMap
+	 */
+	public void updateUserProfile(Map<String, String> profile)
+	{
+		Entity userEntity = getSingle(Utils.USER_ENTITY, Utils.EMAIL_FIELD_NAME, profile.get(Utils.EMAIL_FIELD_NAME));
+		userEntity.setProperty(Utils.USERNAME_FIELD_NAME, profile.get(Utils.USERNAME_FIELD_NAME));
+		userEntity.setProperty(Utils.SCHOOL_FIELD_NAME, profile.get(Utils.SCHOOL_FIELD_NAME));
+		update(userEntity);
 	}
 	
 	public void recordGameSession(User user, int level, int points, String connections, String screenData)
@@ -242,6 +271,17 @@ public final class GameUserProfileService extends AbstractService {
 		
 				
 		return users;
+	}
+	/**
+	 * defines the content of the profile map
+	 * @return a map containing email, name and school
+	 */
+	public Map<String, String> getProfileMap() {
+		Map<String, String> profileMap = new HashMap<String, String>();
+		profileMap.put(Utils.EMAIL_FIELD_NAME, null);
+		profileMap.put(Utils.USERNAME_FIELD_NAME, null);
+		profileMap.put(Utils.SCHOOL_FIELD_NAME, null);
+		return profileMap;
 	}
 
 }
